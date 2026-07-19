@@ -1,0 +1,12 @@
+[build]
+  publish = "dist"
+
+[[edge_functions]]
+  path = "/"
+  function = "invite-preview"
+
+# SPA-style: unknown paths fall back to index (so ?i=slug always resolves)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
