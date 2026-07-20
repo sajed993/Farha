@@ -147,6 +147,7 @@ function openPaySheet(item,price){closePay();S._submitting=false;S._pay={item:St
  d.innerHTML=`<div class="paysheet">
   <div class="payhead"><b>${esc(item)}</b><span class="payprice">${price}${cur}</span></div>
   <p class="paysub">📲 ${t().payChoose}</p>
+  <input class="payphone" id="payName" maxlength="60" placeholder="${S.lang==='ar'?'👤 اسمكم الكامل — لكي نعرف صاحب الطلب':'👤 Your full name'}" value="${esc(S._cname||'')}" style="margin-bottom:8px">
   <input class="payphone" id="payPhone" inputmode="tel" maxlength="16" placeholder="${S.lang==='ar'?'🟢 رقم واتسابكم — نرسل عليه رابط دعوتكم بعد تأكيد الدفع':'🟢 Your WhatsApp — your invitation link arrives after payment'}" value="${esc(S._phone||'')}">
   <div class="paytabs">
    <button class="paytab on" data-m="d17" onclick="payTab('d17')">💳 D17</button>
@@ -194,8 +195,11 @@ function payCopy(){const n=String(CFG.d17||'').replace(/\D/g,'');const done=()=>
 function _slimSt(st){try{const s=JSON.parse(JSON.stringify(st||S.st||{}));s.photos=[];s.video=null;s.track=null;return s;}catch(e){return {};}}
 function payProof(){const p=S._pay||{};
  if(S._submitting)return;                       // hard guard: no double-submit
+ const nm=((document.getElementById('payName')||{}).value||'').trim();
+ if(nm.length<2){toast(S.lang==='ar'?'👤 اكتبوا اسمكم أولًا':'👤 Enter your name first');const e=document.getElementById('payName');if(e)e.focus();return;}
  const ph=((document.getElementById('payPhone')||{}).value||'').trim();const phn=ph.replace(/\D/g,'');
  if(phn.length<8){toast(S.lang==='ar'?'🟢 أدخلوا رقم واتسابكم أولًا — عليه تصلكم الدعوة':'🟢 Enter your WhatsApp number first');const e=document.getElementById('payPhone');if(e)e.focus();return;}
+ S._cname=nm;
  S._submitting=true;setTimeout(()=>{S._submitting=false;},4000);
  try{const _b=document.querySelector('.payproof');if(_b){_b.disabled=true;_b.style.opacity=.6;}}catch(e){}
  S._phone=ph;
@@ -223,7 +227,7 @@ function payProof(){const p=S._pay||{};
   try{ st = (hasMedia && window.__uploadEventMedia) ? await window.__uploadEventMedia(baseSt) : _slimSt.call({},baseSt); }
   catch(e){ st = {photos:[],video:null,track:null}; }
   const payload=Object.assign({design:designSnap,c:cSnap,st:st,uIdx:uIdxSnap},extra);
-  dbHook('order',{item:String(p.item),price:p.price,phone:phn,ref:(m==='rib'?(p.ref||''):''),method:m,payload:payload});
+  dbHook('order',{item:String(p.item),price:p.price,phone:phn,customer_name:nm,ref:(m==='rib'?(p.ref||''):''),method:m,payload:payload});
   if(hasMedia)toast(S.lang==='ar'?'📨 استلمنا طلبكم بصوركم — بعد تأكيد الدفع تصلكم دعوتكم 💛':'📨 Order received with your media ✓');
  })();}
 window.addEventListener('storage',function(e){if(e&&e.key&&(e.key===LSK.cfg||e.key===LSK.wishes)){try{loadCFG();render();}catch(x){}}});

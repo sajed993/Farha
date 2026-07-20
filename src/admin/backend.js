@@ -4,7 +4,7 @@
 // Without: the login gate, or local demo mode.
 import { sb } from '../shared/supabase.js'
 
-let dbOrders = [], dbWishes = [], dbRsvps = [], dbInvitations = []
+let dbOrders = [], dbWishes = [], dbRsvps = [], dbInvitations = [], dbEvents = []
 const $ = (id) => document.getElementById(id)
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]))
 const E = (s) => (window.escA ? window.escA(s) : esc(s))
@@ -57,25 +57,59 @@ async function doLogin() {
 }
 
 /* ---------- cloud mode ---------- */
+let __origTitle = (typeof document !== 'undefined' && document.title) || 'فرحة'
+let __titleFlash = null
+function notifyNewOrder (row) {
+  try {
+    const item = (row && row.item) || 'طلب جديد'
+    const price = (row && row.price) ? (' — ' + row.price + ' د.ت') : ''
+    // 1) toast
+    try { toast('🔔 طلب جديد: ' + item + price) } catch (e) {}
+    // 2) flashing browser-tab title (so you notice even on another tab)
+    try {
+      clearInterval(__titleFlash)
+      let on = true
+      __titleFlash = setInterval(() => { document.title = on ? ('🔔 طلب جديد! — فرحة') : __origTitle; on = !on }, 900)
+      setTimeout(() => { clearInterval(__titleFlash); document.title = __origTitle }, 12000)
+    } catch (e) {}
+    // 3) sound
+    try {
+      const a = new (window.AudioContext || window.webkitAudioContext)()
+      ;[880, 1175].forEach((f, i) => {
+        const o = a.createOscillator(); const g = a.createGain()
+        o.frequency.value = f; g.gain.value = 0.09
+        o.connect(g).connect(a.destination); o.start(a.currentTime + i * 0.18); o.stop(a.currentTime + i * 0.18 + 0.16)
+      })
+    } catch (e) {}
+    // 4) desktop notification (if the owner allowed it)
+    try {
+      if (window.Notification && Notification.permission === 'granted') {
+        new Notification('فرحة — طلب جديد 🔔', { body: item + price, tag: 'farha-order' })
+      }
+    } catch (e) {}
+  } catch (e) {}
+}
 let __fetching = false
 async function fetchAll() {
   if (__fetching) return
   __fetching = true
   try {
     // All four queries fire in PARALLEL (one round-trip instead of four).
-    const [o, w, r, iv] = await Promise.all([
+    const [o, w, r, iv, ev] = await Promise.all([
       sb.from('orders').select('*').order('created_at', { ascending: false }).limit(200),
       sb.from('wishes').select('*').order('created_at', { ascending: false }).limit(200),
       sb.from('rsvps').select('*').order('created_at', { ascending: false }).limit(500),
       sb.from('invitations').select('*').order('created_at', { ascending: false }).limit(300),
+      sb.from('events').select('*').order('created_at', { ascending: false }).limit(2000),
     ])
     if (o && !o.error && Array.isArray(o.data)) dbOrders = o.data
     if (w && !w.error && Array.isArray(w.data)) dbWishes = w.data
     if (r && !r.error && Array.isArray(r.data)) dbRsvps = r.data
     if (iv && !iv.error && Array.isArray(iv.data)) dbInvitations = iv.data
+    if (ev && !ev.error && Array.isArray(ev.data)) dbEvents = ev.data
   } catch (e) { console.warn('[farha db] fetchAll', e && e.message) }
   __fetching = false
-  window.__dbRows = { orders: dbOrders, rsvps: dbRsvps, wishes: dbWishes, invitations: dbInvitations }
+  window.__dbRows = { orders: dbOrders, rsvps: dbRsvps, wishes: dbWishes, invitations: dbInvitations, events: dbEvents }
   try { if (typeof window.renderContent === 'function') window.renderContent() } catch (e) {}
 }
 // realtime bursts can call fetchAll many times/sec — coalesce to one call / 800ms
@@ -100,15 +134,22 @@ function ordersFiltered () {
     if (__ordF === 'delivered' && !o.inv_slug) return false
     if (__ordF === 'undelivered' && o.inv_slug) return false
     if (!__ordQ) return true
-    const hay = [o.id, o.item, o.phone, o.ref, (o.payload && o.payload.c && o.payload.c.n)].join(' ').toLowerCase()
+    const hay = [o.id, o.item, o.phone, o.ref, orderName(o)].join(' ').toLowerCase()
     return hay.includes(__ordQ)
   })
 }
-function ordersListHTML () {
+function orderName (o) {
+    try {
+      const p = o.payload || {}
+      const c = p.c || {}
+      return (o.customer_name || c.n || c.name || p.name || '').toString().trim()
+    } catch (e) { return '' }
+  }
+  function ordersListHTML () {
   const list = ordersFiltered()
   if (!list.length) return `<p class="cmut">لا نتائج مطابقة.</p>`
   return list.slice(0, 80).map((o) => `<div class="ctlrow" style="align-items:flex-start">
-      <span><b>#${o.id}</b> · ${E(o.item)} — ${o.price} د.ت<br>
+      <span>${orderName(o) ? '<b style="color:#8A6210;font-size:1.02em">👤 ' + E(orderName(o)) + '</b><br>' : ''}<b>#${o.id}</b> · ${E(o.item)} — ${o.price} د.ت<br>
       <small style="color:#8A7A63">${new Date(o.created_at).toLocaleString('ar-TN')}${o.phone ? ' · 📱 ' + E(o.phone) : ''}${o.method ? ' · ' + ({d17:'💳 D17',flouci:'📱 Flouci',rib:'🏦 تحويل بنكي'}[o.method] || o.method) : ''}${o.ref ? ' · 🧾 <b style="color:#8A6210">' + E(o.ref) + '</b>' : ''}</small><br>
       ${o.inv_slug
         ? `<small style="color:#2F6B3A">🎁 دعوة جاهزة: ?i=${E(o.inv_slug)} · 👥 ${dbRsvps.filter(r => r.inv_slug === o.inv_slug).length} ردًا</small><br>
@@ -332,6 +373,23 @@ function enterDb() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'wishes' }, () => fetchAllDebounced())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'rsvps' }, () => fetchAllDebounced())
       .subscribe()
+    // LIVE visitor presence: count everyone currently on the customer site
+    try {
+      const pres = sb.channel('presence-site', { config: { presence: { key: 'dashboard-' + Math.random().toString(36).slice(2) } } })
+      pres.on('presence', { event: 'sync' }, () => {
+        try {
+          const state = pres.presenceState()
+          // count non-dashboard keys
+          let n = 0
+          Object.keys(state).forEach((k) => { if (k.indexOf('dashboard-') !== 0) n += (state[k] || []).length })
+          window.__liveCount = n
+          const el = document.getElementById('liveDot')
+          if (el) el.textContent = String(n)
+          if (S.tab === 'ana' && typeof window.renderContent === 'function') { /* live number updates via el */ }
+        } catch (e) {}
+      })
+      pres.subscribe()
+    } catch (e) {}
   } catch (e) {}
 }
 

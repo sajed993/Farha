@@ -84,6 +84,7 @@ function _ordersView0(){
  </div>`;}
 
 function invView(){
+ if(window.__dbMode&&window.__dbRows){return invViewReal();}
  let list=INV;
  if(S.q)list=list.filter(i=>(i.n+i.tpl).includes(S.q));
  return `<div class="card">
@@ -118,6 +119,7 @@ function tplView(){
    </div>`).join('')}</div></div>`;}
 
 function guestsView(){
+ if(window.__dbMode&&window.__dbRows){return guestsViewReal();}
  let list=GUESTS;if(S.q)list=list.filter(g=>g.n.includes(S.q));
  const yes=list.filter(g=>g.st==='سيحضر').length,no=list.filter(g=>g.st==='معتذر').length,w=list.length-yes-no;
  return `<div class="card">
@@ -131,6 +133,42 @@ function guestsView(){
    <td style="font-family:var(--num)">${g.react?'❤️ '+fmtN(g.react):'—'}</td>
    <td>${g.st==='لم يرد'?`<button class="act" onclick="toast('أُرسل تذكير لطيف إلى ${esc(g.n)} 💌')">إرسال تذكير</button>`:'—'}</td></tr>`).join('')}
   </tbody></table></div>`;}
+
+function invViewReal(){
+ const R=window.__dbRows;const evs=R.events||[];
+ let list=(R.invitations||[]).slice();
+ if(S.q)list=list.filter(i=>JSON.stringify(i.config||{}).includes(S.q)||(i.slug||'').includes(S.q));
+ const cnt=(slug,k)=>evs.filter(e=>e.inv_slug===slug&&e.kind===k).length;
+ const rsvpFor=(slug)=>(R.rsvps||[]).filter(r=>r.inv_slug===slug);
+ if(!list.length)return `<div class="card"><h3>💌 الدعوات المُنشأة</h3><p class="cmut">لا دعوات بعد — ستظهر هنا فور تسليم أول طلب.</p></div>`;
+ return `<div class="card">
+  <h3>💌 الدعوات المُنشأة <span class="sub">${fmtN(list.length)} دعوة — حيّة</span></h3>
+  <table class="tbl"><thead><tr><th>الدعوة</th><th>الرابط</th><th>مشاهدات</th><th>فُتحت</th><th>سيحضر / معتذر</th><th></th></tr></thead>
+  <tbody>${list.map(i=>{const nm=(i.config&&i.config.c&&i.config.c.n)||i.slug;const rs=rsvpFor(i.slug);const yes=rs.filter(x=>x.attending!==false).length;const no=rs.length-yes;return `<tr>
+   <td><b style="font-family:var(--serif)">${escA(nm)}</b></td>
+   <td style="color:var(--taupe);font-family:var(--num)">?i=${escA(i.slug)}</td>
+   <td style="font-family:var(--num)">${fmtN(cnt(i.slug,'view')+cnt(i.slug,'open'))}</td>
+   <td style="font-family:var(--num)">${fmtN(cnt(i.slug,'reveal'))}</td>
+   <td><span class="bdg b-yes">${fmtN(yes)}</span> <span class="bdg b-no">${fmtN(no)}</span></td>
+   <td style="white-space:nowrap"><button class="act" onclick="dbCopyLink('${escA(i.slug)}')">🔗 رابط</button>
+    <button class="act" onclick="dbEditFull('${escA(i.slug)}')">🎨 تعديل</button></td>
+  </tr>`;}).join('')}</tbody></table></div>`;}
+function guestsViewReal(){
+ const R=window.__dbRows;let list=(R.rsvps||[]).slice();
+ if(S.q)list=list.filter(g=>(g.name||'').includes(S.q));
+ const yes=list.filter(g=>g.attending!==false).length,no=list.length-yes;
+ const invName=(slug)=>{const iv=(R.invitations||[]).find(x=>x.slug===slug);return (iv&&iv.config&&iv.config.c&&iv.config.c.n)||slug||'—';};
+ return `<div class="card">
+  <h3>👥 الضيوف والردود <span class="sub">${fmtN(list.length)} رد — حيّ</span></h3>
+  <div class="mini-stat" style="margin-bottom:14px">
+   <span>سيحضر <b>${fmtN(yes)}</b></span><span>معتذر <b>${fmtN(no)}</b></span>
+   <span style="margin-inline-start:auto"></span></div>
+  ${list.length?`<table class="tbl"><thead><tr><th>الضيف</th><th>الدعوة</th><th>الرد</th><th>عدد</th><th>رسالة</th></tr></thead>
+  <tbody>${list.map(g=>`<tr><td><b>${escA(g.name||'ضيف')}</b></td><td style="color:var(--taupe)">${escA(invName(g.inv_slug))}</td>
+   <td><span class="bdg ${g.attending!==false?'b-yes':'b-no'}">${g.attending!==false?'سيحضر':'معتذر'}</span></td>
+   <td style="font-family:var(--num)">${toAr(g.guests||1)}</td>
+   <td style="color:var(--taupe);max-width:200px">${escA((g.message||'').slice(0,60))}</td></tr>`).join('')}
+  </tbody></table>`:'<p class="cmut">لا ردود بعد.</p>'}</div>`;}
 
 function wishView(){return realWishesHTML()+_wishView0();}
 function _wishView0(){
@@ -146,38 +184,61 @@ function _wishView0(){
 ;
 
 function anaView(){
- const r=S.range;
- const vws=VIEWS.slice(-r),ops=OPENS.slice(-r);
- const received=Math.round(sum(vws)*1.35),opened=sum(ops),
-  replied=Math.round(opened*0.42),attended=Math.round(replied*0.74);
- const fun=[['وصلت الدعوة',received,100],['فُتحت (سينمائيًا)',opened,Math.round(opened/received*100)],
-  ['ردّوا على RSVP',replied,Math.round(replied/received*100)],['قالوا «سأحضر»',attended,Math.round(attended/received*100)]];
- const ANIMS=[['💌 الظرف الملكي',86],['🚪 أبواب القصر',132],['🦋 حكاية الفراشة',118],['🌹 تساقط الورود',64],
-  ['🎀 الشريط الحريري',49],['✨ غبار السحر',71],['🌅 الغروب الذهبي',94],['🎭 الستارة الملكية',38]].sort((a,b)=>b[1]-a[1]);
- const mxA=ANIMS[0][1];
- const DEV=[{l:'هاتف',v:71,c:'#B98A2F'},{l:'حاسوب',v:22,c:'#C4827A'},{l:'لوحي',v:7,c:'#7C9482'}];
+ const R=(window.__dbMode&&window.__dbRows)?window.__dbRows:null;
+ const r=S.range||7;
+ if(!R){return `<div class="card"><h3>📊 التحليلات</h3><p class="cmut">سجّلوا الدخول السحابي ☁️ لعرض بيانات زوّاركم الحقيقية.</p></div>`;}
+ const now=Date.now(),DAY=86400000,from=now-r*DAY;
+ const evs=(R.events||[]).filter(e=>e.created_at&&new Date(e.created_at).getTime()>=from);
+ const ords=(R.orders||[]).filter(o=>o.created_at&&new Date(o.created_at).getTime()>=from);
+ const rsvps=(R.rsvps||[]);
+ const views=evs.filter(e=>e.kind==='view').length;
+ const opens=evs.filter(e=>e.kind==='open').length;
+ const reveals=evs.filter(e=>e.kind==='reveal').length;
+ const replied=rsvps.length;
+ const attending=rsvps.filter(x=>x.attending!==false).length;
+ const revenue=ords.filter(o=>o.status==='مدفوع'||o.inv_slug).reduce((a,o)=>a+(+o.price||0),0);
+ // daily series for views vs opens
+ const days=[];for(let i=r-1;i>=0;i--){const d0=now-i*DAY;const k=new Date(d0).toISOString().slice(0,10);days.push(k);}
+ const dayCount=(kind)=>days.map(k=>evs.filter(e=>e.kind===kind&&(e.created_at||'').slice(0,10)===k).length);
+ const vSeries=dayCount('view'),oSeries=dayCount('open');
+ // device split from real events
+ const dev={phone:0,tablet:0,desktop:0};evs.forEach(e=>{const d=e.device||'phone';if(dev[d]!=null)dev[d]++;});
+ const devTot=dev.phone+dev.tablet+dev.desktop||1;
+ const DEV=[{l:'هاتف',v:Math.round(dev.phone/devTot*100),c:'#B98A2F'},{l:'حاسوب',v:Math.round(dev.desktop/devTot*100),c:'#C4827A'},{l:'لوحي',v:Math.round(dev.tablet/devTot*100),c:'#7C9482'}];
+ // funnel from real data
+ const fun=[['👁️ زاروا الموقع',views,100],
+  ['💌 فتحوا الدعوة',opens,views?Math.round(opens/views*100):0],
+  ['🎬 شاهدوا الافتتاح',reveals,views?Math.round(reveals/views*100):0],
+  ['✍️ ردّوا (RSVP)',replied,views?Math.round(replied/views*100):0],
+  ['🎉 سيحضرون',attending,views?Math.round(attending/views*100):0]];
+ const live=window.__liveCount||0;
  return `
- <div class="chips">${[7,30,90].map(x=>`<button class="chip ${S.range===x?'on':''}" onclick="S.range=${x};renderContent()">آخر ${toAr(x)} ${x===7?'أيام':'يومًا'}</button>`).join('')}</div>
- <div class="two">
-  <div class="card"><h3>👁️ المشاهدات مقابل الفتحات <span class="sub">آخر ${toAr(r)} يومًا</span></h3>
-   ${twoLines(vws,ops,720,200)}
-   <div class="legend"><i style="--c:#B98A2F">مشاهدات — <b style="font-family:var(--num)">${fmtN(sum(vws))}</b></i>
-    <i style="--c:#C4827A">فتحات — <b style="font-family:var(--num)">${fmtN(sum(ops))}</b></i></div></div>
-  <div class="card"><h3>📱 أجهزة الضيوف</h3>
-   <div class="donut-wrap">${donut(DEV.map(d=>({v:d.v,c:d.c})),'% من الزيارات')}
-    <div class="legend" style="flex-direction:column;align-items:start">${DEV.map(d=>`<i style="--c:${d.c}">${d.l} — <b style="font-family:var(--num)">${toAr(d.v)}%</b></i>`).join('')}</div></div></div>
+ <div class="chips">${[7,30,90].map(x=>`<button class="chip ${S.range===x?'on':''}" onclick="S.range=${x};renderContent()">آخر ${toAr(x)} ${x===7?'أيام':'يومًا'}</button>`).join('')}
+  <button class="cmini" onclick="dbRefresh()" style="margin-inline-start:auto">تحديث ↻</button></div>
+
+ <div class="statgrid" style="margin-bottom:14px">
+  <div class="card" style="text-align:center"><div style="font-size:1.8rem">🟢</div><b style="font-size:1.7rem;font-family:var(--num);color:#2F6B3A">${toAr(live)}</b><div class="sub">على الموقع الآن</div></div>
+  <div class="card" style="text-align:center"><div style="font-size:1.8rem">👁️</div><b style="font-size:1.7rem;font-family:var(--num)">${fmtN(views)}</b><div class="sub">زيارة</div></div>
+  <div class="card" style="text-align:center"><div style="font-size:1.8rem">💌</div><b style="font-size:1.7rem;font-family:var(--num)">${fmtN(opens)}</b><div class="sub">فتحة دعوة</div></div>
+  <div class="card" style="text-align:center"><div style="font-size:1.8rem">💰</div><b style="font-size:1.7rem;font-family:var(--num)">${fmtN(revenue)}</b><div class="sub">د.ت مؤكدة</div></div>
  </div>
+
  <div class="two">
-  <div class="card"><h3>🫙 قمع التفاعل <span class="sub">من الاستلام إلى الحضور</span></h3>
-   <div class="funnel">${fun.map(([l,v,p],i)=>`<div class="fun" style="--w:${100-i*14}%;opacity:${1-i*.08}">
-     <span>${l}</span><b>${fmtN(v)} · ${toAr(p)}%</b></div>`).join('')}</div></div>
-  <div class="card"><h3>🎬 شعبية الافتتاحيات</h3>
-   <div class="bars">${ANIMS.map(([l,v])=>`<div class="bar-row"><span>${l}</span><div class="tr"><div class="fl" style="width:${Math.round(v/mxA*100)}%"></div></div><b>${fmtN(v)}</b></div>`).join('')}</div></div>
+  <div class="card"><h3>👁️ الزيارات مقابل الفتحات <span class="sub">آخر ${toAr(r)} يومًا</span></h3>
+   ${(typeof twoLines==='function')?twoLines(vSeries.length?vSeries:[0],oSeries.length?oSeries:[0],720,200):''}
+   <div class="legend"><i style="--c:#B98A2F">زيارات — <b style="font-family:var(--num)">${fmtN(views)}</b></i>
+    <i style="--c:#C4827A">فتحات — <b style="font-family:var(--num)">${fmtN(opens)}</b></i></div></div>
+  <div class="card"><h3>📱 أجهزة الزوّار <span class="sub">حقيقية</span></h3>
+   ${devTot>1?`<div class="donut-wrap">${(typeof donut==='function')?donut(DEV.map(d=>({v:Math.max(d.v,0.001),c:d.c})),'% من الزيارات'):''}
+    <div class="legend" style="flex-direction:column;align-items:start">${DEV.map(d=>`<i style="--c:${d.c}">${d.l} — <b style="font-family:var(--num)">${toAr(d.v)}%</b></i>`).join('')}</div></div>`
+    :`<p class="cmut">لا زيارات بعد في هذه الفترة.</p>`}</div>
  </div>
- <div class="card"><h3>⏰ أفضل أوقات فتح الدعوات</h3>
-  <div class="bars">${[['صباحًا 8–12',34],['ظهرًا 12–4',52],['مساءً 4–8',88],['ليلًا 8–12',100],['بعد منتصف الليل',41]]
-   .map(([l,v])=>`<div class="bar-row"><span>${l}</span><div class="tr"><div class="fl" style="width:${v}%"></div></div><b>${toAr(v)}%</b></div>`).join('')}</div>
-  <p style="font-size:.78rem;color:var(--taupe);margin-top:12px;font-weight:600">💡 نصيحة: أرسلوا الدعوات بين 8 و10 ليلًا لأعلى نسبة فتح فوري.</p></div>`;}
+
+ <div class="card"><h3>🫙 قمع التفاعل <span class="sub">من الزيارة إلى الحضور — بيانات حقيقية</span></h3>
+  ${views?`<div class="funnel">${fun.map(([l,v,p],i)=>`<div class="fun" style="--w:${100-i*13}%;opacity:${1-i*.07}">
+    <span>${l}</span><b>${fmtN(v)} · ${toAr(p)}%</b></div>`).join('')}</div>`
+   :`<p class="cmut">لا بيانات بعد — شاركوا رابط موقعكم أو دعوةً ليبدأ العدّ فورًا.</p>`}</div>
+`;}
 
 function setView(){
  const c=S.cfg;

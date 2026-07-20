@@ -8,7 +8,7 @@ const TABLE = { order: 'orders', wish: 'wishes', rsvp: 'rsvps', event: 'events' 
 function rowFor(kind, d) {
   d = d || {}
   if (kind === 'order')
-    return { item: String(d.item || '').slice(0, 120), price: +d.price || 0, phone: d.phone ? String(d.phone).slice(0, 20) : null, ref: d.ref ? String(d.ref).slice(0,12) : null, method: d.method ? String(d.method).slice(0,10) : 'd17', payload: d.payload || null }
+    return { item: String(d.item || '').slice(0, 120), price: +d.price || 0, phone: d.phone ? String(d.phone).slice(0, 20) : null, customer_name: d.customer_name ? String(d.customer_name).slice(0, 60) : null, ref: d.ref ? String(d.ref).slice(0,12) : null, method: d.method ? String(d.method).slice(0,10) : 'd17', payload: d.payload || null }
   if (kind === 'wish')
     return { name: String(d.name || 'ضيف').slice(0, 40), body: String(d.body || '').slice(0, 200) }
   if (kind === 'rsvp')
@@ -21,13 +21,18 @@ function rowFor(kind, d) {
       message: String(d.message || '').slice(0, 300),
     }
   if (kind === 'event')
-    return { kind: String(d.kind || 'open').slice(0, 30) }
+    return {
+      kind: String(d.kind || 'open').slice(0, 30),
+      inv_slug: d.inv_slug ? String(d.inv_slug).slice(0, 64) : (window.__inviteSlug || null),
+      device: d.device || _device(),
+      path: (location.pathname + location.search).slice(0, 120),
+    }
   return null
 }
 
 // core columns guaranteed to exist even on a fresh base schema
 const CORE = {
-  order: (r) => ({ item: r.item, price: r.price, phone: r.phone }),
+  order: (r) => ({ item: r.item, price: r.price, phone: r.phone, customer_name: r.customer_name }),
   wish: (r) => ({ name: r.name, body: r.body }),
   rsvp: (r) => ({ attending: r.attending, guests: r.guests, message: r.message }),
   event: (r) => ({ kind: r.kind }),
@@ -39,7 +44,7 @@ async function send(kind, d) {
   if (!table || !row) return
   try {
     const { error } = await sb.from(table).insert(row)
-    if (!error) return
+    if (!error) { if (kind === "order") _notifyOwner(row); return }
     // A missing column (schema not fully migrated) rejects the whole row.
     // Never lose the order: retry with the core columns that always exist.
     console.warn('[farha db] full insert failed, retrying core:', error.message)
@@ -99,6 +104,7 @@ async function loadInvite () {
     const { data, error } = await sb.from('invitations').select('*').eq('slug', slug).eq('published', true).maybeSingle()
     if (error || !data) return
     window.__inviteSlug = slug
+    track('open', { inv_slug: slug })
     if (typeof window.__applyInvite === 'function') window.__applyInvite(data.config || {}, q.get('g') || '')
   } catch (e) {}
 }
@@ -187,8 +193,46 @@ window.__sbSaveTemplate = async function (name, config) {
   } catch (e) { return false }
 }
 
+
+/* ═══ real analytics: device + event tracking + live presence ═══ */
+function _device () {
+  try { const w = window.innerWidth; if (w <= 640) return 'phone'; if (w <= 1024) return 'tablet'; return 'desktop' } catch (e) { return 'phone' }
+}
+let _tracked = {}
+function track (kind, extra) {
+  try {
+    const key = kind + ((extra && extra.inv_slug) || '')
+    if (_tracked[key]) return
+    _tracked[key] = 1
+    if (window.__dbHook) window.__dbHook('event', Object.assign({ kind }, extra || {}))
+  } catch (e) {}
+}
+window.__track = track
+let _presence = null
+async function startPresence () {
+  try {
+    if (!sb || _presence) return
+    _presence = sb.channel('presence-site', { config: { presence: { key: 'v-' + Math.random().toString(36).slice(2) } } })
+    await _presence.subscribe(async (status) => {
+      if (status === 'SUBSCRIBED') await _presence.track({ at: Date.now(), device: _device(), slug: window.__inviteSlug || null })
+    })
+  } catch (e) {}
+}
+
+
+function _notifyOwner (row) {
+  try {
+    fetch("/.netlify/functions/notify-order", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ item: row.item, price: row.price, phone: row.phone, name: row.customer_name, method: row.method, ref: row.ref }),
+      keepalive: true,
+    }).catch(function () {})
+  } catch (e) {}
+}
+
 hookUp()
 loadCloudConfig()
 loadCloudWishes()
 setTimeout(loadInvite, 900)
+setTimeout(function () { track('view'); startPresence() }, 1200)
 setTimeout(loadForEdit, 1000)

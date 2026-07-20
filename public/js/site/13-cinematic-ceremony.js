@@ -243,7 +243,7 @@ function ceremonyMusic(){
  if(!(S.c.music&&S.c.autoplay))return;
  cerMusicOn=true;
  try{playMusic(S.c.music);}catch(e){}}
-function reveal(keepStage){
+function reveal(keepStage){try{window.__track&&window.__track("reveal",{inv_slug:window.__inviteSlug||null});}catch(e){}
  if(!veil)return;
  veil.classList.add('revealed');
  const a=S.c.anim,dz=getDesign();
