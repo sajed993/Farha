@@ -341,7 +341,7 @@ function demoAnim(i){
 function closeVeil(silent){
  const mv=veil&&veil.querySelector('#mv');if(mv){try{mv.pause()}catch(e){}}
  if(veil){veil.remove();veil=null;}
- document.body.style.overflow='';stopMusic();clearInterval(cdTimer);clearTimeout(showEndT);
+ document.body.style.overflow='';stopMusic();clearInterval(cdTimer);clearTimeout(showEndT);try{if(typeof ambT!=='undefined')clearInterval(ambT);}catch(e){}
  clearFilm();
  if(!silent&&demoBackup){S.design=demoBackup.design;S.c=demoBackup.c;demoBackup=null;}
  if(!silent&&S.view==='land')ambient();}

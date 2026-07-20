@@ -32,6 +32,43 @@ function loadCFG(){
  DESIGNS.forEach(d=>{const o=CFG.designs[d.id];d._hide=!!(o&&o.vis===false);
   if(o&&o.badge!==undefined)d.badge=o.badge;});
  try{lsSet(LSK.meta,{designs:DESIGNS.map(d=>({id:d.id,name:(d.name&&(d.name.ar||d.name))||('تصميم '+d.id),em:d.pet||'🎴'}))});}catch(e){}}
+window.__loadForEdit=function(cfg,slug){try{
+ cfg=cfg||{};
+ if(cfg.design!=null)S.design=cfg.design;
+ openEditor(S.design||1);
+ if(cfg.c)S.c={...S.c,...cfg.c};
+ if(cfg.st)S.st=Object.assign({},S.st||{},cfg.st);
+ S._editSlug=slug||null;S._editKind=cfg.kind||'design';S._editUidx=cfg.uIdx||0;
+ render();
+ setTimeout(()=>{try{showEditSaveBar();}catch(e){}},300);
+}catch(e){console.warn('loadForEdit',e&&e.message);}};
+function showEditSaveBar(){
+ if(document.getElementById('editSaveBar'))return;
+ const bar=document.createElement('div');bar.id='editSaveBar';
+ bar.innerHTML=`<span>✏️ ${S.lang==='ar'?'وضع تعديل الطلب':'Editing order'}${S._editSlug?' · '+S._editSlug:''}</span>
+  <span style="display:flex;gap:8px">
+   <button onclick="saveEditToInvite()">💾 ${S.lang==='ar'?'حفظ للزبون':'Save'}</button>
+   <button onclick="saveEditAsTemplate()">⭐ ${S.lang==='ar'?'حفظ كقالب':'Save as template'}</button>
+  </span>`;
+ document.body.appendChild(bar);
+}
+function _editConfig(){return {kind:S._editKind||'design',design:S.design||1,c:JSON.parse(JSON.stringify(S.c)),st:_slimSt(S.st),uIdx:S._editUidx||0};}
+window.saveEditToInvite=async function(){
+ if(!window.__sbSaveInvite||!S._editSlug){toast(S.lang==='ar'?'لا يمكن الحفظ هنا':'Cannot save');return;}
+ toast(S.lang==='ar'?'جارٍ الحفظ…':'Saving…');
+ const ok=await window.__sbSaveInvite(S._editSlug,_editConfig());
+ toast(ok?(S.lang==='ar'?'💾 حُفظ — يظهر فورًا للزبون':'Saved ✓'):(S.lang==='ar'?'تعذّر الحفظ':'Save failed'));
+ return ok;
+};
+window.saveEditAsTemplate=async function(){
+ if(!window.__sbSaveTemplate){toast('—');return;}
+ const nm=prompt(S.lang==='ar'?'اسم القالب الجاهز للبيع:':'Template name:','');
+ if(!nm)return;
+ toast(S.lang==='ar'?'جارٍ الحفظ…':'Saving…');
+ const ok=await window.__sbSaveTemplate(nm,_editConfig());
+ toast(ok?(S.lang==='ar'?'⭐ حُفظ كقالب جاهز':'Saved as template ✓'):(S.lang==='ar'?'تعذّر الحفظ':'Failed'));
+ return ok;
+};
 window.__applyInvite=function(cfg,guest){try{
  cfg=cfg||{};const k=cfg.kind||'design';
  if(cfg.c)S.c={...S.c,...cfg.c};
@@ -103,7 +140,7 @@ function payFlouci(){return String(CFG.flouci||CFG.d17||'').replace(/\D/g,'');}
 function payMethod(){return S._pay&&S._pay.method||'d17';}
 function waNum(){let n=String(CFG.wa||CFG_DEF.wa).replace(/\D/g,'');if(n.slice(0,2)==='00')n=n.slice(2);if(n.length===8)n='216'+n;return n;}
 function fmtD17(n){n=String(n||'').replace(/\D/g,'');const m=n.match(/^(\d{2})(\d{3})(\d{3})$/);return m?m[1]+' '+m[2]+' '+m[3]:n;}
-function openPaySheet(item,price){closePay();S._pay={item:String(item),price:price,ref:'FR'+Math.random().toString(36).slice(2,6).toUpperCase()};
+function openPaySheet(item,price){closePay();S._submitting=false;S._pay={item:String(item),price:price,ref:'FR'+Math.random().toString(36).slice(2,6).toUpperCase()};
  const d=document.createElement('div');d.className='payveil';d.id='payveil';
  d.onclick=function(e){if(e.target===d)closePay();};
  const cur=S.lang==='ar'?' د.ت':' DT';
@@ -156,8 +193,11 @@ function payCopy(){const n=String(CFG.d17||'').replace(/\D/g,'');const done=()=>
  else fallbackCopy(n,done);}
 function _slimSt(st){try{const s=JSON.parse(JSON.stringify(st||S.st||{}));s.photos=[];s.video=null;s.track=null;return s;}catch(e){return {};}}
 function payProof(){const p=S._pay||{};
+ if(S._submitting)return;                       // hard guard: no double-submit
  const ph=((document.getElementById('payPhone')||{}).value||'').trim();const phn=ph.replace(/\D/g,'');
  if(phn.length<8){toast(S.lang==='ar'?'🟢 أدخلوا رقم واتسابكم أولًا — عليه تصلكم الدعوة':'🟢 Enter your WhatsApp number first');const e=document.getElementById('payPhone');if(e)e.focus();return;}
+ S._submitting=true;setTimeout(()=>{S._submitting=false;},4000);
+ try{const _b=document.querySelector('.payproof');if(_b){_b.disabled=true;_b.style.opacity=.6;}}catch(e){}
  S._phone=ph;
  const m=p.method||'d17';
  // 1) open WhatsApp SYNCHRONOUSLY (popup blockers require this in the click handler)
@@ -292,12 +332,12 @@ function ambient(){clearInterval(ambT);
  for(let i=0;i<7;i++)spawnPetal(hero,true);
  ambT=setInterval(()=>{if(!document.querySelector('.hero')){clearInterval(ambT);return;}
   spawnDust(hero);spawnPetal(hero);},1400);}
-function spawnDust(host,init){const d=document.createElement('span');d.className='dust';
+function spawnDust(host,init){if(!host||!host.isConnected)return;const d=document.createElement('span');d.className='dust';
  const s=(2+Math.random()*4).toFixed(1);
  d.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;--dx:${(Math.random()*80-40).toFixed(0)}px;
   animation-duration:${(7+Math.random()*8).toFixed(1)}s;animation-delay:${init?(-Math.random()*8).toFixed(1):0}s`;
  host.appendChild(d);setTimeout(()=>d.remove(),16000);}
-function spawnPetal(host,init){const p=document.createElement('span');p.className='petal';
+function spawnPetal(host,init){if(!host||!host.isConnected)return;const p=document.createElement('span');p.className='petal';
  p.textContent=['🌸','🌺','✿'][Math.floor(Math.random()*3)];
  p.style.cssText=`left:${Math.random()*100}%;--dx:${(Math.random()*120-60).toFixed(0)}px;font-size:${(0.8+Math.random()*0.8).toFixed(2)}rem;
   animation-duration:${(9+Math.random()*7).toFixed(1)}s;animation-delay:${init?(-Math.random()*9).toFixed(1):0}s;opacity:.75`;

@@ -15,7 +15,7 @@ function rowFor(kind, d) {
     return {
       inv_slug: d.inv_slug ? String(d.inv_slug).slice(0, 64) : (window.__inviteSlug || null),
       attending: !!d.attending,
-      guests: Math.max(1, +d.guests || 1),
+      guests: Math.min(50, Math.max(1, Math.floor(+d.guests) || 1)),
       allergies: Array.isArray(d.allergies) ? d.allergies.slice(0, 10) : [],
       other: String(d.other || '').slice(0, 120),
       message: String(d.message || '').slice(0, 300),
@@ -25,6 +25,13 @@ function rowFor(kind, d) {
   return null
 }
 
+// core columns guaranteed to exist even on a fresh base schema
+const CORE = {
+  order: (r) => ({ item: r.item, price: r.price, phone: r.phone }),
+  wish: (r) => ({ name: r.name, body: r.body }),
+  rsvp: (r) => ({ attending: r.attending, guests: r.guests, message: r.message }),
+  event: (r) => ({ kind: r.kind }),
+}
 async function send(kind, d) {
   if (!sb) return
   const table = TABLE[kind]
@@ -32,7 +39,13 @@ async function send(kind, d) {
   if (!table || !row) return
   try {
     const { error } = await sb.from(table).insert(row)
-    if (error) console.warn('[farha db]', table, error.message)
+    if (!error) return
+    // A missing column (schema not fully migrated) rejects the whole row.
+    // Never lose the order: retry with the core columns that always exist.
+    console.warn('[farha db] full insert failed, retrying core:', error.message)
+    const core = (CORE[kind] || ((r) => r))(row)
+    const { error: e2 } = await sb.from(table).insert(core)
+    if (e2) console.warn('[farha db] core insert failed:', e2.message)
   } catch (e) {
     console.warn('[farha db]', e && e.message)
   }
@@ -141,7 +154,41 @@ window.__uploadEventMedia = async function (st) {
   } catch (e) { return st }
 }
 
+
+/* ═══ owner order-editing: load ?edit=slug into the editor, save back ═══ */
+async function loadForEdit () {
+  try {
+    if (!sb) return
+    const q = new URLSearchParams(location.search)
+    const slug = q.get('edit')
+    if (!slug) return
+    const { data: sess } = await sb.auth.getSession()
+    if (!sess || !sess.session) { // must be the owner
+      alert('هذه الصفحة للمالك فقط — سجّلوا الدخول من لوحة التحكم.')
+      return
+    }
+    const { data, error } = await sb.from('invitations').select('config,slug').eq('slug', slug).maybeSingle()
+    if (error || !data) { alert('لم يُعثر على الدعوة'); return }
+    if (typeof window.__loadForEdit === 'function') window.__loadForEdit(data.config || {}, data.slug)
+  } catch (e) { console.warn('loadForEdit', e && e.message) }
+}
+window.__sbSaveInvite = async function (slug, config) {
+  try {
+    if (!sb || !slug) return false
+    const { error } = await sb.from('invitations').update({ config }).eq('slug', slug)
+    return !error
+  } catch (e) { return false }
+}
+window.__sbSaveTemplate = async function (name, config) {
+  try {
+    if (!sb) return false
+    const { error } = await sb.from('templates').insert({ name: String(name).slice(0, 60), config })
+    return !error
+  } catch (e) { return false }
+}
+
 hookUp()
 loadCloudConfig()
 loadCloudWishes()
 setTimeout(loadInvite, 900)
+setTimeout(loadForEdit, 1000)

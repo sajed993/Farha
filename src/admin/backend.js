@@ -57,19 +57,32 @@ async function doLogin() {
 }
 
 /* ---------- cloud mode ---------- */
+let __fetching = false
 async function fetchAll() {
+  if (__fetching) return
+  __fetching = true
   try {
-    const o = await sb.from('orders').select('*').order('created_at', { ascending: false }).limit(100)
-    if (!o.error && Array.isArray(o.data)) dbOrders = o.data
-    const w = await sb.from('wishes').select('*').order('created_at', { ascending: false }).limit(100)
-    if (!w.error && Array.isArray(w.data)) dbWishes = w.data
-    const r = await sb.from('rsvps').select('*').order('created_at', { ascending: false }).limit(100)
-    if (!r.error && Array.isArray(r.data)) dbRsvps = r.data
-    const iv = await sb.from('invitations').select('*').order('created_at', { ascending: false }).limit(200)
-    if (!iv.error && Array.isArray(iv.data)) dbInvitations = iv.data
-  } catch (e) {}
+    // All four queries fire in PARALLEL (one round-trip instead of four).
+    const [o, w, r, iv] = await Promise.all([
+      sb.from('orders').select('*').order('created_at', { ascending: false }).limit(200),
+      sb.from('wishes').select('*').order('created_at', { ascending: false }).limit(200),
+      sb.from('rsvps').select('*').order('created_at', { ascending: false }).limit(500),
+      sb.from('invitations').select('*').order('created_at', { ascending: false }).limit(300),
+    ])
+    if (o && !o.error && Array.isArray(o.data)) dbOrders = o.data
+    if (w && !w.error && Array.isArray(w.data)) dbWishes = w.data
+    if (r && !r.error && Array.isArray(r.data)) dbRsvps = r.data
+    if (iv && !iv.error && Array.isArray(iv.data)) dbInvitations = iv.data
+  } catch (e) { console.warn('[farha db] fetchAll', e && e.message) }
+  __fetching = false
   window.__dbRows = { orders: dbOrders, rsvps: dbRsvps, wishes: dbWishes, invitations: dbInvitations }
   try { if (typeof window.renderContent === 'function') window.renderContent() } catch (e) {}
+}
+// realtime bursts can call fetchAll many times/sec — coalesce to one call / 800ms
+let __fetchTimer = null
+function fetchAllDebounced () {
+  if (__fetchTimer) return
+  __fetchTimer = setTimeout(() => { __fetchTimer = null; fetchAll() }, 800)
 }
 
 function gk(o){const t=String(o.item||'')
@@ -103,7 +116,8 @@ function ordersListHTML () {
            <button class="cmini" onclick="dbSendLink(${o.id})">📲 إرسالها للزبون</button>
            <button class="cmini" onclick="dbGuestWa(${o.id})">📊 ملخص الردود له</button>
            <button class="cmini" onclick="dbGuestCsv('${E(o.inv_slug)}')">⬇️ CSV</button>
-           <button class="cmini" onclick="dbEditNames(${o.id})">✏️ تعديل الأسماء</button>`
+           <button class="cmini" onclick="dbEditNames(${o.id})">✏️ الأسماء</button>
+           <button class="cmini" onclick="dbEditFull('${E(o.inv_slug)}')">🎨 فتح وتعديل كامل</button>`
         : `<select class="csel" id="dk${o.id}" style="margin:4px 6px 4px 0;font-size:.72rem">
              <option value="design" ${gk(o)==='design'?'selected':''}>🎴 دعوة تصميم</option>
              <option value="ultra" ${gk(o)==='ultra'?'selected':''}>👑 الباقة الملكية</option>
@@ -223,6 +237,11 @@ function enterDb() {
     } catch (e) { toast('تعذّر الرفع — تأكدوا من schema-2') }
     ev.target.value = ''
   }
+  window.dbEditFull = (slug) => {
+    if (!slug) return
+    const base = location.origin + location.pathname.replace(/admin(\.html)?\/?$/, '')
+    window.open(base + '?edit=' + encodeURIComponent(slug), '_blank')
+  }
   window.dbEditNames = async (id) => {
     const o = dbOrders.find((x) => String(x.id) === String(id)); if (!o || !o.inv_slug) return
     const cur = (o.payload && o.payload.c && o.payload.c.n) || ''
@@ -307,11 +326,11 @@ function enterDb() {
   // realtime: new orders/wishes pop in live; harmless if the socket fails
   try {
     sb.channel('farha-inbox')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (p) => { notifyNewOrder(p && p.new); fetchAll() })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, () => fetchAll())
-      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'orders' }, () => fetchAll())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'wishes' }, () => fetchAll())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'rsvps' }, () => fetchAll())
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (p) => { notifyNewOrder(p && p.new); fetchAllDebounced() })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, () => fetchAllDebounced())
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'orders' }, () => fetchAllDebounced())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'wishes' }, () => fetchAllDebounced())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rsvps' }, () => fetchAllDebounced())
       .subscribe()
   } catch (e) {}
 }
