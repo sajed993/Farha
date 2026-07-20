@@ -8,7 +8,7 @@
 //  3) Deploy. That's it — you'll get an email per order.
 // If the env vars are missing, this silently does nothing (site still works).
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'no' }
     const key = process.env.RESEND_API_KEY
