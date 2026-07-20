@@ -96,7 +96,7 @@ async function fetchAll() {
   try {
     // All four queries fire in PARALLEL (one round-trip instead of four).
     const [o, w, r, iv, ev] = await Promise.all([
-      sb.from('orders').select('*').order('created_at', { ascending: false }).limit(200),
+      sb.from('orders').select('id,item,price,customer_name,phone,status,ref,method,inv_slug,created_at').order('created_at', { ascending: false }).limit(200),
       sb.from('wishes').select('*').order('created_at', { ascending: false }).limit(200),
       sb.from('rsvps').select('*').order('created_at', { ascending: false }).limit(500),
       sb.from('invitations').select('*').order('created_at', { ascending: false }).limit(300),
@@ -250,13 +250,23 @@ function enterDb() {
     if (o.phone) dbWaLink(o.phone, link)
     fetchAll()
   }
+  // The list fetch is light (no payload, to avoid DB timeouts). When we actually
+  // need the full design — delivering or editing — fetch just that one row's payload.
+  async function ensurePayload (o) {
+    if (o.payload) return o.payload
+    try {
+      const { data } = await sb.from('orders').select('payload').eq('id', o.id).maybeSingle()
+      o.payload = (data && data.payload) || {}
+    } catch (e) { o.payload = {} }
+    return o.payload
+  }
   window.dbDeliver = async (id) => {
     const o = dbOrders.find((x) => String(x.id) === String(id)); if (!o) return
     const okPay = confirm('💰 تأكيد استلام الدفع؟\n\nتحقّقوا من:\n· وصول ' + (o.price||'') + ' د.ت إلى D17\n· تطابق المرجع 🧾 ' + (o.ref || '—') + '\n· رقم المُرسِل ' + (o.phone || '—') + '\n\nبعد التأكيد تُنشأ الدعوة وتُرسل للزبون.')
     if (!okPay) return
     const kEl = document.getElementById('dk' + id)
     const kind = (kEl && kEl.value) || 'design'
-    const pl = o.payload || {}
+    const pl = await ensurePayload(o)
     if (kind === 'ai') {
       const lb = document.getElementById('aiup' + id)
       if (lb) { lb.style.display = 'inline-flex'; toast('📤 اختاروا ملف الفيلم — يُرفع ويُسلَّم برابط خاص') }
