@@ -124,6 +124,55 @@ function gk(o){const t=String(o.item||'')
   if(/موقع|site/i.test(t))return 'site'
   if(/فيلم|سينما|AI|قبلة|فراشة|القصر|القمر|البندقية|سماء/i.test(t))return 'ai'
   return 'design'}
+// design id -> visual palette (kept in sync with 02-data.js)
+const DTHUMB={1:{bg:'#FFF9EC',ac:'#B98A2F',ink:'#3A2B10',orn:'✨'},2:{bg:'#16493E',ac:'#D3AC55',ink:'#F1EADA',orn:'🕌'},3:{bg:'#FCFBF7',ac:'#9A8C7B',ink:'#3A342C',orn:'🕊️'},4:{bg:'#FBEFEA',ac:'#C4827A',ink:'#4E2F2A',orn:'🌹'},5:{bg:'#EDF1FA',ac:'#5570B8',ink:'#22304F',orn:'🎓'},6:{bg:'#1B1710',ac:'#E3C77E',ink:'#F6EBD2',orn:'🎓'},7:{bg:'#FFF4F0',ac:'#E58BA6',ink:'#54333E',orn:'🎈'},8:{bg:'#EFF3EC',ac:'#7C9482',ink:'#2F3E33',orn:'☁️'},9:{bg:'#F6EDD9',ac:'#B98A2F',ink:'#4C3A17',orn:'🥂'},10:{bg:'#F6F0E2',ac:'#8A6A2B',ink:'#4C3A17',orn:'🪔'},11:{bg:'#FBF3EC',ac:'#B98A2F',ink:'#4E342B',orn:'📖'}}
+const KINDICON={design:'🎴',ultra:'👑',site:'🌐',ai:'🎬'}
+// resolve palette for an order: prefer its saved config colors, else the design default
+function _thumbPal(o){
+  try{const p=o.payload||{};const c=p.c||{};const d=DTHUMB[p.design]||DTHUMB[1]||{}
+    return {bg:c.bg||d.bg||'#FFF9EC',ac:c.ac||d.ac||'#B98A2F',ink:c.ink||d.ink||'#3A2B10',orn:c.orn||d.orn||'✨',kind:gk(o)}}
+  catch(e){return {bg:'#FFF9EC',ac:'#B98A2F',ink:'#3A2B10',orn:'✨',kind:'design'}}
+}
+// small CSS invitation thumbnail for an order row
+function miniThumb(o){
+  const pal=_thumbPal(o);const nm=orderName(o)||(o.payload&&o.payload.c&&o.payload.c.n)||''
+  const isVid=pal.kind==='ai'||pal.kind==='site'
+  return `<div class="miniThumb" onclick="dbPreview(${o.id})" title="${o.inv_slug?'اضغطوا للمعاينة':'معاينة أولية'}" style="cursor:pointer;flex:0 0 auto;width:52px;height:70px;border-radius:8px;overflow:hidden;border:1.5px solid ${pal.ac};background:${pal.bg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 1px 4px rgba(0,0,0,.12)">
+    <div style="font-size:15px;line-height:1">${isVid?KINDICON[pal.kind]:pal.orn}</div>
+    <div style="width:60%;height:2px;background:${pal.ac};border-radius:2px"></div>
+    <div style="font-size:6.5px;color:${pal.ink};font-weight:700;text-align:center;padding:0 3px;line-height:1.15;max-height:22px;overflow:hidden">${E(String(nm).slice(0,18))||'&nbsp;'}</div>
+    <div style="width:40%;height:2px;background:${pal.ac};opacity:.6;border-radius:2px"></div>
+  </div>`
+}
+// big preview modal — lazy-loads payload for a faithful mini invitation
+window.dbPreview = async (id) => {
+  const o = dbOrders.find((x) => String(x.id) === String(id)); if (!o) return
+  let host = document.getElementById('previewModal')
+  if (!host) { host = document.createElement('div'); host.id = 'previewModal'; document.body.appendChild(host) }
+  host.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(20,15,8,.72);display:flex;align-items:center;justify-content:center;padding:20px'
+  host.innerHTML = '<div style="color:#F3E3B8;font-family:sans-serif">⏳ جارٍ التحميل…</div>'
+  host.onclick = (e) => { if (e.target === host) host.remove() }
+  if (typeof ensurePayload === 'function') { try { await ensurePayload(o) } catch (e) {} }
+  const pal = _thumbPal(o); const p = o.payload || {}; const c = p.c || {}
+  const nm = orderName(o) || c.n || ''; const dt = c.d || ''; const pl = c.p || ''; const msg = c.m || ''
+  const isVid = pal.kind === 'ai' || pal.kind === 'site'
+  host.innerHTML = `<div style="max-width:340px;width:100%;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+    <div style="background:${pal.bg};padding:30px 22px;text-align:center;border-bottom:3px solid ${pal.ac}">
+      <div style="font-size:34px;margin-bottom:8px">${isVid?KINDICON[pal.kind]:pal.orn}</div>
+      <div style="height:2px;width:44px;background:${pal.ac};margin:10px auto"></div>
+      <div style="font-family:Georgia,serif;font-size:1.4rem;color:${pal.ink};font-weight:700;margin:6px 0">${E(nm)||'—'}</div>
+      ${dt?`<div style="color:${pal.ink};opacity:.85;font-size:.9rem;margin-top:6px">📅 ${E(dt)}</div>`:''}
+      ${pl?`<div style="color:${pal.ink};opacity:.85;font-size:.9rem">📍 ${E(pl)}</div>`:''}
+      ${msg?`<div style="color:${pal.ink};opacity:.7;font-size:.78rem;margin-top:10px;font-style:italic;line-height:1.6">${E(String(msg).slice(0,120))}</div>`:''}
+      <div style="height:2px;width:44px;background:${pal.ac};margin:14px auto 0"></div>
+    </div>
+    <div style="padding:14px;background:#faf7f0;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+      <span style="font-size:.72rem;color:#8A7A63">${KINDICON[pal.kind]||''} ${E(o.item)} · ${o.price} د.ت</span>
+      ${o.inv_slug?`<button class="cmini" onclick="dbEditFull('${E(o.inv_slug)}')">🎨 فتح وتعديل كامل</button>`:'<span style="font-size:.7rem;color:#A33">معاينة أولية — لم تُسلَّم بعد</span>'}
+      <button class="cmini" onclick="document.getElementById('previewModal').remove()">إغلاق ✕</button>
+    </div>
+  </div>`
+}
 let __ordQ = '', __ordF = 'all'
 window.dbOrdSearch = (v) => { __ordQ = String(v || '').trim().toLowerCase(); const el = document.getElementById('ordListWrap'); if (el) el.innerHTML = ordersListHTML() }
 window.dbOrdFilter = (f) => { __ordF = f; try { window.renderContent() } catch (e) {} }
@@ -148,8 +197,9 @@ function orderName (o) {
   function ordersListHTML () {
   const list = ordersFiltered()
   if (!list.length) return `<p class="cmut">لا نتائج مطابقة.</p>`
-  return list.slice(0, 80).map((o) => `<div class="ctlrow" style="align-items:flex-start">
-      <span>${orderName(o) ? '<b style="color:#8A6210;font-size:1.02em">👤 ' + E(orderName(o)) + '</b><br>' : ''}<b>#${o.id}</b> · ${E(o.item)} — ${o.price} د.ت<br>
+  return list.slice(0, 80).map((o) => `<div class="ctlrow" style="align-items:flex-start;gap:10px">
+      ${miniThumb(o)}
+      <span style="flex:1">${orderName(o) ? '<b style="color:#8A6210;font-size:1.02em">👤 ' + E(orderName(o)) + '</b><br>' : ''}<b>#${o.id}</b> · ${E(o.item)} — ${o.price} د.ت<br>
       <small style="color:#8A7A63">${new Date(o.created_at).toLocaleString('ar-TN')}${o.phone ? ' · 📱 ' + E(o.phone) : ''}${o.method ? ' · ' + ({d17:'💳 D17',flouci:'📱 Flouci',rib:'🏦 تحويل بنكي'}[o.method] || o.method) : ''}${o.ref ? ' · 🧾 <b style="color:#8A6210">' + E(o.ref) + '</b>' : ''}</small><br>
       ${o.inv_slug
         ? `<small style="color:#2F6B3A">🎁 دعوة جاهزة: ?i=${E(o.inv_slug)} · 👥 ${dbRsvps.filter(r => r.inv_slug === o.inv_slug).length} ردًا</small><br>
@@ -233,7 +283,8 @@ function enterDb() {
   }
   function dbWaLink (phone, link) {
     let n = String(phone).replace(/\D/g, ''); if (n.slice(0, 2) === '00') n = n.slice(2); if (n.length === 8) n = '216' + n
-    window.open('https://wa.me/' + n + '?text=' + encodeURIComponent('🎁 مبروك! دعوتكم من فرحة جاهزة:\n' + link + '\nافتحوها والمسوا الختم ✨ ثم شاركوها مع ضيوفكم 💛'), '_blank')
+    const _em = { gift: String.fromCodePoint(0x1F381), spark: String.fromCodePoint(0x2728), heart: String.fromCodePoint(0x1F49B) }
+    window.open('https://wa.me/' + n + '?text=' + encodeURIComponent(_em.gift + ' مبروك! دعوتكم من فرحة جاهزة:\n' + link + '\nافتحوها والمسوا الختم ' + _em.spark + ' ثم شاركوها مع ضيوفكم ' + _em.heart), '_blank')
   }
   async function invCreate (o, config) {
     let slug = o.inv_slug

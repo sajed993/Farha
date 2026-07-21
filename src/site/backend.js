@@ -120,7 +120,7 @@ function _dataURLtoBlob (dataUrl) {
     return new Blob([arr], { type: mime })
   } catch (e) { return null }
 }
-async function _uploadOne (srcUrl, bucket, ext) {
+async function _uploadOne (srcUrl, bucket, ext, maxMB) {
   try {
     if (!sb || !srcUrl) return null
     if (srcUrl.startsWith('http')) return srcUrl // already remote
@@ -128,37 +128,42 @@ async function _uploadOne (srcUrl, bucket, ext) {
     if (srcUrl.startsWith('data:')) blob = _dataURLtoBlob(srcUrl)
     else if (srcUrl.startsWith('blob:')) { const r = await fetch(srcUrl); blob = await r.blob() }
     if (!blob) return null
-    if (blob.size > 25 * 1024 * 1024) return null // 25MB guard
+    const cap = (maxMB || 25) * 1024 * 1024
+    if (blob.size > cap) { _uploadErr = { type: bucket, sizeMB: Math.round(blob.size / 1048576), maxMB: (maxMB || 25) }; return null }
     const path = 'orders/' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8) + '.' + (ext || 'bin')
     const { error } = await sb.storage.from(bucket).upload(path, blob, { upsert: true, contentType: blob.type })
-    if (error) return null
+    if (error) { _uploadErr = { type: bucket, msg: error.message || 'upload error' }; return null }
     const { data } = sb.storage.from(bucket).getPublicUrl(path)
     return data.publicUrl
-  } catch (e) { return null }
+  } catch (e) { _uploadErr = { type: bucket, msg: (e && e.message) || 'unknown' }; return null }
 }
+let _uploadErr = null
 // Exposed for the checkout flow: turn S.st media into permanent URLs.
 window.__uploadEventMedia = async function (st) {
   if (!st || !sb) return st
+  _uploadErr = null
   try {
     const out = JSON.parse(JSON.stringify({ ...st, photos: [], video: null, track: null }))
-    // photos (data-URLs) → photos bucket
+    // photos (data-URLs) → photos bucket (10MB each)
     if (Array.isArray(st.photos) && st.photos.length) {
-      const ups = await Promise.all(st.photos.slice(0, 8).map((p) => _uploadOne(p, 'photos', 'jpg')))
+      const ups = await Promise.all(st.photos.slice(0, 8).map((p) => _uploadOne(p, 'photos', 'jpg', 10)))
       out.photos = ups.filter(Boolean)
     }
-    // uploaded music track (blob) → music bucket
+    // uploaded music track (blob) → music bucket (15MB)
     if (st.track && st.track.url) {
-      const u = await _uploadOne(st.track.url, 'music', 'mp3')
+      const u = await _uploadOne(st.track.url, 'music', 'mp3', 15)
       if (u) out.track = { name: String(st.track.name || 'music').slice(0, 40), url: u }
     }
-    // event video (blob) → videos bucket
+    // event video (blob) → videos bucket (50MB)
     if (st.video && st.video.url) {
-      const u = await _uploadOne(st.video.url, 'videos', 'mp4')
+      const u = await _uploadOne(st.video.url, 'videos', 'mp4', 50)
       if (u) out.video = { name: String(st.video.name || 'video').slice(0, 40), url: u }
     }
+    out.__uploadErr = _uploadErr
     return out
   } catch (e) { return st }
 }
+window.__lastUploadError = function () { return _uploadErr }
 
 
 /* ═══ owner order-editing: load ?edit=slug into the editor, save back ═══ */
@@ -180,10 +185,13 @@ async function loadForEdit () {
 }
 window.__sbSaveInvite = async function (slug, config) {
   try {
-    if (!sb || !slug) return false
+    if (!sb || !slug) return { ok: false, reason: 'no-session-or-slug' }
+    const { data: sess } = await sb.auth.getSession()
+    if (!sess || !sess.session) return { ok: false, reason: 'not-logged-in' }
     const { error } = await sb.from('invitations').update({ config }).eq('slug', slug)
-    return !error
-  } catch (e) { return false }
+    if (error) return { ok: false, reason: error.message || 'db-error' }
+    return { ok: true }
+  } catch (e) { return { ok: false, reason: (e && e.message) || 'exception' } }
 }
 window.__sbSaveTemplate = async function (name, config) {
   try {

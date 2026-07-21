@@ -89,24 +89,44 @@ function editorView(){
     <div class="ctl-sec"><label>🖋️ ${t().lFont}</label><div class="opt-row">${fonts}</div></div>
     ${scratch?designCtl:`<div class="ctl-sec"><label>🎨 ${t().lColors}</label><div class="swatches">${pals}</div></div>`}
     <div class="ctl-sec"><label>🎬 ${t().lAnim}</label><div class="opt-row">${anims}</div>
+     <span class="mini-label" style="margin-top:14px">✨ ${S.lang==='ar'?'دعوة فاخرة (جديد)':S.lang==='fr'?'Invitation Luxe (nouveau)':'Luxe invitation (new)'}</span>
+     <div class="opt-row"><button class="opt prem-opt ${S.c.anim==='luxe'?'on':''}" style="border-color:var(--gold3);background:${S.c.anim==='luxe'?'linear-gradient(120deg,#C69A45,#9A7327)':'linear-gradient(120deg,#F5EEE0,#EFE6D3)'};color:${S.c.anim==='luxe'?'#fff':'#8A6420'};font-weight:800" onclick="setC('anim','luxe')">🕯️ ${_luxeTheme().name[S.lang]||'Sidi Gold'} · ${S.lang==='ar'?'ختم شمعي':S.lang==='fr'?'Sceau de cire':'Wax seal'}</button></div>
      <span class="mini-label" style="margin-top:14px">${t().pmScenes}</span>
      <div class="opt-row">${t().pmNames.map((n,i)=>`<button class="opt prem-opt ${S.c.anim===100+i?'on':''}" onclick="setC('anim',${100+i})">${PM_ICO[i]} ${n}</button>`).join('')}</div></div>
     <div class="ctl-sec"><label>${t().lMusic}</label><div class="opt-row">${mus}</div>
      <div style="margin-top:12px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
       <label class="upload-lab">🎵 ${t().upTrack}<input class="hiddenfile" type="file" accept="audio/*" onchange="upTrack(event)"></label>
       <span class="toggle ${S.c.autoplay?'on':''}" onclick="setC('autoplay',${!S.c.autoplay})"><span class="tgl"></span>${t().autoplay}</span>
-     </div>${trimUI}
+     </div>
+     ${S.c.autoplay?`<div style="margin-top:10px">
+      <span class="mini-label">🎼 ${t().musicStartLabel}</span>
+      <div class="opt-row">${[['open','▶️',t().msOpen],['video','🎥',t().msVideo],['reveal','💌',t().msReveal]].map(([v,em,lbl])=>`<button class="opt ${(S.c.musicStart||'open')===v?'on':''}" onclick="setC('musicStart','${v}')">${em} ${lbl}</button>`).join('')}</div>
+     </div>`:''}${trimUI}
      <div style="margin-top:16px;border-top:1px dashed rgba(138,106,43,.18);padding-top:14px">
       <span class="mini-label">🎥 ${t().lVideo}</span>
       <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:4px">
        <label class="upload-lab">${t().upVideo}<input class="hiddenfile" type="file" accept="video/*" onchange="upMemVid(event)"></label>
        ${S.c.memVid?`<span style="font-size:.8rem;color:var(--gold3);font-weight:700">${esc(S.c.memVid.name)} ✓ <button onclick="rmMemVid()" style="color:var(--red);font-weight:700">✕</button></span>`:''}
       </div></div></div>
+    <div style="margin-top:18px;border-top:1px dashed rgba(138,106,43,.18);padding-top:16px">
+     <span class="mini-label">${S.lang==='ar'?'💠 اختاروا الباقة':S.lang==='fr'?'💠 Choisissez la formule':'💠 Choose your package'}</span>
+     <div style="display:grid;gap:10px;margin-top:8px">
+      ${pTiers().map(tr=>`<div onclick="setTier('${tr.id}')" style="cursor:pointer;border:2px solid ${S.tier===tr.id?'#B98A2F':'rgba(138,106,43,.2)'};background:${S.tier===tr.id?'linear-gradient(135deg,#FBF2DE,#F5E5C0)':'#fff'};border-radius:16px;padding:12px 14px;transition:.2s">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+         <b style="font-family:var(--serif);font-size:1.05rem;color:#5A3A28">${tr.em} ${(tr.name&&tr.name[S.lang])||tr.name.en}</b>
+         <b style="font-family:var(--num);color:#8A6210;font-size:1.15rem">${tr.price} ${S.lang==='ar'?'د.ت':'DT'}</b></div>
+        <div style="font-size:.74rem;color:#7A6A4E;margin-top:5px;line-height:1.6">${((tr.feats&&tr.feats[S.lang])||tr.feats.en).map(x=>'· '+x).join('<br>')}</div>
+       </div>`).join('')}
+     </div>
+     <span class="mini-label" style="display:block;margin-top:14px">${S.lang==='ar'?'➕ إضافات اختيارية':S.lang==='fr'?'➕ Options':'➕ Optional extras'}</span>
+     <div class="opt-row" style="margin-top:6px">
+      ${pExtras().map(ex=>`<button class="opt ${(S.extras||[]).indexOf(ex.id)>=0?'on':''}" onclick="toggleExtra('${ex.id}')">${ex.em} ${(ex.name&&ex.name[S.lang])||ex.name.en} +${ex.price}</button>`).join('')}
+     </div>
+    </div>
     <div class="big-actions">
-     <button class="btn-hero" style="background:linear-gradient(120deg,#1E4A28,#2F6B3A);color:#EFFBF2" onclick="addToCart(((DESIGNS.find(z=>z.id===S.design)||{}).name||{})[S.lang]||'دعوة رقمية',CFG.price.design)">${t().buyDesign} ${CFG.price.design} ${S.lang==='ar'?'د.ت':'DT'}</button>
+     <button class="btn-hero" style="background:linear-gradient(120deg,#1E4A28,#2F6B3A);color:#EFFBF2" onclick="buyBundle()">${S.lang==='ar'?'احجزوا الآن':S.lang==='fr'?'Commander':'Order now'} · <b style="font-family:var(--num)">${priceTotal()} ${S.lang==='ar'?'د.ت':'DT'}</b></button>
      <button class="btn-hero" onclick="ceremony(true)">${t().preview}</button>
      <button class="btn-ghost" onclick="shareLink()">${t().getLink}</button>
-     <button class="btn-ghost" onclick="addCart()">${t().addCart}</button>
     </div></div></div></div>`;}
 
 ;

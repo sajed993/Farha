@@ -1,8 +1,20 @@
+const EM={gift:String.fromCodePoint(0x1F381),check:String.fromCodePoint(0x2705),phone:String.fromCodePoint(0x1F4F1),clip:String.fromCodePoint(0x1F4CE),heart:String.fromCodePoint(0x1F49B),spark:String.fromCodePoint(0x2728),receipt:String.fromCodePoint(0x1F9FE)};
 /* ============ dashboard control bridge ============ */
 const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'farha_meta'};
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-const CFG_DEF={sec:{ultra:1,premium:1,ai:1,sites:1,datef:1,open:1,wishes:1},price:{ultra:199,ai:249,site:149,design:79},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:''},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[]}};
+const CFG_DEF={sec:{ultra:1,premium:1,ai:1,sites:1,datef:1,open:1,wishes:1},price:{ultra:199,ai:249,site:149,design:79},
+ tiers:[
+  {id:'ess',em:'🌱',name:{ar:'Essentiel — أساسي',fr:'Essentiel',en:'Essential'},price:29,feats:{ar:['تصميم واحد','الأسماء والتاريخ والمكان','افتتاح بسيط'],fr:['Un design','Noms, date, lieu','Ouverture simple'],en:['One design','Names, date, place','Simple opening']}},
+  {id:'prem',em:'✦',name:{ar:'Premium — مميّز',fr:'Premium',en:'Premium'},price:69,feats:{ar:['كل ما في الأساسي','موسيقى + معرض صور','افتتاح سينمائي','تأكيد حضور RSVP'],fr:['Tout Essentiel','Musique + galerie','Ouverture cinématique','RSVP'],en:['All Essential','Music + gallery','Cinematic opening','RSVP']}},
+  {id:'lux',em:'👑',name:{ar:'Luxe — فاخر',fr:'Luxe',en:'Luxe'},price:129,feats:{ar:['كل ما في المميّز','فيلم بالذكاء الاصطناعي','حائط التهاني','فيديو افتتاح مخصص','تسليم أولوية'],fr:['Tout Premium','Film IA','Mur de vœux','Vidéo perso','Livraison prioritaire'],en:['All Premium','AI film','Wishes wall','Custom video','Priority delivery']}}
+ ],
+ extras:[
+  {id:'aifilm',em:'🎬',name:{ar:'فيلم بالذكاء الاصطناعي',fr:'Film IA',en:'AI film'},price:60},
+  {id:'video',em:'🎥',name:{ar:'فيديو افتتاح مخصص',fr:'Vidéo d\'ouverture',en:'Custom video opening'},price:20},
+  {id:'gallery',em:'🖼️',name:{ar:'معرض صور إضافي',fr:'Galerie photo',en:'Extra photo gallery'},price:10},
+  {id:'musicup',em:'🎵',name:{ar:'رفع موسيقاكم الخاصة',fr:'Votre musique',en:'Upload your music'},price:10}
+ ],wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:''},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[]}};
 let CFG=JSON.parse(JSON.stringify(CFG_DEF));
 let T0=null;
 function loadCFG(){
@@ -56,10 +68,31 @@ function _editConfig(){return {kind:S._editKind||'design',design:S.design||1,c:J
 window.saveEditToInvite=async function(){
  if(!window.__sbSaveInvite||!S._editSlug){toast(S.lang==='ar'?'لا يمكن الحفظ هنا':'Cannot save');return;}
  toast(S.lang==='ar'?'جارٍ الحفظ…':'Saving…');
- const ok=await window.__sbSaveInvite(S._editSlug,_editConfig());
- toast(ok?(S.lang==='ar'?'💾 حُفظ — يظهر فورًا للزبون':'Saved ✓'):(S.lang==='ar'?'تعذّر الحفظ':'Save failed'));
+ // upload any temporary (blob:) videos to permanent storage first
+ const upErr=await _persistEditMedia();
+ if(upErr){const msg=upErr.sizeMB?(S.lang==='ar'?`⚠️ الفيديو حجمه ${upErr.sizeMB} ميغا، الحد الأقصى ${upErr.maxMB} ميغا. اختاروا فيديو أقصر.`:`⚠️ Video is ${upErr.sizeMB}MB, max ${upErr.maxMB}MB. Use a shorter video.`):(S.lang==='ar'?'⚠️ تعذّر رفع الفيديو. حاولوا مجددًا.':'⚠️ Video upload failed. Try again.');toast(msg);return false;}
+ const res=await window.__sbSaveInvite(S._editSlug,_editConfig());
+ const ok=res&&res.ok;
+ if(ok){toast(S.lang==='ar'?'💾 حُفظ — يظهر فورًا للزبون':'Saved ✓');}
+ else{const reason=(res&&res.reason)||'?';
+  const map={'not-logged-in':S.lang==='ar'?'سجّلوا الدخول أولًا من لوحة التحكم':'Please log in from the dashboard first','no-row-matched':S.lang==='ar'?'لم يُعثر على هذه الدعوة (ربما حُذفت)':'Invitation not found (maybe deleted)'};
+  toast((map[reason])||((S.lang==='ar'?'تعذّر الحفظ: ':'Save failed: ')+reason));}
  return ok;
 };
+// convert temporary blob: video URLs in S.c.memVid / S.st.video into permanent storage URLs
+async function _persistEditMedia(){
+ try{
+  if(!window.__uploadEventMedia)return null;
+  const needMem=S.c.memVid&&S.c.memVid.url&&String(S.c.memVid.url).startsWith('blob:');
+  const needStV=S.st&&S.st.video&&S.st.video.url&&String(S.st.video.url).startsWith('blob:');
+  if(!needMem&&!needStV)return null;
+  const packed=await window.__uploadEventMedia({photos:[],track:null,video:needMem?{name:S.c.memVid.name,url:S.c.memVid.url}:(needStV?S.st.video:null)});
+  if(packed&&packed.__uploadErr)return packed.__uploadErr;
+  if(needMem&&packed.video&&packed.video.url){S.c.memVid={name:S.c.memVid.name,url:packed.video.url};}
+  if(needStV&&packed.video&&packed.video.url){S.st.video={name:S.st.video.name,url:packed.video.url};}
+  return null;
+ }catch(e){return {msg:(e&&e.message)||'error'};}
+}
 window.saveEditAsTemplate=async function(){
  if(!window.__sbSaveTemplate){toast('—');return;}
  const nm=prompt(S.lang==='ar'?'اسم القالب الجاهز للبيع:':'Template name:','');
@@ -129,6 +162,16 @@ function checkoutCart(){const a=cartGet();if(!a.length)return;
  const total=a.reduce((s,x)=>s+(+x.price||0),0);
  const label=a.map(x=>x.item).join(' + ').slice(0,118);
  closeCartSheet();placeOrder(label,total);if(S._pay)S._pay.fromCart=true;S._pay.payload={cart:cartGet()};}
+function pTiers(){return (CFG.tiers&&CFG.tiers.length)?CFG.tiers:CFG_DEF.tiers;}
+function pExtras(){return (CFG.extras&&CFG.extras.length)?CFG.extras:CFG_DEF.extras;}
+function pTier(){return pTiers().find(x=>x.id===S.tier)||pTiers()[0];}
+function priceTotal(){let t=(pTier()||{}).price||0;(S.extras||[]).forEach(id=>{const e=pExtras().find(x=>x.id===id);if(e)t+=e.price;});return t;}
+function setTier(id){S.tier=id;render();}
+function toggleExtra(id){const a=S.extras||[];const i=a.indexOf(id);if(i>=0)a.splice(i,1);else a.push(id);S.extras=a;render();}
+function orderLabel(){const tr=pTier()||{};const nm=(tr.name&&tr.name[S.lang])||'دعوة';const ex=(S.extras||[]).length?(' +'+(S.extras.length)+(S.lang==='ar'?' إضافة':' extras')):'';return nm+ex;}
+function buyBundle(){const label=orderLabel();const total=priceTotal();
+ placeOrder(label,total);
+ if(S._pay){S._pay.payload={design:S.design||0,c:JSON.parse(JSON.stringify(S.c)),tier:S.tier,extras:(S.extras||[]).slice(),breakdown:{tier:(pTier()||{}).price||0,extras:(S.extras||[]).map(id=>{const e=pExtras().find(x=>x.id===id);return e?{id:e.id,price:e.price}:null;}).filter(Boolean),total:total}};}}
 function placeOrder(item,price){
  const arr=lsGet(LSK.orders,[]);
  arr.unshift({id:'W'+String(Date.now()).slice(-6),item:String(item),price:price,ts:Date.now(),st:'جديد'});
@@ -178,7 +221,7 @@ function openPaySheet(item,price){closePay();S._submitting=false;S._pay={item:St
 function closePay(){const d=document.getElementById('payveil');if(d)d.remove();}
 function payWa(){const p=S._pay||{};
  const _ph=((document.getElementById('payPhone')||{}).value||'').trim();
- const msg=(S.lang==='ar'?'مرحبًا! لديّ استفسار بخصوص: ':'Hello! I have a question about: ')+p.item+' — '+p.price+(S.lang==='ar'?' د.ت':' DT')+(_ph?'\n📱 '+_ph:'');
+ const msg=(S.lang==='ar'?'مرحبًا! لديّ استفسار بخصوص: ':'Hello! I have a question about: ')+p.item+' — '+p.price+(S.lang==='ar'?' د.ت':' DT')+(_ph?'\n'+EM.phone+' '+_ph:'');
  const num=waNum();if(!num){toast(t().err);return;}
  const txt=encodeURIComponent(msg);const url='https://wa.me/'+num+'?text='+txt;
  try{const w=window.open(url,'_blank');if(!w)toast('واتساب');}catch(e){toast(t().err);}
@@ -192,7 +235,10 @@ function payCopyVal(v){const done=()=>toast(t().payCopied);
 function payCopy(){const n=String(CFG.d17||'').replace(/\D/g,'');const done=()=>toast(t().payCopied);
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(n).then(done).catch(()=>fallbackCopy(n,done));
  else fallbackCopy(n,done);}
-function _slimSt(st){try{const s=JSON.parse(JSON.stringify(st||S.st||{}));s.photos=[];s.video=null;s.track=null;return s;}catch(e){return {};}}
+function _slimSt(st){try{const s=JSON.parse(JSON.stringify(st||S.st||{}));
+ const keepHttp=(m)=>m&&m.url&&String(m.url).startsWith('http')?m:null;
+ s.photos=Array.isArray(s.photos)?s.photos.filter(p=>typeof p==='string'&&p.startsWith('http')):[];
+ s.video=keepHttp(s.video);s.track=keepHttp(s.track);return s;}catch(e){return {};}}
 function payProof(){const p=S._pay||{};
  if(S._submitting)return;                       // hard guard: no double-submit
  const nm=((document.getElementById('payName')||{}).value||'').trim();
@@ -207,7 +253,7 @@ function payProof(){const p=S._pay||{};
  // 1) open WhatsApp SYNCHRONOUSLY (popup blockers require this in the click handler)
  const mLabel={d17:'D17',flouci:'Flouci',rib:(S.lang==='ar'?'تحويل بنكي':'Virement bancaire')}[m];
  const refLine=(m==='rib')?((S.lang==='ar'?'\n🧾 المرجع: ':'\n🧾 Ref: ')+(p.ref||'')):'';
- const msg=(S.lang==='ar'?'✅ دفعت عبر ':'✅ Paid via ')+mLabel+refLine+'\n'+p.item+' — '+p.price+(S.lang==='ar'?' د.ت':' DT')+'\n📱 '+ph+(S.lang==='ar'?'\n📎 أرفقوا لقطة التحويل هنا':'\n📎 Attach your transfer screenshot here');
+ const msg=(S.lang==='ar'?EM.check+' دفعت عبر ':EM.check+' Paid via ')+mLabel+refLine+'\n'+p.item+' — '+p.price+(S.lang==='ar'?' د.ت':' DT')+'\n'+EM.phone+' '+ph+(S.lang==='ar'?'\n'+EM.clip+' أرفقوا لقطة التحويل هنا':'\n'+EM.clip+' Attach your transfer screenshot here');
  const num=waNum();if(!num){toast(t().err);return;}
  try{const w=window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank');if(!w)toast('واتساب');}catch(e){}
  // 2) capture design snapshot + raw media, close sheet, reassure customer
@@ -226,6 +272,10 @@ function payProof(){const p=S._pay||{};
   let st;
   try{ st = (hasMedia && window.__uploadEventMedia) ? await window.__uploadEventMedia(baseSt) : _slimSt.call({},baseSt); }
   catch(e){ st = {photos:[],video:null,track:null}; }
+  // if a media file was too big or failed, tell the user exactly why
+  if(st&&st.__uploadErr){const er=st.__uploadErr;const kind=er.type==='videos'?(S.lang==='ar'?'الفيديو':'The video'):er.type==='music'?(S.lang==='ar'?'الموسيقى':'The music'):(S.lang==='ar'?'إحدى الصور':'A photo');
+   const msg=er.sizeMB?(S.lang==='ar'?`⚠️ ${kind} حجمه ${er.sizeMB} ميغا، الحد الأقصى ${er.maxMB} ميغا. جرّبوا ملف أصغر أو أقصر.`:`⚠️ ${kind} is ${er.sizeMB}MB, the max is ${er.maxMB}MB. Please use a smaller/shorter file.`):(S.lang==='ar'?`⚠️ تعذّر رفع ${kind}. حاولوا مرة أخرى.`:`⚠️ Could not upload ${kind}. Please try again.`);
+   toast(msg);}
   const payload=Object.assign({design:designSnap,c:cSnap,st:st,uIdx:uIdxSnap},extra);
   dbHook('order',{item:String(p.item),price:p.price,phone:phn,customer_name:nm,ref:(m==='rib'?(p.ref||''):''),method:m,payload:payload});
   if(hasMedia)toast(S.lang==='ar'?'📨 استلمنا طلبكم بصوركم — بعد تأكيد الدفع تصلكم دعوتكم 💛':'📨 Order received with your media ✓');
@@ -278,12 +328,14 @@ function addSlidePhoto(ev,i){const f=ev.target.files[0];if(!f)return;
  const r=new FileReader();r.onload=e=>{S.c.story[i].ph=e.target.result;render();};r.readAsDataURL(f);}
 function rmSlidePhoto(i){S.c.story[i].ph='';render();}
 function upMemVid(ev){const f=ev.target.files[0];if(!f)return;
+ if(f.size>50*1024*1024){toast(S.lang==='ar'?`⚠️ الفيديو حجمه ${Math.round(f.size/1048576)} ميغا، الحد الأقصى 50 ميغا. اختاروا فيديو أقصر.`:`⚠️ Video is ${Math.round(f.size/1048576)}MB, max is 50MB. Please pick a shorter video.`);ev.target.value='';return;}
  if(S.c.memVid&&S.c.memVid.url)try{URL.revokeObjectURL(S.c.memVid.url)}catch(e){}
  S.c.memVid={name:f.name.slice(0,26),url:URL.createObjectURL(f)};render();toast('🎥 ✓');}
 function rmMemVid(){if(S.c.memVid&&S.c.memVid.url)try{URL.revokeObjectURL(S.c.memVid.url)}catch(e){}
  S.c.memVid=null;render();}
 function stSet(k,v){S.st[k]=v;render();}
 function stUpVideo(ev){const f=ev.target.files[0];if(!f)return;
+ if(f.size>50*1024*1024){toast(S.lang==='ar'?`⚠️ الفيديو حجمه ${Math.round(f.size/1048576)} ميغا، الحد الأقصى 50 ميغا. اختاروا فيديو أقصر.`:`⚠️ Video is ${Math.round(f.size/1048576)}MB, max is 50MB. Please pick a shorter video.`);ev.target.value='';return;}
  if(S.st.video&&S.st.video.url)try{URL.revokeObjectURL(S.st.video.url)}catch(e){}
  S.st.video={name:f.name.slice(0,26),url:URL.createObjectURL(f)};S.st.style=5;render();toast(t().stVidOk);}
 function stRmVideo(){if(S.st.video&&S.st.video.url)try{URL.revokeObjectURL(S.st.video.url)}catch(e){}

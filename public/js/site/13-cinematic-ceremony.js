@@ -70,9 +70,10 @@ function mountVideoOpen(ix){
   const vd=stage.querySelector('#vopenV');if(!vd){reveal();return;}
   vd.style.opacity=1;
   vd.onended=()=>reveal();vd.onerror=()=>reveal();
-  vd.play().catch(()=>{vd.muted=true;vd.play().catch(()=>reveal());});
+  ceremonyMusic('video');vd.play().catch(()=>{vd.muted=true;vd.play().catch(()=>reveal());});
   filmT.push(setTimeout(()=>{if(vd.paused&&vd.readyState<2)reveal();},2500));};}
 function mountCeremony(){cerMusicOn=false;
+ if(S.c.anim==='luxe'){let stage=veil.querySelector('.cstage');if(!stage){stage=document.createElement('div');stage.className='cstage';veil.appendChild(stage);}mountLuxe(stage);return;}
  if(typeof S.c.anim==='string'&&S.c.anim.charAt(0)==='v'){mountVideoOpen(parseInt(S.c.anim.slice(1))||0);return;}
  clearTimeout(storyT);
  const dz=getDesign(),inv=inviteHTML(dz,S.c),a=S.c.anim;
@@ -88,13 +89,13 @@ function mountCeremony(){cerMusicOn=false;
     <div class="seal"><span class="half h1">❦</span><span class="half h2">❦</span></div>
    </div></div>${hint}`;
   stage.querySelector('#env').onclick=function(){if(this.classList.contains('open'))return;
-   ceremonyMusic();this.classList.add('open');setTimeout(()=>reveal(),1450);};
+   ceremonyMusic('open');this.classList.add('open');setTimeout(()=>reveal(),1450);};
  }else if(a===1){ /* wax seal shatter */
   stage.innerHTML=`<div class="sealstage" id="sst"><div class="parch"></div>
     <div class="bigseal"><span class="shard sh1">❦</span><span class="shard sh2">❦</span><span class="shard sh3">❦</span><span class="shard sh4">❦</span></div>
    </div>${hint}`;
   stage.querySelector('#sst').onclick=function(){if(this.classList.contains('open'))return;
-   ceremonyMusic();this.classList.add('open');const f=veil.querySelector('#flash');if(f)f.classList.add('go');
+   ceremonyMusic('open');this.classList.add('open');const f=veil.querySelector('#flash');if(f)f.classList.add('go');
    setTimeout(()=>reveal(),1050);};
  }else if(a===2){ /* silk ribbon + book fold */
   stage.innerHTML=`<div class="ribstage" id="rib">${inv}
@@ -102,7 +103,7 @@ function mountCeremony(){cerMusicOn=false;
     <div class="riband h"></div><div class="riband v"></div><div class="ribbow">🎀</div>
    </div>${hint}`;
   stage.querySelector('#rib').onclick=function(){if(this.classList.contains('open'))return;
-   ceremonyMusic();this.classList.add('open');setTimeout(()=>reveal(true),1750);};
+   ceremonyMusic('open');this.classList.add('open');setTimeout(()=>reveal(true),1750);};
  }else if(a===3){ /* royal curtains */
   stage.innerHTML=`<div class="big-card" id="bigc" style="opacity:0">${inv}</div>
    <div class="curt l"><span class="tassel">🪢</span></div><div class="curt r"><span class="tassel">🪢</span></div>
@@ -238,17 +239,24 @@ function goldBurstAt(fx,fy){
    --sx:${(Math.random()*220-110).toFixed(0)}px;--sy:${(Math.random()*200-40).toFixed(0)}px;animation-delay:${(Math.random()*.4).toFixed(2)}s`;
   document.body.appendChild(s);setTimeout(()=>s.remove(),2300);}}
 let cerMusicOn=false;
-function ceremonyMusic(){
+function ceremonyMusic(when){
+ // when: 'open' (tap to open) | 'video' (video starts) | 'reveal' (fully opened)
  if(cerMusicOn)return;
  if(!(S.c.music&&S.c.autoplay))return;
+ const mode=S.c.musicStart||'open';
+ if((when||'open')!==mode)return;   // only fire at the chosen moment
  cerMusicOn=true;
  try{playMusic(S.c.music);}catch(e){}}
 function reveal(keepStage){try{window.__track&&window.__track("reveal",{inv_slug:window.__inviteSlug||null});}catch(e){}
+ try{ceremonyMusic("reveal");}catch(e){}
  if(!veil)return;
  veil.classList.add('revealed');
  const a=S.c.anim,dz=getDesign();
  const finish=()=>{buildFinale();};
- if(a>=100){const sc=veil.querySelector('.cine-scene');if(sc)sc.classList.add('dimmed');
+ if(a==='luxe'){const sc=veil.querySelector('.lx-scene');if(sc){sc.style.transition='opacity 1s ease,transform 1s ease';sc.style.opacity='0';sc.style.transform='scale(1.05)';}
+  try{_lxClear();}catch(e){}
+  setTimeout(finish,1050);}
+ else if(a>=100){const sc=veil.querySelector('.cine-scene');if(sc)sc.classList.add('dimmed');
   clearFilm();
   const it=veil.querySelector('#itl');if(it)it.classList.remove('show');
   const dp=veil.querySelector('#dip');if(dp)dp.classList.remove('on');
@@ -327,14 +335,14 @@ function premDemo(i){
  demoBackup={design:S.design,c:JSON.parse(JSON.stringify(S.c))};
  S.design=PM_MAP[i];const dz=DESIGNS.find(d=>d.id===S.design);
  const when=new Date(Date.now()+37*864e5+5*36e5);
- S.c={...S.c,...dz.def[S.lang],font:0,pal:0,anim:100+i,music:1,autoplay:true,qr:false,maps:'',story:[],guest:'',
+ S.c={...S.c,...dz.def[S.lang],font:0,pal:0,anim:100+i,music:1,autoplay:true,musicStart:"open",qr:false,maps:'',story:[],guest:'',
   when:when.toISOString().slice(0,16),program:demoProgram()};
  ceremony(true);}
 function demoAnim(i){
  demoBackup={design:S.design,c:JSON.parse(JSON.stringify(S.c))};
  S.design=[1,10,9,2,4,4,11,1,12][i];const dz=DESIGNS.find(d=>d.id===S.design);
  const when=new Date(Date.now()+37*864e5+5*36e5);
- S.c={...S.c,...dz.def[S.lang],font:0,pal:0,anim:i,music:i===2?3:1,autoplay:true,qr:false,maps:'',story:[],guest:'',
+ S.c={...S.c,...dz.def[S.lang],font:0,pal:0,anim:i,music:i===2?3:1,autoplay:true,musicStart:"open",qr:false,maps:'',story:[],guest:'',
   when:when.toISOString().slice(0,16),
   program:demoProgram()};
  ceremony(true);}
