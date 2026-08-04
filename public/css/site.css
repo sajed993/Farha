@@ -1667,3 +1667,31 @@ html[dir=rtl] .df-yes{translate:50% -50%}
 
 @media(max-width:400px){.lx-nline{font-size:1.95rem}.lx-dnum{font-size:1.85rem}.lx-cart{width:66px;height:84px}}
 @media(prefers-reduced-motion:reduce){.lx-tap{animation:none}}
+
+/* ---- vista collections (bright scenes: dark ink, text inside the arch) ---- */
+.lx-light .lx-hall-scrim{background:linear-gradient(180deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.05) 42%,rgba(18,49,86,.14) 100%)}
+.lx-light .lx-hall-body{justify-content:flex-start;padding:24% 15% 8%}
+.lx-light .lx-names{color:var(--lx-ink);text-shadow:0 1px 10px rgba(255,255,255,.75)}
+.lx-light .lx-kick{color:var(--lx-ink-soft);text-shadow:0 1px 8px rgba(255,255,255,.7)}
+.lx-light .lx-msg{color:var(--lx-ink-soft);text-shadow:0 1px 8px rgba(255,255,255,.75)}
+.lx-light .lx-date,.lx-light .lx-place{color:var(--lx-ink);text-shadow:0 1px 8px rgba(255,255,255,.75)}
+.lx-light .lx-dmon{color:var(--lx-ink-soft)}
+.lx-light .lx-dsep{background:linear-gradient(180deg,transparent,rgba(18,49,86,.5),transparent)}
+.lx-light .lx-cart-t{fill:var(--lx-ink)}
+.lx-light .lx-div path,.lx-light .lx-div circle{stroke:var(--lx-ink-soft)!important;fill:var(--lx-ink-soft)}
+.lx-light .lx-div path[fill]{fill:var(--lx-ink-soft)}
+.lx-light .lx-cover-names{color:#FBF6EC;text-shadow:0 2px 12px rgba(12,28,48,.9)}
+.lx-light .lx-tap{color:#FBF6EC;border-color:rgba(251,246,236,.55);background:rgba(12,28,48,.42)}
+.lx-light .lx-enter{background:linear-gradient(120deg,var(--lx-ink-soft),var(--lx-ink));color:#FBF6EC}
+.lx-light .lx-nline{font-size:2.05rem}
+.lx-light .lx-cart{width:64px;height:80px;margin-bottom:8px}
+@media(max-width:400px){.lx-light .lx-nline{font-size:1.75rem}.lx-light .lx-hall-body{padding:26% 12% 8%}}
+.lx-light .lx-cart-front .lx-cart-t{fill:var(--lx-gold-hi)}
+.lx-light .lx-hall-body{padding:21% 14% 7%;gap:0}
+.lx-light .lx-msg{margin-top:9px;font-size:.8rem;line-height:1.7;max-width:88%}
+.lx-light .lx-div{margin:11px 0 2px;width:160px}
+.lx-light .lx-date{margin-top:5px;gap:11px}
+.lx-light .lx-dnum{font-size:1.85rem}
+.lx-light .lx-dsep{height:28px}
+.lx-light .lx-place{margin-top:9px;font-size:.79rem}
+.lx-light .lx-enter{margin-top:14px;padding:10px 26px;font-size:.9rem}

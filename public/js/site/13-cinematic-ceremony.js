@@ -254,7 +254,7 @@ function reveal(keepStage){try{window.__track&&window.__track("reveal",{inv_slug
  const a=S.c.anim,dz=getDesign();
  const finish=()=>{buildFinale();};
  if(a==='luxe'){const sc=veil.querySelector('.lx-scene');if(sc){sc.style.transition='opacity 1s ease,transform 1s ease';sc.style.opacity='0';sc.style.transform='scale(1.05)';}
-  try{_lxClear();}catch(e){}
+  try{_lxKill();}catch(e){}
   setTimeout(finish,1050);}
  else if(a>=100){const sc=veil.querySelector('.cine-scene');if(sc)sc.classList.add('dimmed');
   clearFilm();

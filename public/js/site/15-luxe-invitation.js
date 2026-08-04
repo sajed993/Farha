@@ -22,22 +22,46 @@ function _lxHallPhoto () {
   return '';
 }
 
-/* ---- themes: clone an entry to add a collection ---- */
+/* ---- collections: each declares a palette + which scene to draw ---- */
 const LUXE_THEMES = {
+  sidibou: {
+    scene: 'vista', vista: 'sidibou',
+    name: { ar: 'دار البحر', fr: 'Dar El Bahr', en: 'Dar El Bahr' },
+    blurb: { ar: 'سيدي بوسعيد — أبواب زرقاء وبحر لا ينتهي', fr: 'Sidi Bou Saïd — portes bleues, mer infinie', en: 'Sidi Bou Said — blue doors, endless sea' },
+    door: '#1E4C8A', doorLo: '#123156', stone: '#EFE6D6', stoneLo: '#CDBEA4',
+    gold: '#C79A45', goldLo: '#8A6420', goldHi: '#F3E3BC',
+    ink: '#123156', inkSoft: '#2C5A96', glow: '#FFE9B8',
+    sky1: '#BEE0F2', sky2: '#EAF6FB', sea1: '#2C6FA8', sea2: '#1B4E7E',
+    bloom: '#C6417C', leaf: '#5C7A43', wash: 'rgba(18,49,86,.10)'
+  },
+  santorini: {
+    scene: 'vista', vista: 'santorini',
+    name: { ar: 'غروب الجزيرة', fr: 'Coucher des Cyclades', en: 'Caldera Sunset' },
+    blurb: { ar: 'سانتوريني — قباب زرقاء وشمس تغرب', fr: 'Santorin — dômes bleus, soleil couchant', en: 'Santorini — blue domes at sunset' },
+    door: '#E8DFD2', doorLo: '#C9BCA8', stone: '#F6EFE4', stoneLo: '#DCCDB6',
+    gold: '#C98F4B', goldLo: '#8E5F27', goldHi: '#F6DDAE',
+    ink: '#5A3524', inkSoft: '#8A5636', glow: '#FFD79A',
+    sky1: '#F6B27A', sky2: '#FCE3C3', sea1: '#2E5F86', sea2: '#1A3A57',
+    bloom: '#E0708A', leaf: '#6E8757', wash: 'rgba(90,53,36,.10)'
+  },
   bab: {
+    scene: 'hall',
     name: { ar: 'باب الذهب', fr: 'Bab Dhahab', en: 'Bab Dhahab' },
+    blurb: { ar: 'قصر بايليكي — ذهب وكريستال', fr: 'Palais beylical — or et cristal', en: 'Beylical palace — gold and crystal' },
     wall: '#241A0E', wallLo: '#140D06', door: '#1F3A2C', doorLo: '#132318',
     gold: '#C79A45', goldLo: '#8A6420', goldHi: '#F0DCA6',
     glow: '#E8B75F', ink: '#F6EBD2', rug: '#4A1E18'
   },
   imperiale: {
+    scene: 'hall',
     name: { ar: 'الإمبراطورية', fr: "L'Impériale", en: 'Imperiale' },
+    blurb: { ar: 'قاعة مذهّبة — فخامة مطلقة', fr: 'Salle dorée — luxe absolu', en: 'Gilded hall — absolute luxury' },
     wall: '#1B1509', wallLo: '#0C0904', door: '#2E1418', doorLo: '#1A0A0C',
     gold: '#D8AE55', goldLo: '#96702A', goldHi: '#F6E4B4',
     glow: '#F0C46A', ink: '#F8EFD8', rug: '#3A1216'
   }
 };
-function _lxTheme () { return LUXE_THEMES[(S.c && S.c.luxeTheme) || 'bab'] || LUXE_THEMES.bab; }
+function _lxTheme () { return LUXE_THEMES[(S.c && S.c.luxeTheme) || 'sidibou'] || LUXE_THEMES.sidibou; }
 
 /* ---- name / initial helpers ---- */
 function _lxSplitNames (n) {
@@ -85,6 +109,15 @@ function _lxDefs (t) {
             fill="none" stroke="${t.gold}" stroke-opacity=".16" stroke-width="1.1"/>
       <circle cx="17" cy="23" r="1.5" fill="${t.gold}" fill-opacity=".2"/>
     </pattern>
+    <linearGradient id="lxSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${t.sky1 || '#BEE0F2'}"/><stop offset="100%" stop-color="${t.sky2 || '#EAF6FB'}"/>
+    </linearGradient>
+    <linearGradient id="lxSea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${t.sea1 || '#2C6FA8'}"/><stop offset="100%" stop-color="${t.sea2 || '#1B4E7E'}"/>
+    </linearGradient>
+    <linearGradient id="lxStone" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${t.stone || '#EFE6D6'}"/><stop offset="100%" stop-color="${t.stoneLo || '#CDBEA4'}"/>
+    </linearGradient>
     <filter id="lxSoft"><feGaussianBlur stdDeviation="7"/></filter>
     <filter id="lxGrain"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="3" result="n"/>
       <feColorMatrix in="n" type="saturate" values="0"/>
@@ -183,6 +216,104 @@ function _lxCartoucheSVG (t, initials) {
   </svg>`;
 }
 
+/* ---- a Mediterranean vista seen through a Moorish arch ---- */
+function _lxVistaSVG (t) {
+  const isSun = t.vista === 'santorini';
+  const horizon = 524;
+  /* white town: cubes with domes */
+  let town = '';
+  const cubes = isSun
+    ? [[74, 556, 76, 58], [150, 568, 62, 48], [206, 542, 84, 76], [286, 564, 70, 56], [352, 554, 74, 64]]
+    : [[66, 562, 72, 54], [136, 548, 66, 70], [200, 568, 80, 52], [278, 546, 68, 72], [344, 566, 78, 54]];
+  cubes.forEach(([x, y, w, h], i) => {
+    town += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#FBF8F2" opacity=".97"/>
+      <rect x="${x}" y="${y}" width="${w}" height="4" fill="#E3DACB"/>`;
+    for (let k = 0; k < 2; k++) {
+      const wx = x + 12 + k * (w - 34), wy = y + 18 + (i % 2) * 10;
+      town += `<rect x="${wx}" y="${wy}" width="13" height="17" rx="1.5" fill="${t.door}" opacity=".82"/>`;
+    }
+    if (i % 2 === (isSun ? 0 : 1)) {
+      const cx = x + w / 2, ry = isSun ? 22 : 17;
+      town += `<path d="M${cx - w * .32} ${y} a${w * .32} ${ry} 0 0 1 ${w * .64} 0 Z" fill="${isSun ? '#2E5F86' : t.door}" opacity=".9"/>
+        <path d="M${cx} ${y - ry - 7} L${cx} ${y - ry}" stroke="${t.goldHi}" stroke-width="1.6"/>`;
+    }
+  });
+  /* bougainvillea / jasmine on the arch */
+  let bloom = '';
+  const clusters = [[92, 176], [128, 148], [164, 132], [300, 134], [336, 150], [372, 180], [70, 236], [392, 240]];
+  clusters.forEach(([bx, by], i) => {
+    for (let k = 0; k < 9; k++) {
+      const dx = bx + (Math.sin(i * 3 + k) * 21), dy = by + (Math.cos(i * 2 + k) * 17);
+      bloom += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="${(2.6 + (k % 3)).toFixed(1)}" fill="${k % 4 === 0 ? '#FBF6EC' : t.bloom}" opacity="${(.62 + (k % 3) * .12).toFixed(2)}"/>`;
+    }
+    for (let k = 0; k < 5; k++) {
+      const dx = bx + (Math.cos(i + k) * 25), dy = by + (Math.sin(i + k) * 21);
+      bloom += `<ellipse cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" rx="5" ry="2.6" fill="${t.leaf}" opacity=".72" transform="rotate(${(k * 37) % 360} ${dx.toFixed(1)} ${dy.toFixed(1)})"/>`;
+    }
+  });
+  const archHole = 'M70 706 L70 330 C58 202 150 142 230 142 C310 142 402 202 390 330 L390 706 Z';
+  const sun = isSun
+    ? `<circle cx="308" cy="470" r="30" fill="${t.glow}" opacity=".9"/>
+       <ellipse cx="308" cy="470" rx="112" ry="88" fill="${t.glow}" opacity=".26" filter="url(#lxSoft)"/>
+       <rect x="70" y="${horizon}" width="320" height="16" fill="${t.glow}" opacity=".35"/>`
+    : `<ellipse cx="322" cy="238" rx="120" ry="96" fill="#FFFFFF" opacity=".2" filter="url(#lxSoft)"/>`;
+  return `<svg class="lx-art" viewBox="0 0 460 760" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    ${_lxDefs(t)}
+    <rect width="460" height="760" fill="url(#lxSky)"/>
+    ${sun}
+    <path d="M70 ${horizon - 6} q60-30 128-16 q70 14 122-6 L390 ${horizon} L70 ${horizon} Z" fill="${t.sea2}" opacity=".28"/>
+    <rect y="${horizon}" width="460" height="132" fill="url(#lxSea)"/>
+    <rect y="${horizon}" width="460" height="2" fill="#FFFFFF" opacity=".45"/>
+    <g opacity=".3">${[542, 562, 586, 608].map((y, i) => `<path d="M${88 + i * 26} ${y} q22-6 44 0 q22 6 44 0 q22-6 44 0" fill="none" stroke="#FFFFFF" stroke-width="1"/>`).join('')}</g>
+    ${town}
+    <rect y="640" width="460" height="120" fill="url(#lxStone)"/>
+    <rect y="640" width="460" height="3" fill="${t.stoneLo}"/>
+    <g opacity=".5">${[0, 1, 2, 3, 4, 5, 6].map((i) => `<rect x="${28 + i * 62}" y="664" width="46" height="46" rx="3" fill="none" stroke="${t.door}" stroke-width="1.4"/><path d="M${51 + i * 62} 616 l11 11 -11 11 -11-11 Z" fill="${t.door}" opacity=".55"/>`).join('')}</g>
+    <path d="M0 0 H460 V760 H0 Z ${archHole}" fill="url(#lxStone)" fill-rule="evenodd"/>
+    <path d="${archHole}" fill="none" stroke="${t.stoneLo}" stroke-width="3"/>
+    <path d="${archHole}" fill="none" stroke="${t.goldHi}" stroke-width="1" opacity=".55" transform="translate(0,6)"/>
+    ${bloom}
+    <rect width="460" height="760" filter="url(#lxGrain)" opacity=".4" fill="none"/>
+  </svg>`;
+}
+
+/* ---- Tunisian studded door leaf (Sidi Bou Said blue) ---- */
+function _lxStudDoorSVG (t, side) {
+  let studs = '';
+  for (let r = 0; r < 11; r++) {
+    for (let c = 0; c < 5; c++) {
+      const x = 24 + c * 38, y = 176 + r * 50;
+      const on = (r % 2 === 0) ? true : (c % 2 === 0);
+      if (on) studs += `<circle cx="${x}" cy="${y}" r="3.4" fill="#0C1C30" opacity=".8"/><circle cx="${x - .9}" cy="${y - 1}" r="1.3" fill="${t.goldHi}" opacity=".35"/>`;
+    }
+  }
+  let diamonds = '';
+  [268, 468].forEach((y) => {
+    diamonds += `<path d="M100 ${y} l30 30 -30 30 -30-30 Z" fill="none" stroke="#0C1C30" stroke-width="1.6" opacity=".5"/>`;
+  });
+  const half = side === 'l'
+    ? 'M0 760 L0 300 C0 190 60 150 200 150 L200 760 Z'
+    : 'M200 760 L200 150 C60 150 0 190 0 300 L0 760 Z';
+  const knobX = side === 'l' ? 176 : 24;
+  return `<svg class="lx-art" viewBox="0 0 200 760" preserveAspectRatio="none" aria-hidden="true">
+    ${_lxDefs(t)}
+    <rect width="200" height="760" fill="url(#lxStone)"/>
+    <path d="${half}" fill="${t.door}"/>
+    <path d="${half}" fill="url(#lxDamask)" opacity=".14"/>
+    <path d="${half}" fill="none" stroke="${t.doorLo}" stroke-width="4"/>
+    ${[210, 400, 590].map((y) => `<rect x="6" y="${y}" width="188" height="7" fill="${t.doorLo}" opacity=".55"/>`).join('')}
+    ${studs}${diamonds}
+    <circle cx="${knobX}" cy="556" r="9" fill="url(#lxGold)"/>
+    <circle cx="${knobX}" cy="556" r="15" fill="none" stroke="url(#lxGold)" stroke-width="1.2" opacity=".55"/>
+    <rect x="${side === 'l' ? 194 : 0}" width="6" height="760" fill="${t.doorLo}" opacity=".6"/>
+    <rect width="200" height="760" filter="url(#lxGrain)" opacity=".4" fill="none"/>
+  </svg>`;
+}
+
+/* pick the right art for the active collection */
+function _lxSceneSVG (t) { return t.scene === 'vista' ? _lxVistaSVG(t) : _lxHallSVG(t); }
+function _lxLeafSVG (t, side) { return t.scene === 'vista' ? _lxStudDoorSVG(t, side) : _lxDoorSVG(t, side); }
+
 /* ═══════════════════════════ MOUNT ═══════════════════════════ */
 let _lxTl = null, _lxTimers = [];
 function _lxKill () {
@@ -227,9 +358,11 @@ function mountLuxe (stage) {
   const doorBg = LUXE_ASSETS.door.url
     ? `<div class="lx-art" style="background-image:url('${LUXE_ASSETS.door.url}');background-size:cover;background-position:center"></div>` : '';
 
-  stage.innerHTML = `<div class="lx-stage" id="lxStage">
+  const light = t.scene === 'vista';
+  v.setProperty('--lx-ink-soft', t.inkSoft || t.ink);
+  stage.innerHTML = `<div class="lx-stage${light ? ' lx-light' : ''}" id="lxStage">
     <div class="lx-hall">
-      ${hallPhoto ? `<div class="lx-art lx-hall-photo" style="background-image:url('${hallPhoto}')"></div>` : _lxHallSVG(t)}
+      ${hallPhoto ? `<div class="lx-art lx-hall-photo" style="background-image:url('${hallPhoto}')"></div>` : _lxSceneSVG(t)}
       <div class="lx-hall-scrim"></div>
       <div class="lx-hall-body">
         <div class="lx-cart" id="lxCart">${_lxCartoucheSVG(t, _lxInitials())}</div>
@@ -262,8 +395,8 @@ function mountLuxe (stage) {
 
     <div class="lx-doors" id="lxDoors">
       <div class="lx-jamb"></div>
-      <div class="lx-leaf lx-l" id="lxL">${doorBg || _lxDoorSVG(t, 'l')}</div>
-      <div class="lx-leaf lx-r" id="lxR">${doorBg || _lxDoorSVG(t, 'r')}</div>
+      <div class="lx-leaf lx-l" id="lxL">${doorBg || _lxLeafSVG(t, 'l')}</div>
+      <div class="lx-leaf lx-r" id="lxR">${doorBg || _lxLeafSVG(t, 'r')}</div>
       <div class="lx-front">
         <div class="lx-cart lx-cart-front" id="lxCartF">${_lxCartoucheSVG(t, _lxInitials())}</div>
         <div class="lx-cover-names">${esc(n1)}${n2 ? ' &amp; ' + esc(n2) : ''}</div>
