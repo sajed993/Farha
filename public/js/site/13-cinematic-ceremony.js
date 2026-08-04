@@ -73,6 +73,7 @@ function mountVideoOpen(ix){
   ceremonyMusic('video');vd.play().catch(()=>{vd.muted=true;vd.play().catch(()=>reveal());});
   filmT.push(setTimeout(()=>{if(vd.paused&&vd.readyState<2)reveal();},2500));};}
 function mountCeremony(){cerMusicOn=false;
+ if(S.c.anim==='edi'){editorialOpen();return;}
  if(S.c.anim==='luxe'){let stage=veil.querySelector('.cstage');if(!stage){stage=document.createElement('div');stage.className='cstage';veil.appendChild(stage);}mountLuxe(stage);return;}
  if(typeof S.c.anim==='string'&&S.c.anim.charAt(0)==='v'){mountVideoOpen(parseInt(S.c.anim.slice(1))||0);return;}
  clearTimeout(storyT);
