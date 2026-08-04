@@ -83,7 +83,7 @@ function landView(){
    <div class="pm-tag">«${t().pmTag}»</div><p>${t().pmSub}</p>
    <button class="pm-cta" onclick="openPremium(0)">${t().pmCta}</button></div>
   <div class="filters pm-filters">${[['all',t().pmCatAll],['r','🎥 '+t().pmCatR],['i','🪄 '+t().pmCatI]].map(([k,l])=>`<button class="chip ${S.pmFilter===k?'on':''}" onclick="setPmFilter('${k}')">${l}</button>`).join('')}</div>
-  <div class="pm-grid">${[0,1,2,3,4,5,6,7,8,9].filter(i=>S.pmFilter==='all'||PM_CAT[i]===S.pmFilter).map(i=>`
+  <div class="pm-grid">${FILMS.map((_,i)=>i).filter(i=>S.pmFilter==='all'||PM_CAT[i]===S.pmFilter).map(i=>`
    <div class="pcard">
     <div class="pv" onclick="premDemo(${i})">${sceneHTML(i)}<span class="pm-badge">${t().pmBadge}</span><span class="play">▶</span></div>
     <div class="pmeta"><b>${PM_ICO[i]} ${t().pmNames[i]}</b><div class="pd">${t().pmDescs[i]}</div>

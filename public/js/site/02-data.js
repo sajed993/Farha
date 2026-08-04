@@ -3,10 +3,10 @@ const FONTS_L=["'Fraunces',serif","'Fraunces',serif","'Karla',sans-serif","'Grea
 const FONTS_A=["'Aref Ruqaa',serif","'Amiri',serif","'IBM Plex Sans Arabic',sans-serif","'Amiri',serif"];
 const LAYERS=['','bg-dots','bg-arch','bg-rays','bg-zellige','bg-damask','bg-stars','bg-confetti'];
 const ANIM_ICO=['💌','🔴','🎀','🎭','🌹','🦋','🌸','🎁','❤️'];
-const PM_ICO=['🌅','🏰','⛲','🚪','🦋','🎆','🌙','✨','💗','💍'];
-const PM_MAP=[1,2,9,10,4,6,3,11,4,9];
-const PM_DUR=['0:45','0:50','0:40','0:35','0:55','0:45','0:40','0:30','0:40','0:35'];
-const PM_CAT=['r','r','r','r','i','i','i','i','i','i'];
+const PM_ICO=['🌅','🏰','⛲','🚪','🦋','🎆','🌙','✨','💗','💍','🕌','♛','🚪','🕯️','🫒','🌊'];
+const PM_MAP=[1,2,9,10,4,6,3,11,4,9,2,6,4,2,8,3];
+const PM_DUR=['0:45','0:50','0:40','0:35','0:55','0:45','0:40','0:30','0:40','0:35','0:50','0:45','0:45','0:50','0:45','0:45'];
+const PM_CAT=['r','r','r','r','i','i','i','i','i','i','r','r','r','r','r','r'];
 /* shot: {x,y,s,s2,d[,dip:'b'|'w'][,txt][,doors]} — x/y camera origin %, s→s2 move, d ms */
 const FILMS=[
  {shots:[{x:50,y:44,s:1,s2:1.1,d:3300},{txt:1,d:2300},{x:50,y:58,s:2.1,s2:2.4,d:3100,dip:'b'},{x:50,y:77,s:2.9,s2:3.3,d:3300,dip:'b'}]},
@@ -18,9 +18,33 @@ const FILMS=[
  {shots:[{x:50,y:40,s:1,s2:1.06,d:3000},{txt:1,d:2400},{x:79,y:23,s:2.25,s2:2.5,d:3400,dip:'b'},{x:32,y:74,s:2.3,s2:2.5,d:3000,dip:'b'}]},
  {shots:[{txt:1,d:2500},{x:50,y:50,s:1,s2:1.08,d:3400},{x:50,y:50,s:1.9,s2:2.15,d:2900,dip:'b'},{x:50,y:50,s:1.05,s2:1.12,d:2200,dip:'w'}],burst:[8900,.5,.46]},
  {shots:[{x:50,y:42,s:1,s2:1.1,d:3200},{x:30,y:34,s:2,s2:2.2,d:2800,dip:'b'},{txt:1,d:2300},{x:50,y:46,s:1.15,s2:1.24,d:2600}]},
- {shots:[{x:50,y:60,s:1,s2:1.12,d:3200},{x:50,y:30,s:2.6,s2:2.9,d:3000,dip:'b'},{txt:1,d:2300},{x:50,y:44,s:1.2,s2:1.3,d:2400,dip:'w'}],burst:[8600,.5,.34]}];
+ {shots:[{x:50,y:60,s:1,s2:1.12,d:3200},{x:50,y:30,s:2.6,s2:2.9,d:3000,dip:'b'},{txt:1,d:2300},{x:50,y:44,s:1.2,s2:1.3,d:2400,dip:'w'}],burst:[8600,.5,.34]},
+ /* Architectural sets: gentler pushes than the character scenes above — past ~1.8x
+    the wide gold surfaces fill the frame and lose their read. */
+ /* 10 · beylical palace — wide, up the arches, along the lanterns, back out */
+ {shots:[{x:50,y:52,s:1,s2:1.1,d:3400},{x:50,y:26,s:1.45,s2:1.6,d:3100,dip:'b'},{txt:1,d:2400},
+  {x:18,y:34,s:1.5,s2:1.65,d:3000,dip:'b'},{x:50,y:74,s:1.35,s2:1.5,d:2900,dip:'b'},{x:50,y:50,s:1.06,s2:1.14,d:2600,dip:'b'}],burst:[15300,.5,.4]},
+ /* 11 · l'impériale — crown, gate, carpet, coronation push */
+ {shots:[{x:50,y:12,s:1.5,s2:1.65,d:3000},{txt:1,d:2400},{x:50,y:44,s:1,s2:1.12,d:3400,dip:'b'},
+  {x:50,y:86,s:1.4,s2:1.55,d:2900,dip:'b'},{x:50,y:40,s:1.2,s2:2,d:2600,dip:'w'}],burst:[11700,.5,.44]},
+ /* 12 · café des délices — sea, blue door, bougainvillea, steps */
+ {shots:[{x:50,y:16,s:1.05,s2:1.14,d:3300},{x:50,y:48,s:1.5,s2:1.65,d:3100,dip:'b'},{txt:1,d:2400},
+  {x:16,y:18,s:1.6,s2:1.75,d:2900,dip:'b'},{x:50,y:52,s:1.08,s2:1.16,d:2700,dip:'b'}]},
+ /* 13 · le grand palais — chandelier, drapes, floor, the waltz */
+ {shots:[{x:50,y:20,s:1,s2:1.1,d:3400},{x:50,y:16,s:1.7,s2:1.85,d:3100,dip:'b'},{txt:1,d:2400},
+  {x:8,y:42,s:1.5,s2:1.65,d:2900,dip:'b'},{x:50,y:78,s:1.4,s2:1.55,d:3000,dip:'b'},{x:50,y:52,s:1.05,s2:1.14,d:2600,dip:'b'}],burst:[15400,.5,.56]},
+ /* 14 · les oliviers — grove, festoon lights, table, low sun */
+ {shots:[{x:50,y:46,s:1,s2:1.1,d:3400},{txt:1,d:2400},{x:50,y:26,s:1.4,s2:1.55,d:3000,dip:'b'},
+  {x:70,y:70,s:1.5,s2:1.65,d:2900,dip:'b'},{x:50,y:48,s:1.08,s2:1.18,d:2900,dip:'b'}],burst:[14600,.5,.36]},
+ /* 15 · la brise nautique — horizon, foam, the floral arch */
+ {shots:[{x:50,y:28,s:1,s2:1.1,d:3400},{x:50,y:70,s:1.4,s2:1.55,d:3000,dip:'b'},{txt:1,d:2400},
+  {x:50,y:52,s:1.35,s2:1.5,d:3000,dip:'b'},{x:50,y:44,s:1.06,s2:1.16,d:2700,dip:'w'}],burst:[14500,.5,.42]}];
 function filmDur(idx){return FILMS[idx].shots.reduce((a,s)=>a+s.d,0);}
 function durStr(i){return S.lang==='ar'?toAr(PM_DUR[i]):PM_DUR[i];}
+/* olive sprig: leaves strung along a stem, used as a foreground frame */
+function obrLeaves(n){let s='';
+ for(let k=0;k<n;k++)s+=`<i style="left:${(k*15+4).toFixed(0)}%;top:${(Math.sin(k*.95)*26+34).toFixed(0)}%;font-size:${(3.4+Math.random()*1.8).toFixed(1)}vmin;transform:rotate(${(k*47)%360}deg)">🌿</i>`;
+ return s;}
 function sceneHTML(i,opts){opts=opts||{};
  const grade=g=>`<div class="grade ${g}"></div>`;
  if(i===0){ /* sunset */
@@ -113,6 +137,83 @@ function sceneHTML(i,opts){opts=opts||{};
   return `<div class="scene sc-ring"><div class="bg"></div>${st}
    <div class="ped"></div>
    <div class="ringw">${sp}<div class="band"></div><div class="stone"></div></div>${grade('g-ring')}</div>`;}
+ if(i===10){ /* beylical palace — burnished gilding & Ottoman splendour */
+  let ln='';for(let k=0;k<3;k++)ln+=`<i class="blant" style="left:${17+k*33}%;--ls:${(4.4+k*.7).toFixed(1)}s;animation-delay:${(-k*1.4).toFixed(1)}s">🪔</i>`;
+  let sm='';for(let k=0;k<4;k++)sm+=`<span class="smoke" style="left:${19+k*21}%;--sd:${(10+Math.random()*5).toFixed(1)}s;animation-delay:${(-Math.random()*10).toFixed(1)}s"></span>`;
+  let cn='';for(let k=0;k<7;k++)cn+=`<i class="bcnd" style="left:${7+k*13.2}%;animation-delay:${(Math.random()*.5).toFixed(2)}s">🕯️</i>`;
+  let gm='';for(let k=0;k<16;k++)gm+=`<span class="gmote" style="left:${(Math.random()*96).toFixed(1)}%;top:${(Math.random()*76).toFixed(1)}%;--gm:${(7+Math.random()*6).toFixed(1)}s;animation-delay:${(-Math.random()*9).toFixed(1)}s"></span>`;
+  return `<div class="scene sc-beya"><div class="zoom"><div class="bg"></div><div class="zell"></div>
+   <div class="barch a1"></div><div class="barch a2"></div><div class="barch a3"></div>
+   <div class="bcol" style="left:31.5%"></div><div class="bcol" style="right:31.5%"></div>
+   <div class="bfloor"></div><div class="bmirror"></div>
+   ${ln}${sm}${cn}${gm}<div class="bfilig"></div>
+   </div>${grade('g-beya')}</div>`;}
+ if(i===11){ /* l'impériale — chiselled gold & a coronation entrance */
+  let br='';for(let k=0;k<9;k++)br+=`<span class="gbar" style="left:${5+k*11.2}%"></span>`;
+  let lf='';for(let k=0;k<14;k++)lf+=`<span class="gleaf" style="left:${(Math.random()*98).toFixed(1)}%;--lz:${(9+Math.random()*7).toFixed(1)}s;animation-delay:${(-Math.random()*12).toFixed(1)}s;width:${(0.7+Math.random()*.9).toFixed(1)}vmin"></span>`;
+  let ry='';for(let k=0;k<5;k++)ry+=`<span class="iray" style="left:${16+k*17}%;animation-delay:${(-k*1.7).toFixed(1)}s"></span>`;
+  return `<div class="scene sc-imper"><div class="zoom"><div class="bg"></div>
+   <div class="igate">${br}<div class="ibars"></div></div>${ry}
+   <div class="icrown">♛</div><div class="isteps"></div><div class="icarpet"></div>
+   <div class="ipanel l"></div><div class="ipanel r"></div>
+   ${lf}</div>${grade('g-imper')}</div>`;}
+ if(i===12){ /* café des délices — Sidi Bou Saïd blue & jasmine */
+  /* bougainvillea: a cascade scattered down the left of the wall */
+  let bg2='';for(let k=0;k<16;k++)bg2+=`<i class="boug" style="left:${(Math.random()*52).toFixed(1)}%;top:${(Math.random()*46).toFixed(1)}%;font-size:${(1.3+Math.random()*1.5).toFixed(1)}vmin;animation-delay:${(-Math.random()*6).toFixed(1)}s">${k%4?'🌺':'🌸'}</i>`;
+  /* jasmine carried on the breeze */
+  let jm='';for(let k=0;k<8;k++)jm+=`<span class="jasm" style="left:${(Math.random()*22).toFixed(1)}%;top:${(4+Math.random()*40).toFixed(1)}%;--fs:${(.8+Math.random()*.7).toFixed(1)}vmin;--wd:${(10+Math.random()*7).toFixed(1)}s;animation-delay:${(-Math.random()*12).toFixed(1)}s"></span>`;
+  let gl='';for(let k=0;k<14;k++)gl+=`<span class="seagl" style="left:${(30+Math.random()*40).toFixed(1)}%;top:${(Math.random()*7).toFixed(1)}%;animation-delay:${(Math.random()*2.4).toFixed(1)}s"></span>`;
+  let st='';for(let k=0;k<9;k++)st+=`<span class="dstud" style="left:${50}%;top:${18+k*7}%"></span>`;
+  return `<div class="scene sc-cafe"><div class="zoom"><div class="sky"></div><div class="msea2">${gl}</div>
+   <div class="wall"></div><div class="bdoor"><div class="dgrid"></div>${st}<span class="dknob"></span></div>
+   <div class="darchtop"></div><div class="steps"></div>
+   <div class="cwin"><span></span><span></span></div>
+   <div class="cage"></div><i class="pot" style="left:9%">🪴</i><i class="pot" style="right:10%;font-size:3.6vmin">🪴</i>
+   <div class="bougwrap">${bg2}</div>${jm}
+   <i class="bird" style="--bf:17s;filter:brightness(0) opacity(.55);font-size:1.5vmin">🕊️</i>
+   <i class="bird" style="--bf:23s;animation-delay:-9s;filter:brightness(0) opacity(.4);font-size:1.1vmin">🕊️</i>
+   </div>${grade('g-cafe')}</div>`;}
+ if(i===13){ /* le grand palais — crystal, gilding & deep velvet */
+  /* chandelier: three tiers of crystal droplets on concentric rings */
+  let cr='';[[8,4.4,3.2],[13,7.6,2.4],[18,10.6,1.7]].forEach(([n,rad,len])=>{
+   for(let k=0;k<n;k++)cr+=`<span class="crys" style="--cr:${(k*360/n).toFixed(1)}deg;--rad:${rad}vmin;--cl:${len}vmin;animation-delay:${(Math.random()*2.6).toFixed(2)}s"></span>`;});
+  let pz='';for(let k=0;k<9;k++)pz+=`<span class="prism" style="left:${(6+Math.random()*88).toFixed(1)}%;top:${(8+Math.random()*62).toFixed(1)}%;animation-delay:${(Math.random()*3.4).toFixed(1)}s;font-size:${(0.8+Math.random()*1.1).toFixed(1)}vmin"></span>`;
+  let dm='';for(let k=0;k<20;k++)dm+=`<span class="gmote" style="left:${(Math.random()*96).toFixed(1)}%;top:${(Math.random()*70).toFixed(1)}%;--gm:${(8+Math.random()*7).toFixed(1)}s;animation-delay:${(-Math.random()*10).toFixed(1)}s"></span>`;
+  return `<div class="scene sc-palais"><div class="zoom"><div class="bg"></div>
+   <div class="gpanel" style="left:6%"></div><div class="gpanel" style="left:38%"></div><div class="gpanel" style="right:6%"></div>
+   <div class="drape l"></div><div class="drape r"></div>
+   <div class="chand2"><div class="cbody">${cr}</div><div class="cglow"></div></div>
+   <div class="parquet"></div><div class="pshine"></div>
+   <i class="waltz">💃🕺</i><div class="wshadow"></div>
+   ${pz}${dm}</div>${grade('g-palais')}</div>`;}
+ if(i===14){ /* les oliviers — open-air boho under olive branches */
+  /* festoon bulbs ride the sag of the wire */
+  let fs='';for(let k=0;k<11;k++)fs+=`<span class="fest" style="left:${k*10}%;top:${(Math.sin(k/10*Math.PI)*8).toFixed(1)}%;animation-delay:${(-k*.3).toFixed(1)}s"></span>`;
+  let ol='';for(let k=0;k<5;k++)ol+=`<i class="olv" style="left:${(Math.random()*30).toFixed(0)}%;top:${(Math.random()*26).toFixed(0)}%;font-size:${(1.2+Math.random()).toFixed(1)}vmin;--wd:${(12+Math.random()*7).toFixed(1)}s;animation-delay:${(-Math.random()*13).toFixed(1)}s">🌿</i>`;
+  let pp='';for(let k=0;k<6;k++)pp+=`<i class="pamp" style="left:${4+k*17}%;--pw:${(5+Math.random()*3).toFixed(1)}s;animation-delay:${(-Math.random()*5).toFixed(1)}s">🌾</i>`;
+  return `<div class="scene sc-oliv"><div class="zoom"><div class="bg"></div><div class="lowsun"></div>
+   <i class="flare" style="left:52%;top:44%;width:11vmin;height:11vmin"></i>
+   <div class="hills"></div><div class="grove"></div><div class="field"></div>
+   <div class="festwire">${fs}</div>
+   <i class="ocpl">🤵👰</i><div class="ocplref"></div>
+   <div class="otable"></div><i class="ovase">🫒</i>
+   ${pp}<div class="haze"></div>${ol}
+   <div class="obr l">${obrLeaves(6)}</div><div class="obr r">${obrLeaves(6)}</div>
+   </div>${grade('g-oliv')}</div>`;}
+ if(i===15){ /* la brise nautique — pale sand, turquoise water, gold light */
+  let wv='';for(let k=0;k<4;k++)wv+=`<span class="foam" style="--fw:${(5.5+k*1.4).toFixed(1)}s;animation-delay:${(-k*1.5).toFixed(1)}s;bottom:${17+k*2.4}%"></span>`;
+  let gl='';for(let k=0;k<16;k++)gl+=`<span class="seagl" style="left:${(24+Math.random()*52).toFixed(1)}%;top:${(30+Math.random()*13).toFixed(1)}%;animation-delay:${(Math.random()*2.6).toFixed(1)}s"></span>`;
+  /* white blooms laid along the semicircle of the arch */
+  let fl='';for(let k=0;k<9;k++){const a=k/8*Math.PI;
+   for(let d=0;d<2;d++)fl+=`<span class="archfl${d?' grn':''}" style="left:${(50-Math.cos(a)*46+(d?2.6:0)).toFixed(1)}%;top:${(30-Math.sin(a)*26+(d?2.4:0)).toFixed(1)}%;--fs:${(d?.9:1.5+Math.random()*.8).toFixed(1)}vmin;animation-delay:${(Math.random()*3).toFixed(1)}s"></span>`;}
+  return `<div class="scene sc-brise"><div class="zoom"><div class="sky"></div>
+   <div class="hsun"></div><i class="flare" style="left:50%;top:26%;width:9vmin;height:9vmin"></i>
+   <div class="turq">${gl}</div>${wv}
+   <div class="sand"></div><div class="wetsand"></div>
+   <div class="varch"><div class="apost l"></div><div class="apost r"></div><div class="abar"></div>${fl}</div>
+   <i class="shell" style="left:16%">🐚</i><i class="shell" style="right:21%;font-size:1.9vmin">🐚</i>
+   <i class="bird" style="--bf:19s;filter:brightness(0) opacity(.45);font-size:1.3vmin">🕊️</i>
+   </div>${grade('g-brise')}</div>`;}
  /* fairy dust */
  let mt='';for(let k=0;k<36;k++){const sz=(0.6+Math.random()*1.1).toFixed(2);
   mt+=`<span class="mote" style="width:${sz}vmin;height:${sz}vmin;--mx:${(Math.random()*84-42).toFixed(1)}vmin;--my:${(Math.random()*66-33).toFixed(1)}vmin;--cx:${(Math.random()*7-3.5).toFixed(1)}vmin;--cy:${(Math.random()*7-3.5).toFixed(1)}vmin;--mt:${(4.5+Math.random()*3.5).toFixed(1)}s;--md:${(-Math.random()*6).toFixed(1)}s"></span>`;}
@@ -125,8 +226,23 @@ const PALETTES=[null,
  {bg:"#FBEFEA",ac:"#C4827A",ink:"#4E2F2A"},
  {bg:"#EFF3EC",ac:"#7C9482",ink:"#2F3E33"},
  {bg:"#EDF1FA",ac:"#5570B8",ink:"#22304F"}];
-const FLOURISH='<svg viewBox="0 0 120 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 7 H44 M76 7 H116"/><path d="M52 7c2-4 6-4 8 0s6 4 8 0"/><circle cx="60" cy="7" r="1.6" fill="currentColor"/></svg>';
-const CORNER_SVG='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 37V14C3 7 8 3 14 3h23"/><path d="M9 31V17c0-5 3-8 8-8h14"/><circle cx="9" cy="9" r="2" fill="currentColor"/></svg>';
+const FLOURISH='<svg viewBox="0 0 160 20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">'
++'<path d="M4 10h44M112 10h44"/>'
++'<path d="M48 10c5-6 11-6 13.5 0-2.5 6-8.5 6-13.5 0Z" fill="currentColor" fill-opacity=".22"/>'
++'<path d="M112 10c-5-6-11-6-13.5 0 2.5 6 8.5 6 13.5 0Z" fill="currentColor" fill-opacity=".22"/>'
++'<path d="M64 10.5c3.5-5 7.5-5 9.5-.5M96 10.5c-3.5-5-7.5-5-9.5-.5" opacity=".85"/>'
++'<path d="M80 3.4l4.4 6.6L80 16.6 75.6 10z" fill="currentColor" stroke="none"/>'
++'<circle cx="69.5" cy="14.6" r="1.05" fill="currentColor" stroke="none"/>'
++'<circle cx="90.5" cy="14.6" r="1.05" fill="currentColor" stroke="none"/>'
++'</svg>';
+const CORNER_SVG='<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">'
++'<path d="M3 44V15C3 8 8 3 15 3h29"/>'
++'<path d="M9.5 37V18.5C9.5 13 13 9.5 18.5 9.5H37"/>'
++'<path d="M9.5 23.5C9.5 15.8 15.8 9.5 23.5 9.5"/>'
++'<path d="M14.6 14.6C18.6 6.6 26 3.2 34 3.2 30 11.2 22.6 14.6 14.6 14.6Z" fill="currentColor" fill-opacity=".2"/>'
++'<circle cx="6.2" cy="6.2" r="2.05" fill="currentColor" stroke="none"/>'
++'<circle cx="23.6" cy="23.6" r="1.1" fill="currentColor" stroke="none"/>'
++'</svg>';
 const Dz=(id,cat,badge,name,sub,tag,bg,ac,ink,foil,orn,corners,layer,def)=>({id,cat,badge,name,sub,tag,bg,ac,ink,foil,orn,corners,layer,def});
 const DESIGNS=[
 Dz(1,'wed','hot',{ar:'عرس ذهبي فاخر',fr:'Mariage Or Luxe',en:'Luxury Gold Wedding'},{ar:'ليلة العمر',fr:'La nuit d\'une vie',en:'The night of a lifetime'},

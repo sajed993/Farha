@@ -148,14 +148,30 @@ html[dir=rtl] .cat .go{align-self:flex-end}
 .tcard.scratchc:hover{background:#fff;transform:translateY(-11px)}
 .tcard.scratchc .big{font-size:3rem}
 
-/* invitation face v3 */
-.invite{aspect-ratio:3/4.25;border-radius:14px;background:var(--ibg,#fff);color:var(--iink,var(--ink));
+/* ============ invitation face v4 — letterpress stationery ============ */
+.invite{aspect-ratio:3/4.25;border-radius:16px;background:var(--ibg,#fff);color:var(--iink,var(--ink));
  display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;
- overflow:hidden;padding:10% 9%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04),inset 0 0 60px rgba(0,0,0,.045)}
-.invite .grain{position:absolute;inset:0;opacity:.5;background:
- radial-gradient(rgba(255,255,255,.06) 1px,transparent 1px);background-size:5px 5px;mix-blend-mode:overlay}
-.invite .frame{position:absolute;inset:5%;border:1.4px solid var(--iac,var(--gold));border-radius:9px;pointer-events:none;opacity:.9}
-.invite .frame::after{content:"";position:absolute;inset:5px;border:1px solid var(--iac);border-radius:6px;opacity:.45}
+ overflow:hidden;padding:11.5% 9.5%;isolation:isolate;
+ box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,.45)}
+/* paper: linen weave + fibre speckle */
+.invite .grain{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.3;mix-blend-mode:overlay;
+ background:
+  repeating-linear-gradient(90deg,rgba(255,255,255,.16) 0 1px,transparent 1px 3px),
+  repeating-linear-gradient(0deg,rgba(120,86,36,.05) 0 1px,transparent 1px 3px),
+  radial-gradient(rgba(255,255,255,.14) 1px,transparent 1.3px);
+ background-size:auto,auto,6px 6px}
+/* light pool from above + soft warm edge vignette */
+.invite .vign{position:absolute;inset:0;z-index:1;pointer-events:none;
+ background:
+  radial-gradient(112% 68% at 50% -10%,rgba(255,255,255,.3),transparent 62%),
+  radial-gradient(128% 96% at 50% 48%,transparent 72%,rgba(104,72,26,.045) 93%,rgba(104,72,26,.09) 100%)}
+/* engraved double rule */
+.invite .frame{position:absolute;inset:5.2%;z-index:1;pointer-events:none;color:var(--iac,var(--gold));
+ border:1.5px solid currentColor;border-radius:10px;opacity:.9;
+ filter:drop-shadow(0 .5px 0 rgba(255,255,255,.55))}
+.invite .frame::before{content:"";position:absolute;inset:4.5px;border:.9px solid currentColor;border-radius:6px;opacity:.45}
+.invite .frame::after{content:"";position:absolute;inset:-1px;border-radius:11px;
+ box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
 .invite .fcorner{position:absolute;width:14%;aspect-ratio:1;z-index:3;color:var(--iac)}
 .invite .fcorner svg{width:100%;height:100%;display:block}
 .fcorner.tl{top:6.5%;inset-inline-start:7%}
@@ -167,19 +183,60 @@ html[dir=rtl] .fcorner.tr{transform:none}
 html[dir=rtl] .fcorner.bl{transform:scale(-1)}
 html[dir=rtl] .fcorner.br{transform:scaleY(-1)}
 .invite>div{position:relative;z-index:2}
-.i-orn{font-size:1.7em;line-height:1.1;margin-bottom:.4em;filter:drop-shadow(0 3px 6px rgba(0,0,0,.14))}
-.i-title{font-size:.6em;letter-spacing:.34em;text-transform:uppercase;font-weight:700;opacity:.72;margin-bottom:.8em}
-html[dir=rtl] .i-title{letter-spacing:.1em;font-size:.68em}
-.i-names{font-family:var(--ifont,var(--disp));font-size:1.62em;font-weight:700;line-height:1.3;color:var(--iac)}
+
+/* monogram medallion */
+.i-mono{width:4.1em;height:4.1em;display:grid;place-items:center;color:var(--iac);
+ margin:.3em 0 .7em;flex:0 0 auto}
+.i-mono .ring{position:absolute;inset:0;border-radius:50%;border:1.4px solid currentColor;opacity:.8}
+.i-mono .ring.r2{inset:.4em;border-width:.7px;opacity:.4}
+.i-mono .ticks{position:absolute;inset:-.52em;border-radius:50%;opacity:.42;
+ background:repeating-conic-gradient(from 0deg,currentColor 0 1.2deg,transparent 1.2deg 15deg);
+ -webkit-mask:radial-gradient(circle,transparent 0 calc(50% - 2.6px),#000 calc(50% - 2.6px));
+ mask:radial-gradient(circle,transparent 0 calc(50% - 2.6px),#000 calc(50% - 2.6px))}
+.i-mono .mg{position:relative;display:flex;align-items:baseline;justify-content:center;gap:.04em;
+ font-family:var(--ifont,var(--disp));font-weight:700;font-size:1.5em;line-height:1;letter-spacing:0;
+ text-shadow:0 1px 0 rgba(255,255,255,.5),0 -.5px 0 rgba(0,0,0,.14)}
+.i-mono .mg .solo{font-size:1.08em}
+.i-mono .mg i.amp{font-style:normal;font-size:.5em;opacity:.66;transform:translateY(-.2em)}
+.i-mono .crest{position:absolute;top:-1.35em;font-size:.85em;line-height:1;
+ filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
+
+/* title with flanking hairlines */
+.i-title{display:flex;align-items:center;justify-content:center;gap:.75em;
+ font-size:.56em;letter-spacing:.34em;text-transform:uppercase;font-weight:700;opacity:.68;margin-bottom:.7em}
+.i-title::before,.i-title::after{content:"";flex:0 0 auto;width:2.2em;height:1px;background:currentColor;opacity:.45}
+html[dir=rtl] .i-title{letter-spacing:.12em;font-size:.66em}
+
+.i-names{font-family:var(--ifont,var(--disp));font-size:1.66em;font-weight:700;line-height:1.32;color:var(--iac);
+ text-shadow:0 1px 0 rgba(255,255,255,.4)}
 .i-names.foil{background:var(--foil);background-size:200% auto;-webkit-background-clip:text;background-clip:text;
- color:transparent;animation:foilshift 5s ease-in-out infinite}
-.i-flourish{width:58%;margin:.55em auto;color:var(--iac);opacity:.95}
+ color:transparent;text-shadow:none;animation:foilshift 5s ease-in-out infinite}
+.i-flourish{width:64%;margin:.5em auto .55em;color:var(--iac);opacity:.95;
+ filter:drop-shadow(0 .5px 0 rgba(255,255,255,.5))}
 .i-flourish svg{width:100%;display:block}
-.i-date{font-weight:700;font-size:.82em;letter-spacing:.1em}
-.i-place{font-size:.68em;opacity:.85;margin-top:.4em}
-.i-msg{font-family:var(--serif);font-size:.72em;opacity:.92;margin-top:.85em;line-height:1.75;white-space:pre-wrap;max-width:96%}
-.i-cd{margin-top:.9em;font-size:.6em;font-weight:700;border:1px solid var(--iac);border-radius:999px;
- padding:.5em 1.1em;color:var(--iac);letter-spacing:.05em}
+
+/* date framed by hairline rules */
+.i-date{font-weight:700;font-size:.8em;letter-spacing:.14em;padding:.62em .2em;margin-top:.1em}
+.i-date::before,.i-date::after{content:"";position:absolute;inset-inline:0;height:1px;background:var(--iac);opacity:.38}
+.i-date::before{top:0}
+.i-date::after{bottom:0}
+.i-date i{font-style:normal;color:var(--iac);font-size:.6em;opacity:.85;margin:0 .55em;vertical-align:.16em}
+.i-place{font-size:.66em;opacity:.84;margin-top:.6em;letter-spacing:.06em}
+.i-msg{font-family:var(--serif);font-size:.71em;opacity:.9;margin-top:.8em;line-height:1.8;white-space:pre-wrap;max-width:94%;font-style:italic}
+html[dir=rtl] .i-msg{font-style:normal}
+.i-cd{margin-top:.85em;font-size:.58em;font-weight:700;border:1px solid var(--iac);border-radius:999px;
+ padding:.5em 1.1em;color:var(--iac);letter-spacing:.05em;opacity:.92}
+
+/* wax seal (premium designs) */
+.i-seal{width:2.1em;height:2.1em;display:grid;place-items:center;margin-top:.8em;flex:0 0 auto}
+.i-seal .wax{position:absolute;inset:0;border-radius:48% 52% 45% 55%/53% 46% 54% 47%;
+ background:radial-gradient(circle at 33% 26%,#D9A758,#B0801F 42%,#7C4F14 74%,#5A360C);
+ box-shadow:0 .15em .28em rgba(48,30,6,.45),inset 0 0 0 .1em rgba(255,238,196,.14),
+  inset 0 -.14em .22em rgba(0,0,0,.36)}
+.i-seal .wax::after{content:"";position:absolute;inset:14%;border-radius:inherit;
+ border:.055em solid rgba(255,240,205,.28)}
+.i-seal b{position:relative;font-family:var(--ifont,var(--disp));font-size:.8em;line-height:1;
+ color:#FFF2D2;letter-spacing:.02em;text-shadow:0 1px 1px rgba(48,30,6,.6)}
 .bg-dots{background-image:radial-gradient(var(--iac) 1px,transparent 1.4px);background-size:17px 17px;position:absolute;inset:0;opacity:.13}
 .bg-arch{position:absolute;inset:0;background:radial-gradient(130% 92% at 50% -28%,var(--iac) 0 38%,transparent 39%);opacity:.14}
 .bg-rays{position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 118%,var(--iac) 0 4deg,transparent 4deg 12deg);opacity:.09}
@@ -1185,6 +1242,365 @@ html[dir=rtl] .strip{flex-direction:row}
 .sray{position:absolute;left:50%;top:20%;width:2px;height:16vmin;background:linear-gradient(#fff,transparent);
  transform-origin:top;filter:drop-shadow(0 0 6px #fff);animation:pulse 2.2s infinite}
 .g-ring{background:radial-gradient(125% 105% at 50% 42%,transparent 44%,rgba(0,0,2,.7) 100%)}
+
+/* ============ V10 FILMS: six signature themes ============ */
+/* shared atmosphere pieces */
+.gmote{position:absolute;width:.5vmin;height:.5vmin;border-radius:99px;opacity:0;pointer-events:none;
+ background:radial-gradient(circle,#FFF2CE,rgba(227,199,126,0) 70%);
+ box-shadow:0 0 .8vmin rgba(240,214,150,.8);animation:gmfloat var(--gm,9s) ease-in-out infinite}
+@keyframes gmfloat{0%{opacity:0;transform:translate(0,0)}20%{opacity:.9}
+ 55%{transform:translate(1.6vmin,-4vmin)}100%{opacity:0;transform:translate(-1.2vmin,-9vmin)}}
+.smoke{position:absolute;bottom:27%;width:1.4vmin;height:22vmin;border-radius:99px;pointer-events:none;
+ background:linear-gradient(0deg,rgba(255,240,210,.3),rgba(255,240,210,0) 82%);
+ filter:blur(3px);opacity:0;animation:smokerise var(--sd,11s) linear infinite}
+@keyframes smokerise{0%{opacity:0;transform:translateY(0) scaleX(.6) skewX(0)}
+ 18%{opacity:.5}60%{transform:translateY(-16vmin) scaleX(1.5) skewX(9deg)}
+ 100%{opacity:0;transform:translateY(-32vmin) scaleX(2.4) skewX(-8deg)}}
+.seagl{position:absolute;width:.6vmin;height:.6vmin;border-radius:99px;background:#FFFDF2;pointer-events:none;
+ box-shadow:0 0 1.2vmin rgba(255,253,242,.95);animation:twinkle 2.4s ease-in-out infinite}
+@keyframes lswing{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+@keyframes cglowp{from{opacity:.55}to{opacity:.95}}
+
+/* ---- 10 · LELLA BEYA — beylical palace, burnished gilding ---- */
+.sc-beya .bg{position:absolute;inset:0;
+ background:radial-gradient(120% 92% at 50% 18%,#6B4A1C 0%,#3A2710 44%,#1A1107 78%,#0B0704 100%)}
+.sc-beya .zell{position:absolute;left:0;right:0;top:0;height:64%;opacity:.18;mix-blend-mode:overlay;
+ background-image:
+  radial-gradient(circle at 0 0,transparent 5.4px,#E3C77E 5.8px,#E3C77E 6.6px,transparent 7px),
+  radial-gradient(circle at 14px 14px,transparent 5.4px,#E3C77E 5.8px,#E3C77E 6.6px,transparent 7px);
+ background-size:14px 14px}
+.sc-beya .barch{position:absolute;bottom:30%;width:18%;height:44%;
+ border-radius:50% 50% 4% 4%/58% 58% 4% 4%;
+ background:linear-gradient(180deg,#FFE9B8 0%,#E9BE68 26%,#A9762C 66%,#4A3113 100%);
+ box-shadow:0 0 8vmin rgba(245,210,138,.32),inset 0 0 3vmin rgba(255,244,212,.45),
+  0 0 0 .9vmin rgba(226,192,116,.5),0 0 0 1.6vmin rgba(50,34,14,.92)}
+/* mashrabiya lattice over the opening + the hall light spilling from below */
+.sc-beya .barch::before{content:"";position:absolute;inset:0;border-radius:inherit;opacity:.28;mix-blend-mode:multiply;
+ background-size:9% 9%;
+ background-image:linear-gradient(45deg,transparent 45%,#6B4A1C 46%,#6B4A1C 54%,transparent 55%),
+  linear-gradient(-45deg,transparent 45%,#6B4A1C 46%,#6B4A1C 54%,transparent 55%)}
+.sc-beya .barch::after{content:"";position:absolute;left:12%;right:12%;bottom:0;height:36%;filter:blur(2px);
+ border-radius:50% 50% 0 0/40% 40% 0 0;
+ background:radial-gradient(ellipse at 50% 100%,rgba(255,250,224,.8),transparent 72%)}
+.sc-beya .a1{left:7%;width:16%;height:40%}
+.sc-beya .a2{left:39%;bottom:27%;width:22%;height:53%}
+.sc-beya .a3{right:7%;width:16%;height:40%}
+.sc-beya .bcol{position:absolute;bottom:26%;width:2.6%;height:40%;border-radius:2px;
+ background:linear-gradient(90deg,#3A2710,#B8873A 34%,#F0D79A 50%,#A87B2E 66%,#2E1F0C);
+ box-shadow:0 0 2vmin rgba(0,0,0,.55)}
+.sc-beya .bcol::before,.sc-beya .bcol::after{content:"";position:absolute;left:-42%;right:-42%;border-radius:2px;
+ background:linear-gradient(90deg,#7A5720,#F2DCA6,#7A5720)}
+.sc-beya .bcol::before{top:-3.6%;height:4%}
+.sc-beya .bcol::after{bottom:-3%;height:3.4%}
+.sc-beya .bfloor{position:absolute;left:0;right:0;bottom:0;height:30%;
+ background:linear-gradient(180deg,#2A1C0B,#160E05 60%,#0A0603);
+ box-shadow:inset 0 1px 0 rgba(240,210,140,.35)}
+.sc-beya .bfloor::before{content:"";position:absolute;inset:0;opacity:.15;
+ background-image:linear-gradient(115deg,transparent 46%,#E3C77E 47%,#E3C77E 53%,transparent 54%),
+  linear-gradient(65deg,transparent 46%,#E3C77E 47%,#E3C77E 53%,transparent 54%);
+ background-size:5% 22%}
+.sc-beya .bmirror{position:absolute;left:0;right:0;bottom:0;height:30%;mix-blend-mode:screen;filter:blur(4px);
+ background:linear-gradient(180deg,rgba(246,224,168,.55),transparent 72%);
+ animation:bshimmer 7s ease-in-out infinite alternate}
+@keyframes bshimmer{from{opacity:.2}to{opacity:.45}}
+.sc-beya .blant{top:9%;font-size:2.6vmin;transform-origin:50% -140%;
+ animation:lswing var(--ls,5s) ease-in-out infinite alternate;
+ filter:drop-shadow(0 0 1.8vmin rgba(255,206,120,.9))}
+.sc-beya .blant::before{content:"";position:absolute;left:50%;top:-7vmin;width:1px;height:7vmin;
+ transform:translateX(-50%);background:linear-gradient(#E3C77E,rgba(227,199,126,.2))}
+.sc-beya .bcnd{bottom:27%;font-size:1.7vmin;filter:drop-shadow(0 0 1.4vmin rgba(255,190,90,.9));
+ animation:cflick 1.5s ease-in-out infinite alternate}
+@keyframes cflick{from{opacity:.75;transform:scale(.97)}to{opacity:1;transform:scale(1.05)}}
+.sc-beya .bfilig{position:absolute;inset:0;pointer-events:none;opacity:.14;mix-blend-mode:screen;
+ background:
+  radial-gradient(ellipse 30% 18% at 50% 2%,transparent 62%,#F0D79A 63%,transparent 67%),
+  radial-gradient(ellipse 22% 14% at 12% 6%,transparent 62%,#F0D79A 63%,transparent 67%),
+  radial-gradient(ellipse 22% 14% at 88% 6%,transparent 62%,#F0D79A 63%,transparent 67%)}
+.g-beya{background:radial-gradient(122% 104% at 50% 34%,transparent 44%,rgba(12,6,1,.72) 100%)}
+
+/* ---- 11 · L'IMPÉRIALE — chiselled gold, a coronation entrance ---- */
+.sc-imper .bg{position:absolute;inset:0;
+ background:radial-gradient(96% 86% at 50% 40%,#241A0E 0%,#120C06 48%,#050302 100%)}
+.sc-imper .igate{position:absolute;left:19%;right:19%;top:9%;bottom:26%;overflow:hidden;
+ border-radius:46% 46% 0 0/26% 26% 0 0;
+ background:radial-gradient(110% 84% at 50% 96%,#FFF0C4 0%,#E8B75C 16%,#8A5D1E 44%,#2E1F0B 78%,#140D04 100%);
+ box-shadow:0 0 16vmin rgba(240,200,120,.4),inset 0 0 5vmin rgba(255,246,214,.35)}
+.sc-imper .gbar{position:absolute;top:0;bottom:0;width:.7%;box-shadow:0 0 1vmin rgba(0,0,0,.6);
+ background:linear-gradient(90deg,rgba(30,20,6,.95),rgba(240,214,150,.85),rgba(30,20,6,.95))}
+.sc-imper .ibars{position:absolute;inset:0;
+ background:repeating-linear-gradient(0deg,transparent 0 11%,rgba(26,17,5,.6) 11% 11.6%)}
+/* chiselled scrollwork across the gate */
+.sc-imper .igate::before{content:"";position:absolute;inset:0;opacity:.5;mix-blend-mode:overlay;
+ background-image:radial-gradient(ellipse 40% 26% at 50% 0,transparent 60%,#FFEFC4 61%,transparent 65%),
+  radial-gradient(circle at 50% 42%,transparent 12%,#FFEFC4 13%,transparent 15%);
+ background-size:26% 22%,100% 100%}
+.sc-imper .zoom::after{content:"";position:absolute;left:17.6%;right:17.6%;top:7.6%;bottom:26%;
+ border:1.2vmin solid #B8873A;border-bottom:none;border-radius:46% 46% 0 0/26% 26% 0 0;
+ box-shadow:0 0 3vmin rgba(0,0,0,.65),inset 0 0 1.4vmin rgba(255,240,200,.35);pointer-events:none}
+.sc-imper .iray{position:absolute;top:10%;width:5%;height:70%;transform:skewX(-8deg);transform-origin:top;
+ background:linear-gradient(180deg,rgba(255,232,180,.5),transparent 78%);
+ filter:blur(6px);mix-blend-mode:screen;animation:iraypulse 5.5s ease-in-out infinite alternate}
+@keyframes iraypulse{from{opacity:.25}to{opacity:.7}}
+.sc-imper .icrown{position:absolute;left:50%;top:1.5%;font-size:9vmin;line-height:1;color:#F6E3B0;z-index:6;
+ text-shadow:0 0 3vmin rgba(246,227,176,.9),0 0 8vmin rgba(226,175,84,.6);
+ animation:crownpulse 4.5s ease-in-out infinite alternate}
+@keyframes crownpulse{from{opacity:.8;transform:translateX(-50%) scale(1)}
+ to{opacity:1;transform:translateX(-50%) scale(1.07)}}
+.sc-imper .isteps{position:absolute;left:0;right:0;bottom:0;height:27%;
+ background:repeating-linear-gradient(180deg,#3A2A14 0 3.6%,#20170A 3.6% 4.2%);
+ box-shadow:inset 0 1px 0 rgba(240,214,150,.3)}
+.sc-imper .icarpet{position:absolute;left:50%;bottom:0;width:44%;height:30%;transform:translateX(-50%);
+ clip-path:polygon(34% 0,66% 0,100% 100%,0 100%);
+ background:linear-gradient(180deg,#7E1A24,#5A0F19 55%,#38080F);
+ box-shadow:0 0 6vmin rgba(0,0,0,.6),inset 0 0 3vmin rgba(255,180,150,.12)}
+.sc-imper .icarpet::after{content:"";position:absolute;inset:0;opacity:.45;
+ background:linear-gradient(90deg,transparent 7%,#C9A24B 8%,transparent 9%,transparent 91%,#C9A24B 92%,transparent 93%)}
+.sc-imper .ipanel{position:absolute;top:10%;width:12%;height:60%;
+ background:linear-gradient(180deg,#221709,#120C05);
+ box-shadow:inset 0 0 0 .5vmin rgba(184,135,58,.45),inset 0 0 3vmin rgba(0,0,0,.7)}
+.sc-imper .ipanel.l{left:1.5%}
+.sc-imper .ipanel.r{right:1.5%}
+.sc-imper .ipanel::after{content:"";position:absolute;inset:16% 22%;
+ border:.34vmin solid rgba(226,192,116,.42);border-radius:50% 50% 0 0/30% 30% 0 0}
+.gleaf{position:absolute;aspect-ratio:1/1.6;opacity:0;pointer-events:none;
+ border-radius:60% 40% 55% 45%/50% 55% 45% 50%;
+ background:linear-gradient(135deg,#FFF3CE,#E8C271 45%,#B8873A);
+ box-shadow:0 0 1vmin rgba(240,215,154,.8);animation:gleaffall var(--lz,11s) linear infinite}
+@keyframes gleaffall{0%{opacity:0;transform:translateY(-8vh) rotate(0)}10%{opacity:.95}90%{opacity:.85}
+ 100%{opacity:0;transform:translateY(108vh) rotate(280deg)}}
+.g-imper{background:radial-gradient(118% 100% at 50% 34%,transparent 40%,rgba(4,2,0,.8) 100%)}
+
+/* ---- 12 · CAFÉ DES DÉLICES — Sidi Bou Saïd blue, jasmine, the sea ---- */
+.sc-cafe .sky{position:absolute;inset:0;background:linear-gradient(180deg,#9FD6EE 0%,#CDE9F5 34%,#EAF6FB 52%,#EAF6FB 100%)}
+.sc-cafe .msea2{position:absolute;left:0;right:0;top:11%;height:19%;
+ background:linear-gradient(180deg,#17608F,#1E6E9E 22%,#2E8CB8 52%,#54AECE 84%,#7FC8DD);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.sc-cafe .msea2::after{content:"";position:absolute;inset:0;opacity:.3;mix-blend-mode:screen;
+ background:repeating-linear-gradient(180deg,transparent 0 1.6%,rgba(255,255,255,.4) 1.6% 2.3%);
+ animation:brwave 8s linear infinite}
+.sc-cafe .wall{position:absolute;left:0;right:0;bottom:0;height:72%;
+ background:linear-gradient(180deg,#FFFFFF,#F7F4ED 46%,#E8E2D5 84%,#D8D1C2);
+ box-shadow:inset 0 2px 0 rgba(255,255,255,.9),0 -1.2vmin 5vmin rgba(60,80,110,.28)}
+.sc-cafe .wall::before{content:"";position:absolute;inset:0;opacity:.32;
+ background:repeating-linear-gradient(0deg,rgba(0,0,0,.03) 0 1px,transparent 1px 6px)}
+/* the low blue band that runs along Sidi Bou Saïd walls */
+.sc-cafe .wall::after{content:"";position:absolute;left:0;right:0;bottom:17%;height:3%;
+ background:linear-gradient(180deg,#3E76B8,#265C99);opacity:.85}
+/* shuttered window with the same blue */
+.sc-cafe .cwin{position:absolute;right:15%;bottom:34%;width:11%;height:19%;display:flex;gap:5%;
+ padding:.5vmin;background:#F6F3EA;border-radius:34% 34% 3% 3%/24% 24% 3% 3%;
+ box-shadow:0 .8vmin 2vmin rgba(40,60,90,.28),inset 0 0 0 .35vmin #2E63A8}
+.sc-cafe .cwin span{flex:1;border-radius:inherit;
+ background:repeating-linear-gradient(180deg,#2E63A8 0 22%,#24528E 22% 30%)}
+.jasm{position:absolute;width:var(--fs,1vmin);aspect-ratio:1;border-radius:50%;opacity:.9;
+ background:radial-gradient(circle at 40% 36%,#FFFFFF,#F4EEDC 70%);
+ box-shadow:0 0 .5vmin rgba(255,255,255,.85);animation:wdrift var(--wd,12s) linear infinite}
+.sc-cafe .bdoor{position:absolute;left:50%;bottom:9%;width:24%;height:50%;transform:translateX(-50%);
+ border-radius:50% 50% 3% 3%/22% 22% 3% 3%;
+ background:linear-gradient(180deg,#2E63A8,#1F4D8C 46%,#153A6E);
+ box-shadow:0 1.6vmin 4vmin rgba(20,40,80,.45),inset 0 0 0 .6vmin #F6F3EA,inset 0 0 2vmin rgba(0,0,0,.4)}
+.sc-cafe .dgrid{position:absolute;inset:9% 11%;opacity:.5;background-size:20% 12%;
+ background-image:linear-gradient(90deg,rgba(255,255,255,.5) 0 1px,transparent 1px),
+  linear-gradient(0deg,rgba(255,255,255,.5) 0 1px,transparent 1px)}
+.dstud{position:absolute;width:.9vmin;height:.9vmin;border-radius:99px;transform:translateX(-50%);
+ background:radial-gradient(circle at 35% 30%,#FFF3D2,#C9A24B 60%,#8A6423);
+ box-shadow:0 .1vmin .2vmin rgba(0,0,0,.5)}
+.sc-cafe .dknob{position:absolute;left:78%;top:56%;width:1.5vmin;height:1.5vmin;border-radius:99px;
+ background:radial-gradient(circle at 34% 28%,#FFF4D4,#C9A24B 62%,#7A5720);
+ box-shadow:0 .2vmin .4vmin rgba(0,0,0,.5)}
+.sc-cafe .darchtop{position:absolute;left:50%;bottom:52%;width:30%;height:11%;transform:translateX(-50%);
+ border:.6vmin solid #2E63A8;border-bottom:none;border-radius:50% 50% 0 0/100% 100% 0 0;opacity:.75}
+.sc-cafe .steps{position:absolute;left:0;right:0;bottom:0;height:10%;
+ background:repeating-linear-gradient(180deg,#FBFAF6 0 42%,#DCD6C8 42% 50%)}
+.sc-cafe .cage{position:absolute;left:13%;top:12%;width:5.2vmin;height:6.4vmin;
+ border:.34vmin solid #1F4D8C;border-radius:44% 44% 12% 12%/34% 34% 12% 12%;
+ background:repeating-linear-gradient(90deg,transparent 0 .8vmin,rgba(31,77,140,.7) .8vmin .98vmin);
+ transform-origin:50% -40%;animation:lswing 6.5s ease-in-out infinite alternate;
+ box-shadow:0 .6vmin 1.4vmin rgba(60,70,90,.28)}
+.sc-cafe .cage::before{content:"";position:absolute;left:50%;top:-4.4vmin;width:1px;height:4.4vmin;
+ transform:translateX(-50%);background:#1F4D8C;opacity:.65}
+.sc-cafe .pot{bottom:9%;font-size:4.4vmin;filter:drop-shadow(0 .6vmin 1vmin rgba(60,70,90,.3))}
+.sc-cafe .bougwrap{position:absolute;left:0;top:0;width:44%;height:54%;z-index:6}
+/* the woody vine the blossoms hang from */
+.sc-cafe .bougwrap::before{content:"";position:absolute;left:-4%;top:6%;width:64%;height:2px;
+ background:linear-gradient(90deg,#5A4028,rgba(90,64,40,.2));transform:rotate(26deg);transform-origin:0 0}
+.boug{animation:bougsway 5.5s ease-in-out infinite alternate;
+ filter:drop-shadow(0 .4vmin .8vmin rgba(120,20,70,.28))}
+@keyframes bougsway{from{transform:rotate(-4deg) translateX(-.4vmin)}to{transform:rotate(4deg) translateX(.4vmin)}}
+.g-cafe{background:radial-gradient(126% 108% at 50% 40%,transparent 56%,rgba(30,50,70,.34) 100%)}
+
+/* ---- 13 · LE GRAND PALAIS — crystal, gilding, deep velvet ---- */
+.sc-palais .bg{position:absolute;inset:0;
+ background:linear-gradient(180deg,#1A0E10 0%,#2E1A18 34%,#412522 62%,#1B0F0E 100%)}
+.sc-palais .gpanel{position:absolute;top:8%;width:26%;height:56%;
+ background:linear-gradient(180deg,rgba(58,32,28,.9),rgba(30,16,14,.95));
+ box-shadow:inset 0 0 0 .5vmin rgba(198,154,69,.45),inset 0 0 4vmin rgba(0,0,0,.6)}
+.sc-palais .gpanel::after{content:"";position:absolute;inset:12% 18%;
+ border:.3vmin solid rgba(226,192,116,.38);border-radius:50% 50% 6% 6%/34% 34% 6% 6%}
+.sc-palais .drape{position:absolute;top:0;bottom:24%;width:16%;box-shadow:0 0 6vmin rgba(0,0,0,.7);
+ background:linear-gradient(90deg,#3A0A14,#6E1421 38%,#4A0C16 62%,#2A0710)}
+.sc-palais .drape::after{content:"";position:absolute;inset:0;opacity:.45;
+ background:repeating-linear-gradient(90deg,rgba(0,0,0,.45) 0 1.6%,rgba(255,190,170,.1) 1.6% 3.2%)}
+.sc-palais .drape.l{left:0}
+.sc-palais .drape.r{right:0}
+.sc-palais .chand2{position:absolute;left:50%;top:3%;width:24vmin;height:24vmin;
+ animation:chsway 9s ease-in-out infinite alternate}
+@keyframes chsway{from{transform:translateX(-50%) rotate(-1.4deg)}to{transform:translateX(-50%) rotate(1.4deg)}}
+.sc-palais .chand2::before{content:"";position:absolute;left:50%;top:-6vmin;width:1px;height:6vmin;
+ transform:translateX(-50%);background:linear-gradient(#E3C77E,rgba(227,199,126,.3))}
+.sc-palais .cbody{position:absolute;inset:0;border-radius:50%;
+ background:radial-gradient(circle at 50% 46%,rgba(255,246,214,.28),rgba(240,210,140,.1) 32%,transparent 54%)}
+/* central stem + the gilded ring the tiers hang from */
+.sc-palais .cbody::before{content:"";position:absolute;left:50%;top:4%;width:.3vmin;height:42%;opacity:.55;
+ transform:translateX(-50%);background:linear-gradient(#F0D79A,rgba(240,215,154,.3))}
+.sc-palais .chand2::after{content:"";position:absolute;left:50%;top:74%;width:1.5vmin;height:1.5vmin;
+ border-radius:50%;transform:translateX(-50%);
+ background:radial-gradient(circle at 38% 32%,#FFFDF2,#E8C271 58%,#B8873A);
+ box-shadow:0 0 2vmin rgba(255,240,200,.8)}
+.sc-palais .cbody::after{content:"";position:absolute;left:50%;top:50%;width:17vmin;height:17vmin;
+ transform:translate(-50%,-50%);border-radius:50%;border:.34vmin solid rgba(240,215,154,.5);
+ box-shadow:0 0 1.6vmin rgba(255,240,200,.45),inset 0 0 1.6vmin rgba(255,240,200,.3)}
+.crys{position:absolute;left:50%;top:50%;width:.8vmin;height:var(--cl,3vmin);border-radius:0 0 50% 50%;
+ transform:translate(-50%,-50%) rotate(var(--cr,0deg)) translateY(var(--rad,8vmin));
+ background:linear-gradient(180deg,#FFFDF2,rgba(255,240,200,.45));
+ box-shadow:0 0 1.4vmin rgba(255,246,214,1),0 0 3vmin rgba(255,230,170,.55);
+ animation:twinkle 2.8s ease-in-out infinite}
+.sc-palais .cglow{position:absolute;left:50%;top:50%;width:40vmin;height:40vmin;border-radius:50%;
+ transform:translate(-50%,-50%);pointer-events:none;mix-blend-mode:screen;filter:blur(8px);
+ background:radial-gradient(circle,rgba(255,238,190,.26),transparent 58%);
+ animation:cglowp 5s ease-in-out infinite alternate}
+.prism{position:absolute;width:1.1vmin;height:1.1vmin;border-radius:99px;filter:blur(.4px);
+ background:conic-gradient(#FF9AA2,#FFDAC1,#B5EAD7,#C7CEEA,#FF9AA2);
+ box-shadow:0 0 1.4vmin rgba(255,255,255,.7);animation:twinkle 3.4s ease-in-out infinite}
+.sc-palais .parquet{position:absolute;left:0;right:0;bottom:0;height:26%;
+ background:linear-gradient(180deg,#4A2C18,#2A1810 58%,#170D08)}
+.sc-palais .parquet::after{content:"";position:absolute;inset:0;opacity:.2;background-size:6% 26%;
+ background-image:linear-gradient(115deg,transparent 47%,#E0BE7C 48%,#E0BE7C 52%,transparent 53%),
+  linear-gradient(65deg,transparent 47%,#E0BE7C 48%,#E0BE7C 52%,transparent 53%)}
+.sc-palais .pshine{position:absolute;left:0;right:0;bottom:0;height:26%;mix-blend-mode:screen;filter:blur(4px);
+ background:radial-gradient(60% 100% at 50% 0,rgba(255,238,190,.55),transparent 70%)}
+.sc-palais .waltz{left:50%;bottom:22%;font-size:5.4vmin;z-index:6;
+ filter:brightness(.12) drop-shadow(0 0 1vmin rgba(0,0,0,.6));
+ animation:waltzsway 6s ease-in-out infinite alternate}
+@keyframes waltzsway{from{transform:translateX(-56%) rotate(-2deg)}to{transform:translateX(-44%) rotate(2deg)}}
+.sc-palais .wshadow{position:absolute;left:50%;bottom:15%;width:11vmin;height:5vmin;filter:blur(3px);
+ transform:translateX(-50%);background:radial-gradient(ellipse,rgba(0,0,0,.5),transparent 70%)}
+.g-palais{background:radial-gradient(120% 102% at 50% 24%,transparent 40%,rgba(10,4,4,.76) 100%)}
+
+/* ---- 14 · LES OLIVIERS — open-air boho under olive branches ---- */
+.sc-oliv .bg{position:absolute;inset:0;
+ background:linear-gradient(180deg,#F3C983 0%,#E9AE68 22%,#D68F53 40%,#A87A4A 62%,#6E5836 100%)}
+.sc-oliv .lowsun{position:absolute;left:52%;top:40%;width:16vmin;height:16vmin;border-radius:99px;
+ transform:translate(-50%,-50%);mix-blend-mode:screen;filter:blur(2px);
+ background:radial-gradient(circle,#FFF6D2 0 26%,rgba(255,226,150,.7) 46%,transparent 72%);
+ animation:cglowp 6s ease-in-out infinite alternate}
+.sc-oliv .hills{position:absolute;left:-4%;right:-4%;bottom:38%;height:20%;opacity:.68;filter:blur(1px);
+ background:linear-gradient(180deg,#8C7A4E,#6A5A38);border-radius:50% 50% 0 0/44% 44% 0 0}
+/* olive trees: canopies with trunks, so the midground reads as a grove */
+.sc-oliv .grove{position:absolute;left:0;right:0;bottom:30%;height:24%;opacity:.94}
+.sc-oliv .grove::before{content:"";position:absolute;inset:0;filter:blur(.7px);
+ background:
+  radial-gradient(ellipse 10% 54% at 8% 88%,#556644 0 62%,transparent 64%),
+  radial-gradient(ellipse 12% 64% at 27% 88%,#41522C 0 62%,transparent 64%),
+  radial-gradient(ellipse 10% 56% at 47% 88%,#556644 0 62%,transparent 64%),
+  radial-gradient(ellipse 13% 66% at 69% 88%,#3C4C28 0 62%,transparent 64%),
+  radial-gradient(ellipse 10% 52% at 91% 88%,#556644 0 62%,transparent 64%)}
+.sc-oliv .grove::after{content:"";position:absolute;left:0;right:0;bottom:0;height:22%;
+ background:
+  linear-gradient(90deg,transparent 7.4%,#4A3A22 7.4% 8.6%,transparent 8.6%),
+  linear-gradient(90deg,transparent 26.3%,#3E3018 26.3% 27.7%,transparent 27.7%),
+  linear-gradient(90deg,transparent 46.4%,#4A3A22 46.4% 47.6%,transparent 47.6%),
+  linear-gradient(90deg,transparent 68.2%,#3E3018 68.2% 69.8%,transparent 69.8%),
+  linear-gradient(90deg,transparent 90.4%,#4A3A22 90.4% 91.6%,transparent 91.6%)}
+/* dry summer grass in the foreground */
+.sc-oliv .field{position:absolute;left:0;right:0;bottom:0;height:32%;
+ background:linear-gradient(180deg,#BCA068,#AA8E58 42%,#8E7442);
+ box-shadow:inset 0 1px 0 rgba(255,236,190,.45)}
+.sc-oliv .field::after{content:"";position:absolute;inset:0;opacity:.32;
+ background:repeating-linear-gradient(88deg,rgba(90,72,32,.35) 0 1px,transparent 1px 5px),
+  repeating-linear-gradient(94deg,rgba(255,238,194,.3) 0 1px,transparent 1px 7px)}
+.sc-oliv .festwire{position:absolute;left:-2%;right:-2%;top:15%;height:18%}
+.sc-oliv .festwire::before{content:"";position:absolute;left:0;right:0;top:0;height:56%;
+ border-bottom:.24vmin solid rgba(60,44,20,.55);border-radius:0 0 50% 50%/0 0 100% 100%}
+.fest{position:absolute;width:1.5vmin;height:1.5vmin;border-radius:99px;
+ background:radial-gradient(circle at 36% 30%,#FFF8DC,#FFD98A 60%,#E0A840);
+ box-shadow:0 0 1.8vmin rgba(255,214,138,.9);animation:festglow 3.2s ease-in-out infinite alternate}
+@keyframes festglow{from{opacity:.6;transform:scale(.9)}to{opacity:1;transform:scale(1.08)}}
+/* couple in silhouette against the low sun */
+.sc-oliv .ocpl{left:50%;bottom:31%;transform:translateX(-50%);font-size:3.4vmin;z-index:5;
+ filter:brightness(.14) contrast(1.4) drop-shadow(0 0 1vmin rgba(60,40,16,.55))}
+.sc-oliv .ocplref{position:absolute;left:50%;bottom:29%;width:6vmin;height:2vmin;filter:blur(2px);z-index:4;
+ transform:translateX(-50%);background:radial-gradient(ellipse,rgba(60,40,16,.45),transparent 70%)}
+.sc-oliv .otable{position:absolute;left:50%;bottom:12%;width:52%;height:5%;transform:translateX(-50%);
+ background:linear-gradient(180deg,#F6EEDC,#E4D6B6 62%,#C6B490);border-radius:2px;
+ box-shadow:0 1.4vmin 3vmin rgba(60,40,16,.4),inset 0 1px 0 rgba(255,255,255,.7)}
+.sc-oliv .otable::after{content:"";position:absolute;left:6%;right:6%;top:100%;height:6vmin;filter:blur(2px);
+ background:linear-gradient(180deg,rgba(246,238,220,.5),transparent)}
+.sc-oliv .ovase{left:50%;bottom:17%;transform:translateX(-50%);font-size:2.2vmin;
+ filter:drop-shadow(0 .6vmin 1.2vmin rgba(60,40,16,.45))}
+.pamp{position:absolute;bottom:8%;font-size:3vmin;color:#E6D6A8;transform-origin:50% 100%;
+ animation:pampsway var(--pw,6s) ease-in-out infinite alternate;
+ filter:drop-shadow(0 .5vmin 1vmin rgba(80,56,20,.3))}
+@keyframes pampsway{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+.sc-oliv .haze{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;filter:blur(3px);
+ background:linear-gradient(180deg,rgba(255,226,164,.34),transparent 52%)}
+.olv{color:#7C8C56;opacity:.8;animation:leafdrift var(--wd,14s) linear infinite}
+/* foreground olive sprigs framing the top corners */
+.sc-oliv .obr{position:absolute;top:-6%;width:40%;height:30%;z-index:7;pointer-events:none;
+ filter:drop-shadow(0 1vmin 2vmin rgba(40,30,10,.35))}
+.sc-oliv .obr i{filter:hue-rotate(-12deg) saturate(.8) brightness(.86)}
+.sc-oliv .obr.l{left:-5%;transform-origin:0 0;animation:brsway 8s ease-in-out infinite alternate}
+.sc-oliv .obr.r{right:-5%;transform-origin:100% 0;animation:brsway2 9s ease-in-out infinite alternate}
+@keyframes brsway{from{transform:rotate(4deg)}to{transform:rotate(10deg)}}
+@keyframes brsway2{from{transform:rotate(-4deg) scaleX(-1)}to{transform:rotate(-10deg) scaleX(-1)}}
+.g-oliv{background:radial-gradient(126% 106% at 50% 40%,transparent 52%,rgba(60,38,10,.5) 100%)}
+
+/* ---- 15 · LA BRISE NAUTIQUE — pale sand, turquoise water, gold light ---- */
+.sc-brise .sky{position:absolute;inset:0;
+ background:linear-gradient(180deg,#FBE7C4 0%,#F6D7B0 16%,#E9E4CE 30%,#CFE6E4 40%,#CFE6E4 100%)}
+.sc-brise .hsun{position:absolute;left:50%;top:26%;width:13vmin;height:13vmin;border-radius:99px;
+ transform:translate(-50%,-50%);mix-blend-mode:screen;
+ background:radial-gradient(circle,#FFFAE4 0 30%,rgba(255,232,178,.7) 50%,transparent 74%);
+ animation:cglowp 6.5s ease-in-out infinite alternate}
+.sc-brise .turq{position:absolute;left:0;right:0;top:29%;bottom:26%;
+ background:linear-gradient(180deg,#2E8C9E 0%,#3FA6B4 26%,#5FC2C6 56%,#8FD9D2 84%,#BCE8DE 100%);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.65)}
+.sc-brise .turq::after{content:"";position:absolute;inset:0;opacity:.35;mix-blend-mode:screen;
+ background:repeating-linear-gradient(180deg,transparent 0 1.4%,rgba(255,255,255,.34) 1.4% 2%);
+ animation:brwave 7s linear infinite}
+@keyframes brwave{to{background-position:0 4vmin}}
+.foam{position:absolute;left:-4%;right:-4%;height:1.4vmin;border-radius:99px;filter:blur(1.6px);opacity:0;
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.9) 20%,rgba(255,255,255,.95) 78%,transparent);
+ animation:foamroll var(--fw,7s) ease-in-out infinite}
+@keyframes foamroll{0%{opacity:0;transform:translateY(2vmin) scaleX(.9)}
+ 22%{opacity:.9}70%{opacity:.7}100%{opacity:0;transform:translateY(-3vmin) scaleX(1.08)}}
+.sc-brise .sand{position:absolute;left:0;right:0;bottom:0;height:27%;
+ background:linear-gradient(180deg,#EBD9B6,#DFC79E 52%,#CBB187)}
+.sc-brise .sand::after{content:"";position:absolute;inset:0;opacity:.28;background-size:5px 5px;
+ background-image:radial-gradient(rgba(120,96,56,.4) .6px,transparent .8px)}
+.sc-brise .wetsand{position:absolute;left:0;right:0;bottom:24%;height:5%;mix-blend-mode:multiply;filter:blur(2px);
+ background:linear-gradient(180deg,rgba(120,140,140,.4),transparent)}
+.sc-brise .varch{position:absolute;left:50%;bottom:20%;width:40%;height:44%;transform:translateX(-50%)}
+.sc-brise .apost{position:absolute;bottom:0;width:1.2vmin;height:76%;border-radius:2px;
+ background:linear-gradient(90deg,#C9B48C,#F6EEDC 45%,#B6A078);
+ box-shadow:0 .6vmin 1.6vmin rgba(90,70,40,.3)}
+.sc-brise .apost.l{left:2%}
+.sc-brise .apost.r{right:2%}
+.sc-brise .abar{position:absolute;left:0;right:0;top:0;height:32%;opacity:.9;
+ border:.7vmin solid transparent;border-top-color:#EFE4CC;
+ border-radius:50% 50% 0 0/100% 100% 0 0}
+/* white blooms + their greenery, laid along the arch */
+.archfl{position:absolute;width:var(--fs,1.6vmin);aspect-ratio:1;border-radius:50%;
+ transform:translate(-50%,-50%);animation:twinkle 4.5s ease-in-out infinite;
+ background:radial-gradient(circle at 40% 36%,#FFFFFF 0 34%,#FBF3E4 58%,#E4D8BE 100%);
+ box-shadow:0 0 .6vmin rgba(255,255,255,.75),0 .3vmin .6vmin rgba(90,70,40,.22)}
+.archfl::after{content:"";position:absolute;inset:36%;border-radius:50%;background:#E9C877;opacity:.8}
+.archfl.grn{border-radius:60% 10% 60% 10%;box-shadow:none;animation:none;
+ background:linear-gradient(135deg,#8FA672,#5F7A4A)}
+.archfl.grn::after{display:none}
+.sc-brise .shell{bottom:6%;font-size:2.8vmin;filter:drop-shadow(0 .4vmin .8vmin rgba(120,96,56,.4))}
+.g-brise{background:radial-gradient(128% 108% at 50% 34%,transparent 56%,rgba(40,60,66,.4) 100%)}
+
 /* ---- heart-bloom first-date opening (anim 8) ---- */
 .veil.blush{background:radial-gradient(120% 100% at 50% 20%,#FCE9F1 0%,#F7D3E2 48%,#E9B7CE 100%)}
 .veil.blush .rays{background:repeating-conic-gradient(from 0deg at 50% 42%,rgba(196,102,127,.06) 0 6deg,transparent 6deg 18deg)}
