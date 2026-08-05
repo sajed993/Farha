@@ -1,0 +1,122 @@
+/* ================= wax envelope opening =================
+   The screen a guest lands on: a cream envelope, four fold seams meeting at
+   the centre, one black wax seal. Press the seal and the flap folds back.
+   No photography — cream paper, fold geometry and a wax blob on canvas. */
+
+/* Black wax, pressed with the couple's initials. */
+function envWax(cv,initials){
+ const ctx=cv.getContext('2d');if(!ctx)return null;
+ let done=false,strokes=0;
+
+ function paint(){
+  const r=cv.getBoundingClientRect();
+  cv.width=Math.max(140,Math.round(r.width*2));
+  cv.height=Math.max(140,Math.round(r.height*2));
+  const w=cv.width,h=cv.height,cx=w/2,cy=h/2,rr=Math.min(w,h)*.46;
+  ctx.clearRect(0,0,w,h);
+
+  /* the blob: a circle pushed out of true, the way poured wax spreads */
+  ctx.beginPath();
+  const n=34;
+  for(let i=0;i<=n;i++){const a=i/n*Math.PI*2;
+   const rad=rr*(.9+.08*Math.sin(a*5+.6)+.045*Math.cos(a*3-1.2)+.02*Math.sin(a*8));
+   const x=cx+Math.cos(a)*rad,y=cy+Math.sin(a)*rad;
+   i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+  ctx.closePath();
+  const g=ctx.createRadialGradient(w*.38,h*.32,w*.03,cx,cy,rr*1.2);
+  g.addColorStop(0,'#4A443C');g.addColorStop(.3,'#2E2A25');
+  g.addColorStop(.72,'#1A1714');g.addColorStop(1,'#0C0A08');
+  ctx.fillStyle=g;ctx.fill();
+
+  /* pressed relief — light catches the upper rim, the lower edge sits in shadow */
+  ctx.save();ctx.clip();
+  ctx.strokeStyle='rgba(255,255,255,.16)';ctx.lineWidth=w*.02;
+  ctx.beginPath();ctx.arc(cx,cy-rr*.06,rr*.98,Math.PI*1.05,Math.PI*1.95);ctx.stroke();
+  ctx.strokeStyle='rgba(0,0,0,.5)';ctx.lineWidth=w*.03;
+  ctx.beginPath();ctx.arc(cx,cy+rr*.04,rr*.97,Math.PI*.08,Math.PI*.92);ctx.stroke();
+  ctx.restore();
+
+  /* the die: a stamped ring and the initials, debossed */
+  ctx.strokeStyle='rgba(255,255,255,.13)';ctx.lineWidth=w*.011;
+  ctx.beginPath();ctx.arc(cx,cy,rr*.74,0,Math.PI*2);ctx.stroke();
+  ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=w*.013;
+  ctx.beginPath();ctx.arc(cx,cy,rr*.69,0,Math.PI*2);ctx.stroke();
+
+  const fs=Math.round(w*.23);
+  ctx.font='700 '+fs+'px '+(S.lang==='ar'?'"Aref Ruqaa",serif':'"Cormorant Garamond",serif');
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(0,0,0,.5)';
+  ctx.fillText(initials||'✦',cx,cy+w*.018);
+  ctx.fillStyle='rgba(255,255,255,.15)';
+  ctx.fillText(initials||'✦',cx,cy+w*.004);}
+
+ const at=e=>{const r=cv.getBoundingClientRect();
+  const p=(e.touches&&e.touches[0])||e;
+  return [(p.clientX-r.left)/r.width*cv.width,(p.clientY-r.top)/r.height*cv.height];};
+
+ /* Crumble the wax where the finger goes; a tap alone is enough to open. */
+ const rub=e=>{
+  if(done)return;
+  if(e.cancelable)e.preventDefault();
+  const c=at(e);
+  ctx.globalCompositeOperation='destination-out';
+  ctx.beginPath();ctx.arc(c[0],c[1],cv.width*.16,0,Math.PI*2);ctx.fill();
+  ctx.globalCompositeOperation='source-over';
+  if(++strokes>=8)cv.__open();};
+
+ let rubbing=false;
+ cv.addEventListener('pointerdown',e=>{rubbing=true;rub(e);});
+ cv.addEventListener('pointermove',e=>{if(rubbing)rub(e);});
+ window.addEventListener('pointerup',()=>{rubbing=false;});
+ cv.addEventListener('touchstart',e=>{rubbing=true;rub(e);},{passive:false});
+ cv.addEventListener('touchmove',e=>{if(rubbing)rub(e);},{passive:false});
+ cv.addEventListener('touchend',()=>{rubbing=false;});
+ cv.addEventListener('click',()=>{if(!done)cv.__open();});
+
+ paint();
+ window.addEventListener('resize',paint);
+ return ()=>{done=true;};}
+
+/* Mount the envelope. `after` runs once the flap has finished opening. */
+function waxEnvelope(host,after){
+ const c=S.c,ini=inInitials(c.n).join('');
+ host.innerHTML=`<div class="wenv" id="wenv">
+   <div class="wenv-grain"></div>
+   <button class="wenv-x" onclick="closeVeil()">${t().closePrev}</button>
+   <div class="wenv-stack">
+    <p class="wenv-to">${c.guest?esc(t().helloGuest)+' '+esc(c.guest):esc(t().helloAll)}</p>
+    <div class="wenv-env" id="wenvEnv">
+     <div class="wenv-lin"></div>
+     <span class="wenv-f l"></span><span class="wenv-f r"></span><span class="wenv-f b"></span>
+     <svg class="wenv-seams" viewBox="0 0 100 72" preserveAspectRatio="none" aria-hidden="true">
+      <g fill="none" stroke="currentColor" vector-effect="non-scaling-stroke" stroke-width="1">
+       <path d="M0 0 L50 37"/><path d="M100 0 L50 37"/>
+       <path d="M0 72 L50 37"/><path d="M100 72 L50 37"/>
+      </g></svg>
+     <div class="wenv-note"><span>${esc(c.t)}</span><b>${esc(c.n)}</b></div>
+     <span class="wenv-f t"></span>
+     <canvas class="wenv-wax" id="wenvWax"></canvas>
+    </div>
+    <p class="wenv-hint" id="wenvHint">${t().uSealHint}</p>
+   </div>
+  </div>`;
+
+ const env=host.querySelector('#wenvEnv');
+ const cv=host.querySelector('#wenvWax');
+ const hint=host.querySelector('#wenvHint');
+ let opened=false;
+
+ cv.__open=function(){
+  if(opened)return;opened=true;
+  if(hint)hint.style.opacity='0';
+  cv.style.transition='opacity .55s ease,transform .55s ease';
+  cv.style.opacity='0';cv.style.transform='scale(.82) translateY(6%)';
+  env.classList.add('cracked');
+  setTimeout(()=>env.classList.add('open'),320);      /* flap folds back */
+  setTimeout(()=>env.classList.add('lift'),1180);     /* note rises out */
+  setTimeout(()=>{const w=host.querySelector('#wenv');
+   if(w){w.classList.add('gone');}},1900);
+  setTimeout(()=>{if(after)after();},2500);};
+
+ envWax(cv,ini);}
+;

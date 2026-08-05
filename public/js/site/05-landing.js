@@ -5,6 +5,7 @@ function navHTML(){return `<div class="nav">
   <a onclick="scrollSec('gallery')" href="javascript:void(0)">${t().navTpl}</a>
   <a onclick="scrollSec('cats')" href="javascript:void(0)">${t().navCats}</a>
   <a onclick="scrollSec('open')" href="javascript:void(0)">${t().navOpen}</a>
+  <a class="prem" onclick="scrollSec('ready')" href="javascript:void(0)" style="color:#B0801F">✦ ${t().rdNav}</a>
   <a class="prem" onclick="scrollSec('ultra')" href="javascript:void(0)" style="color:#E3C77E">✦ ${t().uBadge}</a>
   <a class="prem" onclick="scrollSec('premium')" href="javascript:void(0)">${t().navPrem}</a>
   <a class="prem" onclick="scrollSec('sites')" href="javascript:void(0)">${t().navSites}</a>
@@ -31,6 +32,7 @@ function landView(){
   </div>
   <div class="hero-art" id="heroArt">${heroCards()}</div>
  </header>
+ ${filmShelfHTML()}
  <section id="cats">
   <div class="sec-head"><span class="kicker">${t().catsKick}</span><h2>${t().catsTitle}</h2></div>
   <div class="cats">

@@ -19,7 +19,16 @@ function ediPreload(done){
   im.src=EDI_IMG_BASE+k+'.jpg';});
  if(!EDI_PLATES.length&&done)done();}
 
+/* Sections share one film, so each enters it at a different moment — the
+   scroll then reads as a journey rather than the same shot four times. */
+const EDI_CUE={hero:0,hall:.34,detail:.62,venue:.82};
+/* A plate is a film when one is assigned, else a photograph, else the CSS wash. */
 function ediPlate(k,cls){
+ const film=S.c.films&&S.c.films[k];
+ if(film&&/\.mp4$/i.test(film))
+  return `<div class="edi-ph film ${cls||''}"><video src="${film}" muted loop playsinline autoplay preload="auto" data-cue="${EDI_CUE[k]||0}"></video></div>`;
+ if(film)
+  return `<div class="edi-ph has ${cls||''}" style="background-image:url('${film}')"></div>`;
  const on=ediImgOK[k];
  return `<div class="edi-ph p-${k} ${on?'has':''} ${cls||''}"${on?` style="background-image:url('${EDI_IMG_BASE}${k}.jpg')"`:''}></div>`;}
 
@@ -42,6 +51,75 @@ const EDI_ICONS=[
  '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M8 6h16l-8 10z"/><path d="M16 16v9"/><path d="M11 25h10"/></svg>',
  '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="16" cy="16" r="9"/><circle cx="16" cy="16" r="4.4" opacity=".55"/></svg>',
  '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="11" cy="23" r="4"/><path d="M15 23V7l10-2v14"/><circle cx="21" cy="19" r="4"/></svg>'];
+
+/* ---- gold frame + floral corners, drawn ----
+   The reference plates put a cream panel inside an ornate gold frame with
+   blooms crowding two opposite corners. Both are SVG so they scale with the
+   section and stay crisp behind a real photograph later. */
+const EDI_FCORNER='<svg viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
+ +'<path d="M2 58V20C2 10 10 2 20 2h38"/>'
+ +'<path d="M8 50V23C8 15 15 8 23 8h27"/>'
+ +'<path d="M8 30C8 17.8 17.8 8 30 8"/>'
+ +'<path d="M14 14C19 5 28 2 38 2 34 12 25 14 14 14Z" fill="currentColor" fill-opacity=".2"/>'
+ +'<path d="M30 8c0 6-5 11-11 11" opacity=".7"/>'
+ +'<circle cx="5.6" cy="5.6" r="2.2" fill="currentColor" stroke="none"/>'
+ +'<circle cx="30" cy="30" r="1.3" fill="currentColor" stroke="none"/></svg>';
+/* small crest that sits at the top centre of the frame */
+const EDI_CREST='<svg viewBox="0 0 80 34" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
+ +'<path d="M4 30h20M56 30h20"/>'
+ +'<path d="M40 4c-7 6-11 12-11 18a11 11 0 0022 0c0-6-4-12-11-18Z"/>'
+ +'<path d="M40 12c-3.4 3.4-5 6.6-5 9.6a5 5 0 0010 0c0-3-1.6-6.2-5-9.6Z" fill="currentColor" fill-opacity=".22"/>'
+ +'<path d="M29 22c-4 0-7-2-8-5M51 22c4 0 7-2 8-5" opacity=".7"/>'
+ +'<circle cx="40" cy="32" r="1.6" fill="currentColor" stroke="none"/></svg>';
+
+function ediFrame(){
+ return `<div class="edi-frame" aria-hidden="true">
+   <span class="fc tl">${EDI_FCORNER}</span><span class="fc tr">${EDI_FCORNER}</span>
+   <span class="fc bl">${EDI_FCORNER}</span><span class="fc br">${EDI_FCORNER}</span>
+   <span class="fcrest">${EDI_CREST}</span></div>`;}
+
+/* A bloom: layered petals over a shaded heart, so it reads as a rose and not a dot. */
+function ediRose(r,fill,dark){
+ let s='';
+ for(let k=0;k<7;k++)s+=`<ellipse cx="0" cy="${(-r*.58).toFixed(1)}" rx="${(r*.46).toFixed(1)}" ry="${(r*.56).toFixed(1)}" fill="${fill}" transform="rotate(${(k*360/7).toFixed(0)})"/>`;
+ for(let k=0;k<5;k++)s+=`<ellipse cx="0" cy="${(-r*.3).toFixed(1)}" rx="${(r*.3).toFixed(1)}" ry="${(r*.36).toFixed(1)}" fill="${dark}" opacity=".26" transform="rotate(${(k*72+28).toFixed(0)})"/>`;
+ return s+`<circle r="${(r*.2).toFixed(1)}" fill="${dark}" opacity=".5"/>`;}
+
+/* A corner bouquet: blooms crowd the corner along a quarter arc and shrink
+   away from it, with foliage sprays reaching out past them. Deterministic
+   from `seed` so a section renders identically every time. */
+function ediFlora(seed,cls){
+ if(S.c.films)return '';   /* the footage carries the decoration */
+ const rnd=i=>{const x=Math.sin(seed*97.13+i*13.71)*10000;return x-Math.floor(x);};
+ const pals=[['#E7B6AE','#B4635E','#F6E0DA'],['#DFC3D6','#8A5172','#F2E4EC'],
+  ['#EFD6B6','#C08F3E','#FBF1E0'],['#E6C6B8','#A97158','#F7E8E0'],['#D8C3A4','#9C7C4E','#F1E6D4']];
+ let defs='',s='';
+ const N=8;
+ for(let i=0;i<N;i++){
+  const f=i/(N-1),a=(.05+.9*f)*Math.PI/2,R=24+rnd(i)*36;
+  const cx=6+Math.cos(a)*R,cy=6+Math.sin(a)*R;
+  const r=18-9.5*f+rnd(i+9)*4.5,p=pals[i%pals.length];
+  defs+=`<radialGradient id="fg${seed}_${i}" cx="36%" cy="30%" r="72%">`
+   +`<stop offset="0" stop-color="${p[2]}"/><stop offset="1" stop-color="${p[0]}"/></radialGradient>`;
+  s+=`<g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)}) rotate(${(rnd(i+30)*360).toFixed(0)})">`
+   +ediRose(r,`url(#fg${seed}_${i})`,p[1])+`</g>`;}
+ /* foliage sprays, drawn under nothing in particular — they read as filler */
+ let fol='';
+ for(let i=0;i<6;i++){
+  const a=(.08+.84*(i/5))*Math.PI/2,L=54+rnd(i+60)*38;
+  const x2=6+Math.cos(a)*L,y2=6+Math.sin(a)*L;
+  const qx=6+Math.cos(a)*L*.5-9+rnd(i+70)*18,qy=6+Math.sin(a)*L*.5-9+rnd(i+80)*18;
+  fol+=`<path d="M6 6 Q${qx.toFixed(1)} ${qy.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="#8B9C73" stroke-width="1.05" opacity=".62"/>`;
+  for(let k=1;k<=3;k++){const u=k/4,v=1-u;
+   const px=v*v*6+2*v*u*qx+u*u*x2,py=v*v*6+2*v*u*qy+u*u*y2;
+   fol+=`<ellipse cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" rx="2.7" ry="6.4" fill="#8B9C73" opacity=".55" transform="rotate(${(rnd(i*7+k)*360).toFixed(0)} ${px.toFixed(1)} ${py.toFixed(1)})"/>`;}}
+ /* a few gold buds for sparkle */
+ let bud='';
+ for(let i=0;i<6;i++){
+  const a=(.1+.8*rnd(i+500))*Math.PI/2,R=30+rnd(i+520)*44;
+  bud+=`<circle cx="${(6+Math.cos(a)*R).toFixed(1)}" cy="${(6+Math.sin(a)*R).toFixed(1)}" r="${(1.6+rnd(i+540)*2).toFixed(1)}" fill="#C9A24B" opacity=".78"/>`;}
+ return `<svg class="edi-flora ${cls||''}" viewBox="0 0 100 100" aria-hidden="true">`
+  +`<defs>${defs}</defs>${fol}${bud}${s}</svg>`;}
 
 /* ---- date split for the seal reveal ---- */
 function ediDateParts(){
@@ -135,12 +213,13 @@ function ediHTML(){
  const cart=n=>`<div class="edi-mono ${n||''}">${EDI_CART}<span class="mg">${mono}</span></div>`;
  const prog=(c.program&&c.program.length?c.program:[]).slice(0,6);
 
- return `<div class="edi" id="edi">
+ return `<div class="edi ${S.c.ediPal?'pal-'+S.c.ediPal:''}" id="edi">
   <div class="edi-bar"><i id="ediBar"></i></div>
   <button class="edi-x" onclick="closeVeil()">${t().closePrev}</button>
 
   <section class="edi-s edi-hero">
    ${ediPlate('hero')}<div class="edi-wash"></div>
+   ${ediFlora(3,'tr')}${ediFlora(8,'bl')}${ediFrame()}
    <div class="edi-in">
     ${cart()}
     <h1 class="edi-names">${esc(c.n)}</h1>
@@ -152,6 +231,7 @@ function ediHTML(){
 
   <section class="edi-s edi-invite">
    ${ediPlate('hall')}<div class="edi-wash deep"></div>
+   ${ediFlora(14,'tl')}${ediFlora(21,'br')}${ediFrame()}
    <div class="edi-in rv">
     ${cart('lg')}
     <h2 class="edi-names">${esc(c.n)}</h2>
@@ -162,6 +242,7 @@ function ediHTML(){
 
   <section class="edi-s edi-msg">
    ${ediPlate('detail','soft')}<div class="edi-wash deep"></div>
+   ${ediFlora(30,'tr')}${ediFrame()}
    <div class="edi-in rv">
     <p class="edi-lbl">${esc(E.msgL)}</p>
     <h3 class="edi-sub">${esc(E.msgS)}</h3>
@@ -172,6 +253,8 @@ function ediHTML(){
   </section>
 
   <section class="edi-s edi-date">
+   ${S.c.films?ediPlate('detail','soft'):''}${S.c.films?'<div class="edi-wash deep"></div>':''}
+   ${ediFlora(37,'tl')}${ediFlora(44,'br')}${ediFrame()}
    <div class="edi-in rv">
     <p class="edi-lbl">${esc(E.dateL)}</p>
     <p class="edi-hint">${esc(E.dateHint)}</p>
@@ -188,6 +271,7 @@ function ediHTML(){
   </section>
 
   <section class="edi-s edi-venue light">
+   ${ediFlora(51,'tr')}${ediFrame()}
    <div class="edi-in rv">
     <p class="edi-lbl dk">${esc(E.venueL)}</p>
     <div class="edi-rule sm dk">${EDI_RULE}</div>
@@ -198,6 +282,7 @@ function ediHTML(){
   </section>
 
   ${prog.length?`<section class="edi-s edi-prog">
+   ${ediFrame()}
    <div class="edi-in rv">
     <p class="edi-lbl">${esc(t().progTitle)}</p>
     <div class="edi-rule sm">${EDI_RULE}</div>
@@ -210,6 +295,7 @@ function ediHTML(){
   </section>`:''}
 
   <section class="edi-s edi-rsvp light">
+   ${ediFlora(58,'bl')}${ediFrame()}
    <div class="edi-in rv">
     <p class="edi-lbl dk">${t().uRsvp}</p>
     <div class="edi-rule sm dk">${EDI_RULE}</div>
@@ -238,6 +324,14 @@ function mountEditorial(stage){
   items.forEach(n=>io.observe(n));
  } else items.forEach(n=>n.classList.add('in'));
 
+ /* seek each film to its cue once the metadata is in */
+ root.querySelectorAll('.edi-ph.film video').forEach(v=>{
+  const cue=parseFloat(v.dataset.cue||'0');
+  const seek=()=>{if(v.duration&&isFinite(v.duration)&&cue>0){
+   try{v.currentTime=v.duration*cue;}catch(e){}}};
+  if(v.readyState>=1)seek();else v.addEventListener('loadedmetadata',seek,{once:true});
+  v.play().catch(()=>{});});
+
  const bar=root.querySelector('#ediBar');
  root.addEventListener('scroll',()=>{
   const m=root.scrollHeight-root.clientHeight;
@@ -249,9 +343,14 @@ function editorialOpen(){
  document.body.appendChild(veil);document.body.style.overflow='hidden';
  const stage=document.createElement('div');stage.className='cstage edi-stage';
  veil.appendChild(stage);
- stage.innerHTML=`<div class="edi-boot"><span></span></div>`;
- ediPreload(()=>{if(veil&&veil.querySelector('.edi-stage'))mountEditorial(stage);
-  try{if(S.c.music&&S.c.autoplay)playMusic(S.c.music);}catch(e){}});}
+ /* The guest meets the envelope first; the invitation mounts behind it
+    while they are still deciding to press the seal. */
+ waxEnvelope(stage,()=>{
+  if(!veil)return;
+  const inner=veil.querySelector('.edi-stage');
+  if(inner)mountEditorial(inner);});
+ ediPreload(()=>{});
+ try{if(S.c.music&&S.c.autoplay)playMusic(S.c.music);}catch(e){}}
 
 /* demo entry: dress the emerald wedding template with a full programme */
 function editorialDemo(){
