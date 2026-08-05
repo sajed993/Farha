@@ -2409,8 +2409,10 @@ html[dir=rtl] .wenv-hint{font-family:var(--bodyA);letter-spacing:.02em;text-tran
  linear-gradient(180deg,#FBF7EF,#F3EBDC 46%,#EFE5D2)}
 #ready .kicker{border-color:rgba(176,128,31,.45);color:#7A5A1C;background:rgba(255,255,255,.6)}
 #ready .sec-head h2{color:#3E3020}
-.rd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(276px,1fr));
- gap:clamp(26px,4vw,48px);max-width:1180px;margin:0 auto}
+.rd-grid{display:grid;grid-template-columns:repeat(2,1fr);
+ gap:clamp(22px,3vw,40px);max-width:1320px;margin:0 auto}
+@media(min-width:1120px){.rd-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:560px){.rd-grid{grid-template-columns:1fr;max-width:340px}}
 .rd-card{display:flex;flex-direction:column}
 
 /* the stage: blurred bleed + phone on top */
@@ -2420,7 +2422,7 @@ html[dir=rtl] .wenv-hint{font-family:var(--bodyA);letter-spacing:.02em;text-tran
  transition:transform .55s cubic-bezier(.2,.8,.2,1),box-shadow .55s}
 .rd-card:hover .rd-stage{transform:translateY(-8px);box-shadow:0 40px 80px -32px rgba(90,68,36,.6),inset 0 0 0 1px rgba(176,128,31,.35)}
 .rd-bleed{position:absolute;inset:-14%;background-size:cover;background-position:center;
- filter:blur(30px) saturate(1.5) brightness(1.1) contrast(.94);transform:scale(1.12);opacity:.95}
+ filter:blur(32px) saturate(1.22) brightness(1.06) contrast(.96);transform:scale(1.12);opacity:.92}
 .rd-glow{position:absolute;inset:0;mix-blend-mode:soft-light;background:
  radial-gradient(74% 56% at 50% 6%,rgba(255,247,228,.72),transparent 64%),
  linear-gradient(180deg,rgba(255,246,224,.3),transparent 42%,rgba(120,82,30,.34))}
@@ -2436,35 +2438,61 @@ html[dir=rtl] .wenv-hint{font-family:var(--bodyA);letter-spacing:.02em;text-tran
  font-size:clamp(1.2rem,3.4vw,1.5rem);letter-spacing:.14em;text-transform:uppercase;color:#7A5A1C}
 html[dir=rtl] .rd-meta b{font-family:var(--dispA);font-weight:700;letter-spacing:0;text-transform:none;
  font-size:clamp(1.3rem,4vw,1.65rem)}
-.rd-meta p{margin-top:9px;font-size:.9rem;line-height:1.85;color:#6B583C}
-.rd-acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
-.rd-btn{border-radius:2px;padding:12px 22px;font-weight:600;font-size:.86rem;transition:.3s;
- border:1px solid #8A6A2B;letter-spacing:.02em}
+.rd-meta p{margin-top:8px;font-size:.85rem;line-height:1.78;color:#6B583C;min-height:4.6em}
+.rd-acts{display:grid;gap:8px;justify-content:stretch;margin-top:16px}
+.rd-btn{border-radius:2px;padding:11px 16px;font-weight:600;font-size:.82rem;transition:.3s;
+ border:1px solid #8A6A2B;letter-spacing:.02em;width:100%}
 .rd-btn.gold{background:linear-gradient(120deg,#B0801F,#8A6A2B);color:#FCF8F0;
  box-shadow:0 12px 28px -14px rgba(138,106,43,.8)}
 .rd-btn.gold:hover{transform:translateY(-2px)}
 .rd-btn.ghost{background:transparent;color:#7A5A1C;border-color:rgba(138,106,43,.4)}
 .rd-btn.ghost:hover{background:rgba(138,106,43,.1)}
 
-/* ---- the phone ---- */
-.iph{position:relative;aspect-ratio:9/19.3;padding:2.6%;
- border-radius:13.5%/6.3%;
- background:linear-gradient(148deg,#E4E0DA 0%,#9A958E 16%,#F4F1EC 34%,#7E7A74 52%,#EFECE6 68%,#8A8680 86%,#DCD8D2 100%);
- box-shadow:0 26px 48px -18px rgba(40,30,14,.5),0 2px 5px rgba(0,0,0,.3),
-  inset 0 0 0 1px rgba(255,255,255,.4)}
-.iph-scr{position:relative;width:100%;height:100%;border-radius:11.4%/5.4%;overflow:hidden;
- background:#0B0B0C;box-shadow:inset 0 0 0 1.5px #0B0B0C}
-.iph-scr video,.iph-scr img{width:100%;height:100%;object-fit:cover;display:block}
-.iph-isl{position:absolute;z-index:4;top:2%;left:50%;transform:translateX(-50%);
- width:30%;height:3.1%;min-height:9px;border-radius:99px;background:#08080A}
+/* ---- the phone ----
+   Titanium rail built from a multi-stop gradient so the light reads as
+   directional; a hairline black bezel inside it; screen, island, glare and a
+   contact shadow underneath. */
+.iph{position:relative;aspect-ratio:9/19.3;padding:1.9%;
+ border-radius:15%/6.9%;
+ background:
+  linear-gradient(148deg,#F0EDE8 0%,#A9A49C 9%,#6E6A64 17%,#FBF9F5 27%,#B6B1A9 38%,
+   #75716B 50%,#F6F3EF 62%,#AEA9A1 73%,#6B6761 84%,#E8E5E0 94%,#9C9790 100%);
+ box-shadow:
+  0 34px 58px -20px rgba(38,28,12,.52),
+  0 8px 16px -6px rgba(38,28,12,.34),
+  inset 0 0 0 1px rgba(255,255,255,.5),
+  inset 0 -1px 2px rgba(0,0,0,.35)}
+/* the hairline black bezel between rail and glass */
+.iph::before{content:"";position:absolute;inset:1.5%;border-radius:13.6%/6.1%;
+ background:#0A0A0B;z-index:0}
+/* contact shadow on the surface below */
+.iph::after{content:"";position:absolute;left:8%;right:8%;bottom:-4%;height:6%;
+ border-radius:50%;background:radial-gradient(ellipse,rgba(38,28,12,.42),transparent 72%);
+ filter:blur(7px);z-index:-1}
+.iph-scr{position:relative;z-index:1;width:100%;height:100%;
+ border-radius:13.1%/5.9%;overflow:hidden;background:#0B0B0C;
+ box-shadow:inset 0 0 0 1px rgba(0,0,0,.9),inset 0 0 14px rgba(0,0,0,.5)}
+.iph-scr video,.iph-scr img{width:100%;height:100%;object-fit:cover;display:block;
+ transform:translateZ(0);backface-visibility:hidden}
+.iph-isl{position:absolute;z-index:4;top:1.7%;left:50%;transform:translateX(-50%);
+ width:27%;height:2.8%;min-height:9px;border-radius:99px;background:#08080A;
+ box-shadow:inset 0 -1px 1px rgba(255,255,255,.09)}
+/* the island's camera, just visible */
+.iph-isl::after{content:"";position:absolute;inset-inline-end:14%;top:50%;
+ width:22%;aspect-ratio:1;transform:translateY(-50%);border-radius:50%;
+ background:radial-gradient(circle at 36% 32%,#2A3140,#0C0E14 70%)}
 .iph-glare{position:absolute;inset:0;z-index:3;pointer-events:none;border-radius:inherit;
- background:linear-gradient(112deg,transparent 34%,rgba(255,255,255,.13) 44%,rgba(255,255,255,.05) 50%,transparent 58%)}
-.iph-btn{position:absolute;background:linear-gradient(180deg,#B4AFA8,#8A857E);border-radius:2px;z-index:1}
-/* left rail: silence switch then the two volume keys */
-.iph-btn.vol1{inset-inline-start:-1.2%;top:19%;width:1.4%;height:5%}
-.iph-btn.vol2{inset-inline-start:-1.2%;top:27%;width:1.4%;height:8.6%}
-.iph-btn.vol3{inset-inline-start:-1.2%;top:37.5%;width:1.4%;height:8.6%}
-.iph-btn.pwr{inset-inline-end:-1.2%;top:30%;width:1.4%;height:12%}
+ background:
+  linear-gradient(116deg,transparent 30%,rgba(255,255,255,.15) 41%,rgba(255,255,255,.05) 47%,transparent 55%),
+  linear-gradient(200deg,rgba(255,255,255,.07) 0%,transparent 18%)}
+.iph-btn{position:absolute;border-radius:2px;z-index:0;
+ background:linear-gradient(180deg,#EFECE7,#A6A19A 40%,#6F6B65);
+ box-shadow:0 1px 1px rgba(0,0,0,.4)}
+/* left rail: silence switch, then the two volume keys */
+.iph-btn.vol1{inset-inline-start:-.9%;top:18.5%;width:1.1%;height:4.4%}
+.iph-btn.vol2{inset-inline-start:-.9%;top:26.5%;width:1.1%;height:8.2%}
+.iph-btn.vol3{inset-inline-start:-.9%;top:36.6%;width:1.1%;height:8.2%}
+.iph-btn.pwr{inset-inline-end:-.9%;top:29.5%;width:1.1%;height:11.4%}
 
 @media(max-width:640px){
  .rd-stage{border-radius:20px}
@@ -2473,9 +2501,11 @@ html[dir=rtl] .rd-meta b{font-family:var(--dispA);font-weight:700;letter-spacing
  .rd-card:hover .rd-stage{transform:none}}
 
 /* film plates inside the invitation */
-.edi-ph.film{overflow:hidden;animation:none}
+/* No ken-burns on footage: animating transform on a <video> re-composites every
+   decoded frame and was the main source of judder. The clip already moves. */
+.edi-ph.film{overflow:hidden;animation:none;contain:paint}
 .edi-ph.film video{width:100%;height:100%;object-fit:cover;display:block;
- animation:ediKen 30s ease-in-out infinite alternate}
+ transform:translateZ(0);backface-visibility:hidden}
 /* per-film grading, so type keeps its contrast over the footage */
 .edi.pal-mono .edi-ph.film video{filter:grayscale(1) contrast(1.04)}
 .edi.pal-mono .edi-wash{background:

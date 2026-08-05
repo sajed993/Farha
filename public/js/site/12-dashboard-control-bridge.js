@@ -285,7 +285,7 @@ function render(){applyCFGdom._raf=requestAnimationFrame(function(){try{applyCFG
  const sameView=prevView===S.view;
  const keepY=sameView?window.scrollY:0;
  app.innerHTML=S.view==='land'?landView():editorView();
- if(S.view==='land')ambient();
+ if(S.view==='land'){ambient();try{filmShelfMount()}catch(e){}}
  window.scrollTo(0,sameView?keepY:0);
  prevView=S.view;}
 function go(v){S.view=v;render();}

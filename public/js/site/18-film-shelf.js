@@ -16,6 +16,12 @@ const FILMS_READY=[
    fr:'Noir et blanc : escarpins, champagne et un écrin sur le tulle… une promesse écrite tout en légèreté',
    en:'Black and white: heels, champagne and a ring box on tulle… a promise written lightly'},
   pal:'mono'},
+ {id:'wisteria',v:'/media/inv/inv-4.mp4',p:'/media/inv/inv-4.jpg',design:4,
+  name:{ar:'ظلال الوستارية',fr:'Ombres de Glycine',en:'Wisteria Shade'},
+  blurb:{ar:'وستارية تتهدّل على بابٍ عاجي بحلقةٍ ذهبية، والضوء يرقص بين الأوراق',
+   fr:"Une glycine retombe sur une porte ivoire cerclée d'or, la lumière danse entre les feuilles",
+   en:'Wisteria spilling over an ivory door ringed in gold, light dancing through the leaves'},
+  pal:'warm'},
  {id:'rings',v:'/media/inv/inv-3.mp4',p:'/media/inv/inv-3.jpg',design:1,
   name:{ar:'خواتم النور',fr:'Anneaux de Lumière',en:'Rings of Light'},
   blurb:{ar:'خاتمان على أرضٍ كالمرآة، ونافذةٌ مقوّسة يعبرها ظلُّ العروس',
@@ -43,7 +49,7 @@ function filmShelfHTML(){
      <div class="rd-bleed" style="background-image:url('${f.p}')"></div>
      <div class="rd-glow"></div>
      ${iphoneHTML(`<video class="rd-v" src="${f.v}" poster="${f.p}"
-        muted loop playsinline preload="metadata" autoplay></video>`)}
+        muted loop playsinline preload="none"></video>`)}
      <span class="rd-play">▶</span>
     </div>
     <div class="rd-meta">
@@ -67,6 +73,21 @@ function openReady(id){
  S.c={...S.c,...dz.def[S.lang],font:0,pal:0,anim:'edi',music:1,autoplay:true,musicStart:'open',
   qr:false,maps:'https://maps.google.com',story:[],guest:'',
   when:when.toISOString().slice(0,16),program:ediDemoProgram(),
-  film:f.id,films:{hero:f.v,hall:f.v,detail:f.v,venue:f.p},ediPal:f.pal};
+  film:f.id,films:{hero:f.v,hall:f.v,detail:f.v,date:f.v,venue:f.p},ediPal:f.pal};
  editorialOpen();}
 ;
+
+/* Shelf playback is gated the same way as the invitation: a card off screen
+   costs nothing, and preload only escalates once it scrolls in. */
+function filmShelfMount(){
+ const host=document.getElementById('ready');
+ if(!host||host.dataset.mounted)return;
+ host.dataset.mounted='1';
+ const vids=[...host.querySelectorAll('.rd-v')];
+ if(!vids.length)return;
+ if(!('IntersectionObserver' in window)){vids.forEach(v=>{v.preload='auto';v.play().catch(()=>{})});return;}
+ const io=new IntersectionObserver(es=>es.forEach(e=>{
+  const v=e.target;
+  if(e.isIntersecting){if(v.preload!=='auto')v.preload='auto';v.play().catch(()=>{});}
+  else if(!v.paused)v.pause();}),{threshold:.35});
+ vids.forEach(v=>io.observe(v));}

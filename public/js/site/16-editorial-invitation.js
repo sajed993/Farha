@@ -21,12 +21,22 @@ function ediPreload(done){
 
 /* Sections share one film, so each enters it at a different moment — the
    scroll then reads as a journey rather than the same shot four times. */
-const EDI_CUE={hero:0,hall:.34,detail:.62,venue:.82};
+const EDI_CUE={hero:0,hall:.28,detail:.52,date:.74,venue:.88};
+/* Seconds into each clip, so a #t= fragment can be baked into the src. Seeking
+   in JS after load stalls the decoder and shows as a freeze; the fragment lets
+   the browser begin decoding at the cue instead. */
+const EDI_DUR={'/media/inv/inv-1.mp4':16.3,'/media/inv/inv-2.mp4':8.4,
+ '/media/inv/inv-3.mp4':9.9,'/media/inv/inv-4.mp4':12.2};
 /* A plate is a film when one is assigned, else a photograph, else the CSS wash. */
 function ediPlate(k,cls){
  const film=S.c.films&&S.c.films[k];
- if(film&&/\.mp4$/i.test(film))
-  return `<div class="edi-ph film ${cls||''}"><video src="${film}" muted loop playsinline autoplay preload="auto" data-cue="${EDI_CUE[k]||0}"></video></div>`;
+ if(film&&/\.mp4$/i.test(film)){
+  const cue=EDI_CUE[k]||0, dur=EDI_DUR[film]||0;
+  const src=film+(cue>0&&dur?('#t='+(dur*cue).toFixed(1)):'');
+  const poster=film.replace(/\.mp4$/,'.jpg');
+  /* only the first plate preloads in full — the rest wait until they scroll in */
+  return `<div class="edi-ph film ${cls||''}"><video src="${src}" poster="${poster}"
+    muted loop playsinline preload="${k==='hero'?'auto':'metadata'}"></video></div>`;}
  if(film)
   return `<div class="edi-ph has ${cls||''}" style="background-image:url('${film}')"></div>`;
  const on=ediImgOK[k];
@@ -253,7 +263,7 @@ function ediHTML(){
   </section>
 
   <section class="edi-s edi-date">
-   ${S.c.films?ediPlate('detail','soft'):''}${S.c.films?'<div class="edi-wash deep"></div>':''}
+   ${S.c.films?ediPlate('date','soft'):''}${S.c.films?'<div class="edi-wash deep"></div>':''}
    ${ediFlora(37,'tl')}${ediFlora(44,'br')}${ediFrame()}
    <div class="edi-in rv">
     <p class="edi-lbl">${esc(E.dateL)}</p>
@@ -324,13 +334,18 @@ function mountEditorial(stage){
   items.forEach(n=>io.observe(n));
  } else items.forEach(n=>n.classList.add('in'));
 
- /* seek each film to its cue once the metadata is in */
- root.querySelectorAll('.edi-ph.film video').forEach(v=>{
-  const cue=parseFloat(v.dataset.cue||'0');
-  const seek=()=>{if(v.duration&&isFinite(v.duration)&&cue>0){
-   try{v.currentTime=v.duration*cue;}catch(e){}}};
-  if(v.readyState>=1)seek();else v.addEventListener('loadedmetadata',seek,{once:true});
-  v.play().catch(()=>{});});
+ /* Decode only what is visible. Every plate playing at once was the stutter. */
+ const vids=[...root.querySelectorAll('.edi-ph.film video')];
+ if(vids.length){
+  const hero=vids[0];
+  if(hero)hero.play().catch(()=>{});
+  if('IntersectionObserver' in window){
+   const vo=new IntersectionObserver(es=>es.forEach(e=>{
+    const v=e.target;
+    if(e.isIntersecting){if(v.preload!=='auto')v.preload='auto';v.play().catch(()=>{});}
+    else if(!v.paused)v.pause();}),{threshold:.15});
+   vids.forEach(v=>vo.observe(v));
+  } else vids.forEach(v=>v.play().catch(()=>{}));}
 
  const bar=root.querySelector('#ediBar');
  root.addEventListener('scroll',()=>{
