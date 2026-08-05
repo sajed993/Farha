@@ -137,6 +137,16 @@ const EDI_DIAL='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strok
  +'<path d="M20 11.5V20l5.4 3.4"/>'
  +'<path d="M20 3.6v2.6M20 33.8v2.6M3.6 20h2.6M33.8 20h2.6"/>'
  +'<circle cx="20" cy="20" r="1.3" fill="currentColor" stroke="none"/></svg>';
+const EDI_PIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
+ +'<path d="M12 21s6.4-6.2 6.4-11A6.4 6.4 0 0 0 5.6 10c0 4.8 6.4 11 6.4 11Z"/>'
+ +'<circle cx="12" cy="10" r="2.3"/></svg>';
+const EDI_COMPASS='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
+ +'<circle cx="20" cy="20" r="15"/>'
+ +'<path d="M25.6 14.4 17 17l-2.6 8.6L23 23z"/>'
+ +'<circle cx="20" cy="20" r="1.1" fill="currentColor" stroke="none"/></svg>';
+const EDI_KEY='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
+ +'<circle cx="14.6" cy="14.6" r="7"/><circle cx="14.6" cy="14.6" r="2.6"/>'
+ +'<path d="M19.6 19.6 32 32"/><path d="M27.4 27.4 31 23.8M31 31l3.4-3.4"/></svg>';
 const EDI_DRESS='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
  +'<path d="M14.6 5.4 20 10l5.4-4.6"/>'
  +'<path d="M14.6 5.4 12.4 12 20 15.6 27.6 12l-2.2-6.6"/>'
@@ -232,10 +242,10 @@ function ediWax(cv,initials){
    Classic stationery treatment rather than a digital timer. */
 function ediCountHTML(){
  const c=S.c,E=t().edi;
- if(!c.when)return '';
+ if(!c.when||!ediSecOn('cd'))return '';
  return `<section class="edi-s edi-count">
    ${S.c.films?ediPlate('venue','soft'):''}${S.c.films?'<div class="edi-wash deep"></div>':''}
-   ${ediFlora(63,'tr')}${ediFrame()}
+   ${ediTint(1)}${ediFlora(63,'tr')}${ediFrame()}
    <div class="edi-in rv">
     <p class="edi-lbl"><span class="edi-ico">${EDI_DIAL}</span>${esc(E.cdL)}</p>
     <div class="edi-rule sm">${EDI_RULE}</div>
@@ -263,11 +273,11 @@ function ediStartClock(){
 /* ---- dress code ---- */
 function ediDressHTML(){
  const d=S.c.dress,E=t().edi;
- if(!d||!(d.t||d.d))return '';
+ if(!d||!(d.t||d.d)||!ediSecOn('dress'))return '';
  const sw=(d.sw&&d.sw.length?d.sw:['var(--ink)','var(--blush)','var(--cream-hi)'])
   .map(c=>`<span class="sw" style="background:${c}"></span>`).join('');
  return `<section class="edi-s edi-dress light">
-   ${ediFlora(70,'bl')}${ediFrame()}
+   ${ediTint(1)}${ediFlora(70,'bl')}${ediFrame()}
    <div class="edi-in rv">
     <p class="edi-lbl dk"><span class="edi-ico">${EDI_DRESS}</span>${esc(E.dressL)}</p>
     <div class="edi-rule sm dk">${EDI_RULE}</div>
@@ -277,6 +287,36 @@ function ediDressHTML(){
    </div>
   </section>`;}
 
+
+/* The light sections had no film behind them and read as flat cream. This bleeds
+   the film's own poster through at low opacity so the colour keeps flowing. */
+function ediTint(seed){
+ const f=S.c.films&&(S.c.films.venue||S.c.films.hero);
+ if(!f)return '';
+ const img=/\.mp4$/i.test(f)?f.replace(/\.mp4$/i,'.jpg'):f;
+ return `<div class="edi-tint t${(seed||0)%3}" style="background-image:url('${img}')"></div>`;}
+
+/* ---- optional notes: directions, accommodation ----
+   Same shape for both, so adding another later costs one entry. */
+function ediNoteHTML(key,icon,label,cls){
+ const d=S.c[key];
+ if(!d||!(d.t||d.d))return '';
+ if(!ediSecOn(key))return '';
+ return `<section class="edi-s edi-note ${cls||''}">
+   ${ediTint(2)}${ediFrame()}
+   <div class="edi-in rv">
+    <p class="edi-lbl dk"><span class="edi-ico">${icon}</span>${esc(label)}</p>
+    <div class="edi-rule sm dk">${EDI_RULE}</div>
+    ${d.t?`<h3 class="edi-note-t">${esc(d.t)}</h3>`:''}
+    ${d.d?`<p class="edi-note-d">${esc(d.d)}</p>`:''}
+   </div>
+  </section>`;}
+
+/* Dashboard switches. Absent config means on, so nothing disappears by default. */
+function ediSecOn(k){
+ const o=(typeof CFG!=='undefined'&&CFG&&CFG.edi)||null;
+ return !o||o[k]===undefined||!!o[k];}
+
 /* ---- sections ---- */
 function ediHTML(){
  const c=S.c,E=t().edi,ini=inInitials(c.n),dp=ediDateParts();
@@ -284,7 +324,7 @@ function ediHTML(){
   ? `<b>${esc(ini[0])}</b><i>${S.lang==='ar'?'و':'&'}</i><b>${esc(ini[1])}</b>`
   : `<b class="solo">${esc(ini[0]||'✦')}</b>`;
  const cart=n=>`<div class="edi-mono ${n||''}">${EDI_CART}<span class="mg">${mono}</span></div>`;
- const prog=(c.program&&c.program.length?c.program:[]).slice(0,6);
+ const prog=ediSecOn('prog')?(c.program&&c.program.length?c.program:[]).slice(0,6):[];
 
  return `<div class="edi" id="edi">
   <div class="edi-bar"><i id="ediBar"></i></div>
@@ -344,7 +384,7 @@ function ediHTML(){
   </section>
 
   <section class="edi-s edi-venue light">
-   ${ediFlora(51,'tr')}${ediFrame()}
+   ${ediTint(0)}${ediFlora(51,'tr')}${ediFrame()}
    <div class="edi-in rv">
     <p class="edi-lbl dk">${esc(E.venueL)}</p>
     <div class="edi-rule sm dk">${EDI_RULE}</div>
@@ -357,22 +397,29 @@ function ediHTML(){
   ${ediCountHTML()}
 
   ${prog.length?`<section class="edi-s edi-prog">
-   ${ediFrame()}
+   ${ediTint(2)}${ediFrame()}
    <div class="edi-in rv">
     <p class="edi-lbl">${esc(t().progTitle)}</p>
     <div class="edi-rule sm">${EDI_RULE}</div>
     <div class="edi-tl">${prog.map((p,i)=>`<div class="edi-tli">
       <span class="edi-med">${EDI_ICONS[i%EDI_ICONS.length]}</span>
+      <span class="edi-tlw">
+       <span class="edi-tlt">${esc(p.title)||'—'}</span>
+       ${p.place?`<span class="edi-pos"><i>${EDI_PIN}</i>${p.map
+         ?`<a href="${esc(p.map)}" target="_blank" rel="noopener">${esc(p.place)}</a>`
+         :esc(p.place)}</span>`:''}
+      </span>
       <b>${esc(p.time)}</b>
-      <span class="edi-tlt">${esc(p.title)||'—'}</span>
      </div>`).join('')}</div>
    </div>
   </section>`:''}
 
   ${ediDressHTML()}
+  ${ediNoteHTML('dir',EDI_COMPASS,t().edi.dirL,'light')}
+  ${ediNoteHTML('stay',EDI_KEY,t().edi.stayL)}
 
-  <section class="edi-s edi-rsvp light">
-   ${ediFlora(58,'bl')}${ediFrame()}
+  ${ediSecOn('rsvp')?`<section class="edi-s edi-rsvp light">
+   ${ediTint(0)}${ediFlora(58,'bl')}${ediFrame()}
    <div class="edi-in rv">
     <p class="edi-lbl dk">${t().uRsvp}</p>
     <div class="edi-rule sm dk">${EDI_RULE}</div>
@@ -383,7 +430,7 @@ function ediHTML(){
     </div>
     <p class="edi-thx">${esc(E.thanks)}</p>
    </div>
-  </section>
+  </section>`:''}
  </div>`;}
 
 /* ---- mount ---- */
@@ -450,9 +497,15 @@ function editorialDemo(){
 
 function ediDemoProgram(){
  const L={
-  ar:[['16:00','استقبال الضيوف'],['17:00','عقد القران'],['18:30','كوكتيل وصور'],['20:00','العشاء'],['22:00','السهرة']],
-  fr:[['16:00','Accueil des invités'],['17:00','Cérémonie'],['18:30','Cocktail & photos'],['20:00','Dîner'],['22:00','Soirée']],
-  en:[['16:00','Guest welcome'],['17:00','Ceremony'],['18:30','Cocktail & photos'],['20:00','Dinner'],['22:00','Party']]}[S.lang];
- return L.map(([time,title])=>({time:time,title:title,place:'',map:'',music:0,photos:[]}));}
+  ar:[['16:00','استقبال الضيوف','بهو القصر'],['17:00','عقد القران','قاعة الياسمين'],
+   ['18:30','كوكتيل وصور','الشرفة المطلّة على البحر'],['20:00','العشاء','القاعة الكبرى'],
+   ['22:00','السهرة','الحديقة الخلفية']],
+  fr:[['16:00','Accueil des invités','Hall du palais'],['17:00','Cérémonie','Salle Yasmine'],
+   ['18:30','Cocktail & photos','Terrasse sur la mer'],['20:00','Dîner','Grande salle'],
+   ['22:00','Soirée','Jardin arrière']],
+  en:[['16:00','Guest welcome','Palace hall'],['17:00','Ceremony','Yasmine hall'],
+   ['18:30','Cocktail & photos','Sea-facing terrace'],['20:00','Dinner','The grand hall'],
+   ['22:00','Party','The back garden']]}[S.lang];
+ return L.map(([time,title,place])=>({time:time,title:title,place:place,map:'',music:0,photos:[]}));}
 
 ;

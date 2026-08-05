@@ -2,10 +2,12 @@
 const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'farha_meta'};
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-const CFG_DEF={sec:{ultra:1,premium:1,ai:1,sites:1,datef:1,open:1,wishes:1},price:{ultra:199,ai:249,site:149,design:79},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[]}};
+const CFG_DEF={sec:{ultra:1,premium:1,ai:1,sites:1,datef:1,open:1,wishes:1,ready:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},price:{ultra:199,ai:249,site:149,design:79},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[]}};
 function loadCFG(){const cc=lsGet(LSK.cfg,{})||{};const o=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(o.sec,cc.sec||{});Object.assign(o.price,cc.price||{});o.wa=cc.wa||CFG_DEF.wa;o.d17=cc.d17||CFG_DEF.d17;
- Object.assign(o.banner,cc.banner||{});o.designs=cc.designs||{};o.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),cc.media||{});return o;}
+ Object.assign(o.banner,cc.banner||{});o.designs=cc.designs||{};
+ Object.assign(o.edi,cc.edi||{});o.films=cc.films||{};
+ o.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),cc.media||{});return o;}
 let CFG=loadCFG();
 function saveCFG(){lsSet(LSK.cfg,CFG);if(window.__dbSaveCfg)window.__dbSaveCfg(CFG);toast('حُفظ — سيظهر على الموقع فورًا ✓');}
 function ctlExport(){const pub=lsGet(LSK.wishes,[]).filter(w=>w.ok).slice(0,20).map(w=>({txt:w.txt,n:w.n}));
@@ -18,10 +20,20 @@ function ctlPrice(k,v){CFG.price[k]=Math.max(0,parseInt(v)||0);saveCFG();}
 function ctlWa(v){CFG.wa=(v||'').trim();saveCFG();}
 function ctlD17(v){CFG.d17=(v||'').trim();saveCFG();}
 function ctlBan(k,v){CFG.banner[k]=(k==='on')?(v?1:0):v;saveCFG();}
+/* the four ready-made films, and the sections inside their invitation */
+const RDFILMS=[['marble','قصر الرخام'],['oneday','يومًا ما'],['wisteria','ظلال الوستارية'],['rings','خواتم النور']];
+const EDISECL=[['cd','ساعة العدّ التنازلي'],['prog','برنامج الحفل + مواقع الفقرات'],['dress','قواعد اللباس'],
+ ['dir','الوصول وصفّ السيارات'],['stay','الإقامة'],['rsvp','تأكيد الحضور']];
+function ctlEdi(k,v){CFG.edi[k]=v?1:0;saveCFG();}
+function ctlFilm(id,k,v){CFG.films[id]=CFG.films[id]||{};
+ if(k==='vis')CFG.films[id].vis=!!v;
+ else if(k==='price')CFG.films[id].price=Math.max(0,parseInt(v)||0);
+ else CFG.films[id][k]=v;
+ saveCFG();}
 function ctlVis(id,v){CFG.designs[id]=CFG.designs[id]||{};CFG.designs[id].vis=!!v;saveCFG();}
 function ctlBadge(id,v){CFG.designs[id]=CFG.designs[id]||{};CFG.designs[id].badge=v;saveCFG();}
 function escA(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
-const SECL=[['ultra','✦ قسم «واقعي جدًا»'],['premium','قسم بريميوم'],['ai','سينما AI (داخل بريميوم)'],['sites','مواقع المناسبات'],['datef','دعوة أول موعد التفاعلية'],['open','عروض لحظة الفتح'],['wishes','صندوق التهاني داخل الدعوات']];
+const SECL=[['ready','✦ قسم «دعوات جاهزة» (الأفلام)'],['ultra','✦ قسم «واقعي جدًا»'],['premium','قسم بريميوم'],['ai','سينما AI (داخل بريميوم)'],['sites','مواقع المناسبات'],['datef','دعوة أول موعد التفاعلية'],['open','عروض لحظة الفتح'],['wishes','صندوق التهاني داخل الدعوات']];
 function ctlCard(tt,ss,inner){return `<div class="ctlcard"><h3>${tt}</h3>${ss?`<p class="cmut">${ss}</p>`:''}${inner}</div>`;}
 
 /* ===== dynamic content manager ===== */
@@ -55,9 +67,28 @@ function mAddDesign(){const g=id=>(document.getElementById(id)||{}).value||'';
 function mDelDesign(i){CFG.media.customDesigns.splice(i,1);saveCFG();renderContent();}
 function mShowTgl(i,on){const h=CFG.media.hideShows;const ix=h.indexOf(i);
  if(on&&ix>-1)h.splice(ix,1);if(!on&&ix===-1)h.push(i);saveCFG();}
+/* the ready-made films, and the sections inside their invitation */
+function readyView(){
+ const F=CFG.films||{},E=CFG.edi||{};
+ return ctlCard('🎞️ الدعوات الجاهزة — الأفلام',
+  'أخفوا فيلمًا، أو غيّروا اسمه وسعره. الألوان تُستخرج من الفيديو تلقائيًا.',
+  RDFILMS.map(([id,nm])=>{const o=F[id]||{};
+   return `<div class="ctlrow" style="flex-wrap:wrap;gap:8px">
+    <span style="min-width:9rem">${nm}</span>
+    <span class="sw-toggle ${o.vis===false?'':'on'}" onclick="ctlFilm('${id}','vis',${o.vis===false});renderContent()"></span>
+    <input style="flex:1;min-width:7rem" placeholder="${escA(nm)}" value="${escA(o.nm||'')}"
+     onchange="ctlFilm('${id}','nm',this.value)">
+    <input type="number" style="width:5.5rem" placeholder="${CFG.price.ultra}" value="${o.price||''}"
+     onchange="ctlFilm('${id}','price',this.value)">
+   </div>`;}).join(''))
+ + ctlCard('🧩 أقسام الدعوة','ما يظهر داخل الدعوة نفسها — بلا أي شيء عن الطعام أو الحساسية.',
+   EDISECL.map(([k,l])=>`<div class="ctlrow"><span>${l}</span>
+    <span class="sw-toggle ${E[k]===0?'':'on'}" onclick="ctlEdi('${k}',${E[k]===0});renderContent()"></span>
+   </div>`).join(''));}
+
 function mediaView(){
  const M=CFG.media;const cloud=window.__dbMode?'':`<p class="cmut" style="color:#A33">⚠️ لرفع الفيديوهات سجّلوا الدخول السحابي أولًا (الأزرار الأخرى تعمل).</p>`;
- return `<div class="cgrid">`+
+ return `<div class="cgrid">`+readyView()+
   ctlCard('🎬 أفلام سينما AI — فيديوهاتها','ولّدوا الفيديو بأزرار «نسخ البرومبت» في الموقع، ثم ارفعوه هنا ليظهر فورًا لكل الزوّار'+(cloud?'':''),
    cloud+AIN.map((n,i)=>{const has=M.films[i]&&M.films[i].url;
     return `<div class="ctlrow"><span>${AIE[i]} ${n} ${has?'<b style="color:#2F6B3A">· سحابي ✓</b>':''}</span>

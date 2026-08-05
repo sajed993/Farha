@@ -2240,8 +2240,8 @@ html[dir=rtl] .edi-mono .mg{font-family:var(--dispA)}
 .edi-mono .mg .solo{font-size:1.24em}
 
 /* --- type --- */
-.edi-names{font-family:'Cormorant Garamond',serif;font-weight:300;
- font-size:clamp(1.55rem,6.4vw,2.6rem);line-height:1.42;letter-spacing:.2em;
+.edi-names{font-family:'Cinzel','Cormorant Garamond',serif;font-weight:400;
+ font-size:clamp(1.4rem,5.8vw,2.3rem);line-height:1.5;letter-spacing:.16em;
  text-transform:uppercase;color:var(--gold-lo)}
 html[dir=rtl] .edi-names{font-family:var(--dispA);font-weight:700;letter-spacing:0;
  text-transform:none;font-size:clamp(1.8rem,8vw,2.9rem);color:var(--gold-lo)}
@@ -2251,8 +2251,8 @@ html[dir=rtl] .edi-names{font-family:var(--dispA);font-weight:700;letter-spacing
 .edi-rule svg{width:100%;display:block}
 .edi-kick,.edi-lbl{font-family:'Cormorant Garamond',serif;font-size:clamp(.72rem,2.3vw,.85rem);
  letter-spacing:.34em;text-transform:uppercase;color:var(--ink-mute);font-weight:400}
-html[dir=rtl] .edi-kick,html[dir=rtl] .edi-lbl{font-family:var(--bodyA);letter-spacing:.14em;
- text-transform:none;font-size:clamp(.82rem,2.9vw,.96rem)}
+html[dir=rtl] .edi-kick,html[dir=rtl] .edi-lbl{font-family:'Reem Kufi',var(--bodyA);letter-spacing:.1em;
+ text-transform:none;font-size:clamp(.82rem,2.9vw,.96rem);font-weight:500}
 .edi-lbl.dk{color:var(--gold-lo)}
 .edi-sub{font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;
  font-size:clamp(1.12rem,4.3vw,1.55rem);color:var(--ink);margin-top:.5em;line-height:1.5}
@@ -2269,7 +2269,7 @@ html[dir=rtl] .edi-sign{font-family:var(--dispA);font-weight:700;font-size:clamp
 .edi-cue{position:absolute;bottom:clamp(26px,5.4vh,48px);left:0;right:0;z-index:5;
  display:flex;flex-direction:column;align-items:center;gap:9px;opacity:0;transition:opacity 1.4s ease .8s}
 .edi-cue.in{opacity:1}
-.edi-cue span{font-family:'Cormorant Garamond',serif;font-size:.68rem;letter-spacing:.3em;
+.edi-cue span{font-family:'Cinzel','Cormorant Garamond',serif;font-size:.62rem;letter-spacing:.26em;
  text-transform:uppercase;color:var(--ink-mute)}
 html[dir=rtl] .edi-cue span{font-family:var(--bodyA);letter-spacing:.1em;text-transform:none;font-size:.78rem}
 .edi-cue i{width:1px;height:32px;background:linear-gradient(color-mix(in srgb,var(--gold-lo) 70%,transparent),transparent);
@@ -2304,8 +2304,8 @@ html[dir=rtl] .edi-skip{font-family:var(--bodyA);letter-spacing:.04em;text-trans
 /* --- venue + rsvp --- */
 .edi-s.light{background:radial-gradient(88% 60% at 50% 20%,var(--cream-hi),var(--cream) 58%,var(--beige))}
 .edi-venue .edi-in,.edi-rsvp .edi-in{max-width:28rem}
-.edi-venue-n{font-family:'Cormorant Garamond',serif;font-weight:300;
- font-size:clamp(1.45rem,5.8vw,2.2rem);line-height:1.4;color:var(--ink);letter-spacing:.06em}
+.edi-venue-n{font-family:'Cinzel','Cormorant Garamond',serif;font-weight:400;
+ font-size:clamp(1.25rem,5vw,1.9rem);line-height:1.5;color:var(--ink);letter-spacing:.1em}
 html[dir=rtl] .edi-venue-n{font-family:var(--dispA);font-weight:700;letter-spacing:0;color:var(--ink)}
 .edi-ph.frame{position:relative;inset:auto;width:min(100%,24rem);aspect-ratio:4/3;
  margin:clamp(24px,4.6vh,36px) auto 0;border-radius:1px;animation:none;z-index:4;
@@ -2329,7 +2329,7 @@ html[dir=rtl] .edi-thx{font-family:var(--dispA);font-weight:700;font-size:clamp(
 .edi-prog{background:radial-gradient(88% 62% at 50% 24%,var(--cream-hi),var(--cream) 58%,var(--beige))}
 .edi-prog .edi-in{max-width:28rem;width:100%}
 .edi-tl{display:grid;gap:clamp(15px,2.8vh,24px);margin-top:clamp(24px,4.6vh,36px);text-align:start}
-.edi-tli{display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:clamp(12px,3vw,20px);
+.edi-tli{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:clamp(12px,3vw,20px);
  padding-bottom:clamp(13px,2.4vh,19px);border-bottom:1px solid color-mix(in srgb,var(--gold-lo) 22%,transparent)}
 .edi-tli:last-child{border-bottom:none;padding-bottom:0}
 .edi-med{width:clamp(38px,10vw,46px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
@@ -2339,8 +2339,8 @@ html[dir=rtl] .edi-thx{font-family:var(--dispA);font-weight:700;font-size:clamp(
 .edi-tli b{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(1rem,3.6vw,1.14rem);
  color:var(--gold-lo);letter-spacing:.08em;font-variant-numeric:lining-nums tabular-nums;
  font-feature-settings:'lnum' 1,'tnum' 1}
-.edi-tlt{font-family:'Cormorant Garamond',serif;font-size:clamp(.82rem,2.9vw,.94rem);
- letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft)}
+.edi-tlt{font-family:'Cinzel','Cormorant Garamond',serif;font-size:clamp(.76rem,2.7vw,.88rem);
+ letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
 html[dir=rtl] .edi-tlt{font-family:var(--bodyA);letter-spacing:.02em;text-transform:none;font-size:clamp(.9rem,3.2vw,1.04rem)}
 
 @media(prefers-reduced-motion:reduce){
@@ -2463,8 +2463,8 @@ html[dir=rtl] .wenv-hint{font-family:var(--bodyA);letter-spacing:.02em;text-tran
 .rd-card:hover .rd-play{opacity:1;transform:translate(-50%,-50%) scale(1)}
 
 .rd-meta{padding:20px 6px 0;text-align:center}
-.rd-meta b{display:block;font-family:'Cormorant Garamond',serif;font-weight:400;
- font-size:clamp(1.2rem,3.4vw,1.5rem);letter-spacing:.14em;text-transform:uppercase;color:#7A5A1C}
+.rd-meta b{display:block;font-family:'Cinzel','Cormorant Garamond',serif;font-weight:400;
+ font-size:clamp(1.05rem,3vw,1.3rem);letter-spacing:.12em;text-transform:uppercase;color:#7A5A1C}
 html[dir=rtl] .rd-meta b{font-family:var(--dispA);font-weight:700;letter-spacing:0;text-transform:none;
  font-size:clamp(1.3rem,4vw,1.65rem)}
 .rd-meta p{margin-top:8px;font-size:.85rem;line-height:1.78;color:#6B583C;min-height:4.6em}
@@ -2563,8 +2563,8 @@ html[dir=rtl] .rd-meta b{font-family:var(--dispA);font-weight:700;letter-spacing
  font-size:clamp(2.1rem,9vw,3.1rem);line-height:1;color:var(--gold-lo);
  font-variant-numeric:lining-nums tabular-nums;font-feature-settings:'lnum' 1,'tnum' 1}
 html[dir=rtl] .edi-clock b{font-family:var(--dispA);font-weight:400}
-.edi-clock span{display:block;margin-top:.5em;font-family:'Cormorant Garamond',serif;
- font-size:clamp(.62rem,2.2vw,.74rem);letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute)}
+.edi-clock span{display:block;margin-top:.5em;font-family:'Cinzel','Cormorant Garamond',serif;
+ font-size:clamp(.58rem,2vw,.7rem);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-mute)}
 html[dir=rtl] .edi-clock span{font-family:var(--bodyA);letter-spacing:.04em;text-transform:none;
  font-size:clamp(.72rem,2.6vw,.84rem)}
 .edi-clock .started{grid-column:1/-1;font-family:'Cormorant Garamond',serif;font-style:italic;
@@ -2577,8 +2577,8 @@ html[dir=rtl] .edi-cdnote{font-family:var(--bodyA);letter-spacing:.04em;text-tra
 /* --- dress code --- */
 .edi-dress{background:radial-gradient(86% 60% at 50% 24%,var(--cream-hi),var(--cream) 58%,var(--beige))}
 .edi-dress .edi-in{max-width:26rem}
-.edi-dress-t{font-family:'Cormorant Garamond',serif;font-weight:300;letter-spacing:.16em;
- text-transform:uppercase;font-size:clamp(1.3rem,5.4vw,1.9rem);color:var(--ink);line-height:1.4}
+.edi-dress-t{font-family:'Cinzel','Cormorant Garamond',serif;font-weight:400;letter-spacing:.14em;
+ text-transform:uppercase;font-size:clamp(1.15rem,4.8vw,1.65rem);color:var(--ink);line-height:1.5}
 html[dir=rtl] .edi-dress-t{font-family:var(--dispA);font-weight:700;letter-spacing:0;text-transform:none}
 .edi-dress-d{margin-top:.7em;font-family:'Cormorant Garamond',serif;font-style:italic;
  font-size:clamp(.94rem,3.4vw,1.08rem);color:var(--ink-soft);line-height:1.9}
@@ -2586,3 +2586,43 @@ html[dir=rtl] .edi-dress-d{font-family:var(--serifA);font-style:normal}
 .edi-sw{display:flex;gap:.9em;justify-content:center;margin-top:clamp(20px,3.8vh,32px)}
 .edi-sw .sw{width:clamp(30px,8vw,40px);aspect-ratio:1;border-radius:50%;
  box-shadow:inset 0 0 0 1px rgba(0,0,0,.16),0 4px 12px -4px rgba(0,0,0,.3)}
+
+/* --- optional notes: directions, accommodation --- */
+.edi-note{background:radial-gradient(86% 60% at 50% 26%,var(--cream-hi),var(--cream) 58%,var(--beige))}
+.edi-note .edi-in{max-width:25rem}
+.edi-note-t{font-family:'Cinzel','Cormorant Garamond',serif;font-weight:400;letter-spacing:.14em;
+ text-transform:uppercase;font-size:clamp(1.1rem,4.4vw,1.5rem);color:var(--ink);line-height:1.5}
+html[dir=rtl] .edi-note-t{font-family:var(--dispA);font-weight:700;letter-spacing:0;text-transform:none}
+.edi-note-d{margin-top:.8em;font-family:'Cormorant Garamond',serif;font-style:italic;
+ font-size:clamp(.92rem,3.3vw,1.05rem);color:var(--ink-soft);line-height:1.95}
+html[dir=rtl] .edi-note-d{font-family:var(--serifA);font-style:normal}
+
+/* --- the film's colour bleeding through the light sections ---
+   Heavily blurred and low opacity: it reads as a tint in the palette's own
+   hues, not as a picture. Each variant crops differently so consecutive
+   sections do not look identical. */
+.edi-tint{position:absolute;inset:-18%;z-index:0;pointer-events:none;
+ background-size:cover;background-position:center;
+ filter:blur(58px) saturate(1.45) brightness(1.06);opacity:.42;
+ transform:scale(1.12)}
+.edi-tint.t1{background-position:28% 34%;transform:scale(1.2) rotate(6deg);opacity:.36}
+.edi-tint.t2{background-position:70% 68%;transform:scale(1.16) rotate(-5deg);opacity:.32}
+/* a wash of the palette over the tint keeps type legible.
+   Note: no blanket rule on `.edi-tint + *` — that outranks .edi-frame's
+   position:absolute and collapses the frame into the flow. */
+.edi-s.light::before,.edi-note::before,.edi-prog::before,.edi-count::before{
+ content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+ background:radial-gradient(112% 76% at 50% 34%,
+  color-mix(in srgb,var(--cream-hi) 82%,transparent) 0%,
+  color-mix(in srgb,var(--cream) 66%,transparent) 56%,
+  color-mix(in srgb,var(--beige) 52%,transparent) 100%)}
+
+/* --- a position under each programme entry --- */
+.edi-tlw{display:block;min-width:0}
+.edi-pos{display:flex;align-items:center;gap:.4em;margin-top:.3em;
+ font-family:var(--bodyA);font-size:clamp(.74rem,2.6vw,.84rem);color:var(--ink-mute);line-height:1.5}
+html[dir=ltr] .edi-pos{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(.78rem,2.7vw,.9rem)}
+.edi-pos i{display:inline-grid;place-items:center;width:1em;height:1em;flex:0 0 auto;color:var(--blush)}
+.edi-pos i svg{width:100%;height:100%;display:block}
+.edi-pos a{color:inherit;text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--blush) 45%,transparent)}
+.edi-pos a:hover{color:var(--ink)}

@@ -30,6 +30,11 @@ const FILMS_READY=[
   pal:'cool',dress:{ar:['أنيق كلاسيكي','أزرق داكن · عاجي'],fr:['Classique élégant','Bleu profond · ivoire'],en:['Classic formal','Deep blue · ivory']},sw:['#2C3742','#5E88AA','#E6D6BE']}];
 
 function readyFilm(id){return FILMS_READY.find(f=>f.id===id)||FILMS_READY[0];}
+/* Dashboard overrides: hide a film, rename it, or reprice it. */
+function readyCfg(id){return (typeof CFG!=='undefined'&&CFG&&CFG.films&&CFG.films[id])||{};}
+function readyShown(){return FILMS_READY.filter(f=>readyCfg(f.id).vis!==false);}
+function readyName(f){const o=readyCfg(f.id);return (o.nm&&o.nm.trim())||f.name[S.lang];}
+function readyPrice(f){const o=readyCfg(f.id);return o.price||CFG.price.ultra;}
 
 /* An iPhone: titanium rail, Dynamic Island, side buttons, a little screen glare. */
 function iphoneHTML(inner,cls){
@@ -43,7 +48,7 @@ function filmShelfHTML(){
  return `<section id="ready">
   <div class="sec-head"><span class="kicker">${t().rdKick}</span>
    <h2>${t().rdTitle}</h2><p>${t().rdSub}</p></div>
-  <div class="rd-grid">${FILMS_READY.map(f=>`
+  <div class="rd-grid">${readyShown().map(f=>`
    <article class="rd-card">
     <div class="rd-stage" onclick="openReady('${f.id}')">
      <div class="rd-bleed" style="background-image:url('${f.p}')"></div>
@@ -53,11 +58,11 @@ function filmShelfHTML(){
      <span class="rd-play">▶</span>
     </div>
     <div class="rd-meta">
-     <b>${f.name[S.lang]}</b>
+     <b>${esc(readyName(f))}</b>
      <p>${f.blurb[S.lang]}</p>
      <div class="rd-acts">
       <button class="rd-btn gold" onclick="openReady('${f.id}')">${t().rdOpen}</button>
-      <button class="rd-btn ghost" onclick="addToCart('${f.name[S.lang].replace(/'/g,'')}',CFG.price.ultra)">${t().rdOrder}</button>
+      <button class="rd-btn ghost" onclick="addToCart('${readyName(f).replace(/'/g,'')}',${readyPrice(f)})">${t().rdOrder}</button>
      </div>
     </div>
    </article>`).join('')}</div>
@@ -74,7 +79,8 @@ function openReady(id){
   qr:false,maps:'https://maps.google.com',story:[],guest:'',
   when:when.toISOString().slice(0,16),program:ediDemoProgram(),
   film:f.id,films:{hero:f.v,hall:f.v,detail:f.v,date:f.v,venue:f.p},ediPal:f.id,
-  dress:{t:(f.dress&&f.dress[S.lang]||[])[0]||'',d:(f.dress&&f.dress[S.lang]||[])[1]||'',sw:f.sw||null}};
+  dress:{t:(f.dress&&f.dress[S.lang]||[])[0]||'',d:(f.dress&&f.dress[S.lang]||[])[1]||'',sw:f.sw||null},
+  dir:ediDemoNote('dir'),stay:ediDemoNote('stay')};
  editorialOpen();}
 ;
 
@@ -92,3 +98,14 @@ function filmShelfMount(){
   if(e.isIntersecting){if(v.preload!=='auto')v.preload='auto';v.play().catch(()=>{});}
   else if(!v.paused)v.pause();}),{threshold:.35});
  vids.forEach(v=>io.observe(v));}
+
+/* Placeholder copy for the optional notes until the couple fills them in. */
+function ediDemoNote(k){
+ const L={
+  dir:{ar:['موقف مجاني','خدمة صفّ السيارات من الساعة ٣:٣٠ · مدخل الضيوف من البوابة الشرقية'],
+   fr:['Parking gratuit',"Service voiturier dès 15h30 · entrée des invités par la porte est"],
+   en:['Free parking','Valet from 3:30 pm · guest entrance through the east gate']},
+  stay:{ar:['أسعار خاصة','فندقان على بعد دقائق — اذكروا اسم العروسين عند الحجز'],
+   fr:['Tarifs négociés','Deux hôtels à quelques minutes — mentionnez les mariés à la réservation'],
+   en:['Negotiated rates','Two hotels minutes away — mention the couple when booking']}}[k][S.lang];
+ return {t:L[0],d:L[1]};}
