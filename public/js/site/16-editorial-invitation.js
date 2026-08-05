@@ -131,6 +131,18 @@ function ediFlora(seed,cls){
  return `<svg class="edi-flora ${cls||''}" viewBox="0 0 100 100" aria-hidden="true">`
   +`<defs>${defs}</defs>${fol}${bud}${s}</svg>`;}
 
+/* an engraved dial, and a gown-and-tails mark for the dress code */
+const EDI_DIAL='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">'
+ +'<circle cx="20" cy="20" r="15"/><circle cx="20" cy="20" r="12" stroke-dasharray="1 3" opacity=".6"/>'
+ +'<path d="M20 11.5V20l5.4 3.4"/>'
+ +'<path d="M20 3.6v2.6M20 33.8v2.6M3.6 20h2.6M33.8 20h2.6"/>'
+ +'<circle cx="20" cy="20" r="1.3" fill="currentColor" stroke="none"/></svg>';
+const EDI_DRESS='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
+ +'<path d="M14.6 5.4 20 10l5.4-4.6"/>'
+ +'<path d="M14.6 5.4 12.4 12 20 15.6 27.6 12l-2.2-6.6"/>'
+ +'<path d="M20 15.6 12.6 35h14.8z"/>'
+ +'<path d="M16.6 24.4h6.8" opacity=".55"/></svg>';
+
 /* ---- date split for the seal reveal ---- */
 function ediDateParts(){
  const c=S.c;
@@ -214,6 +226,57 @@ function ediWax(cv,initials){
  paint();
  window.addEventListener('resize',paint);}
 
+
+/* ---- countdown ----
+   Four engraved cells separated by hairlines, with a drawn dial in the label.
+   Classic stationery treatment rather than a digital timer. */
+function ediCountHTML(){
+ const c=S.c,E=t().edi;
+ if(!c.when)return '';
+ return `<section class="edi-s edi-count">
+   ${S.c.films?ediPlate('venue','soft'):''}${S.c.films?'<div class="edi-wash deep"></div>':''}
+   ${ediFlora(63,'tr')}${ediFrame()}
+   <div class="edi-in rv">
+    <p class="edi-lbl"><span class="edi-ico">${EDI_DIAL}</span>${esc(E.cdL)}</p>
+    <div class="edi-rule sm">${EDI_RULE}</div>
+    <div class="edi-clock" id="ediClock">${ediClockCells([0,0,0,0])}</div>
+    <p class="edi-cdnote">${esc(S.lang==='ar'?toAr(c.d):c.d)}</p>
+   </div>
+  </section>`;}
+function ediClockCells(v){
+ const L=t().cdL, ar=S.lang==='ar';
+ return v.map((n,i)=>`<div><b>${ar?toAr(String(n).padStart(2,'0')):String(n).padStart(2,'0')}</b><span>${L[i]}</span></div>`).join('');}
+let ediCdT=null;
+function ediStartClock(){
+ clearInterval(ediCdT);
+ const box=document.getElementById('ediClock');
+ if(!box||!S.c.when)return;
+ const tick=()=>{
+  const el=document.getElementById('ediClock');
+  if(!el){clearInterval(ediCdT);return;}
+  const diff=new Date(S.c.when)-Date.now();
+  if(diff<=0){el.innerHTML=`<div class="started">${t().started}</div>`;clearInterval(ediCdT);return;}
+  el.innerHTML=ediClockCells([Math.floor(diff/864e5),Math.floor(diff/36e5)%24,
+   Math.floor(diff/6e4)%60,Math.floor(diff/1e3)%60]);};
+ tick();ediCdT=setInterval(tick,1000);}
+
+/* ---- dress code ---- */
+function ediDressHTML(){
+ const d=S.c.dress,E=t().edi;
+ if(!d||!(d.t||d.d))return '';
+ const sw=(d.sw&&d.sw.length?d.sw:['var(--ink)','var(--blush)','var(--cream-hi)'])
+  .map(c=>`<span class="sw" style="background:${c}"></span>`).join('');
+ return `<section class="edi-s edi-dress light">
+   ${ediFlora(70,'bl')}${ediFrame()}
+   <div class="edi-in rv">
+    <p class="edi-lbl dk"><span class="edi-ico">${EDI_DRESS}</span>${esc(E.dressL)}</p>
+    <div class="edi-rule sm dk">${EDI_RULE}</div>
+    <h3 class="edi-dress-t">${esc(d.t||'')}</h3>
+    ${d.d?`<p class="edi-dress-d">${esc(d.d)}</p>`:''}
+    <div class="edi-sw">${sw}</div>
+   </div>
+  </section>`;}
+
 /* ---- sections ---- */
 function ediHTML(){
  const c=S.c,E=t().edi,ini=inInitials(c.n),dp=ediDateParts();
@@ -223,7 +286,7 @@ function ediHTML(){
  const cart=n=>`<div class="edi-mono ${n||''}">${EDI_CART}<span class="mg">${mono}</span></div>`;
  const prog=(c.program&&c.program.length?c.program:[]).slice(0,6);
 
- return `<div class="edi ${S.c.ediPal?'pal-'+S.c.ediPal:''}" id="edi">
+ return `<div class="edi" id="edi">
   <div class="edi-bar"><i id="ediBar"></i></div>
   <button class="edi-x" onclick="closeVeil()">${t().closePrev}</button>
 
@@ -291,6 +354,8 @@ function ediHTML(){
    ${ediPlate('venue','frame')}
   </section>
 
+  ${ediCountHTML()}
+
   ${prog.length?`<section class="edi-s edi-prog">
    ${ediFrame()}
    <div class="edi-in rv">
@@ -303,6 +368,8 @@ function ediHTML(){
      </div>`).join('')}</div>
    </div>
   </section>`:''}
+
+  ${ediDressHTML()}
 
   <section class="edi-s edi-rsvp light">
    ${ediFlora(58,'bl')}${ediFrame()}
@@ -347,6 +414,8 @@ function mountEditorial(stage){
    vids.forEach(v=>vo.observe(v));
   } else vids.forEach(v=>v.play().catch(()=>{}));}
 
+ ediStartClock();
+
  const bar=root.querySelector('#ediBar');
  root.addEventListener('scroll',()=>{
   const m=root.scrollHeight-root.clientHeight;
@@ -354,7 +423,8 @@ function mountEditorial(stage){
 
 function editorialOpen(){
  closeVeil(true);
- veil=document.createElement('div');veil.className='veil edi-veil-root';
+ veil=document.createElement('div');
+ veil.className='veil edi-veil-root'+(S.c.ediPal?' pal-'+S.c.ediPal:'');
  document.body.appendChild(veil);document.body.style.overflow='hidden';
  const stage=document.createElement('div');stage.className='cstage edi-stage';
  veil.appendChild(stage);

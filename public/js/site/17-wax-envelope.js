@@ -3,10 +3,24 @@
    the centre, one black wax seal. Press the seal and the flap folds back.
    No photography — cream paper, fold geometry and a wax blob on canvas. */
 
-/* Black wax, pressed with the couple's initials. */
+/* Shift a hex toward white or black — used to build the wax's relief from the
+   single --wax colour the palette gives us. */
+function envShade(hex,amt){
+ const h=String(hex||'').trim().replace('#','');
+ if(h.length<6)return '#2A2622';
+ const n=parseInt(h.slice(0,6),16);
+ let r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+ const t=amt>0?255:0,k=Math.abs(amt);
+ r=Math.round(r+(t-r)*k);g=Math.round(g+(t-g)*k);b=Math.round(b+(t-b)*k);
+ return '#'+[r,g,b].map(v=>('0'+v.toString(16)).slice(-2)).join('');}
+
+/* Wax pressed with the couple's initials, in the film's own colour. */
 function envWax(cv,initials){
  const ctx=cv.getContext('2d');if(!ctx)return null;
  let done=false,strokes=0;
+ const waxOf=()=>{
+  const v=getComputedStyle(cv).getPropertyValue('--wax').trim();
+  return v||'#2A2622';};
 
  function paint(){
   const r=cv.getBoundingClientRect();
@@ -23,9 +37,10 @@ function envWax(cv,initials){
    const x=cx+Math.cos(a)*rad,y=cy+Math.sin(a)*rad;
    i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
   ctx.closePath();
+  const base=waxOf();
   const g=ctx.createRadialGradient(w*.38,h*.32,w*.03,cx,cy,rr*1.2);
-  g.addColorStop(0,'#4A443C');g.addColorStop(.3,'#2E2A25');
-  g.addColorStop(.72,'#1A1714');g.addColorStop(1,'#0C0A08');
+  g.addColorStop(0,envShade(base,.34));g.addColorStop(.3,envShade(base,.06));
+  g.addColorStop(.72,envShade(base,-.28));g.addColorStop(1,envShade(base,-.52));
   ctx.fillStyle=g;ctx.fill();
 
   /* pressed relief — light catches the upper rim, the lower edge sits in shadow */

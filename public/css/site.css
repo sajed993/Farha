@@ -2118,20 +2118,48 @@ html[dir=rtl] .df-yes{translate:50% -50%}
    is a variable on .edi so the whole tier repalettes from one place.
    Photographs are optional — .edi-ph keeps its CSS backdrop until
    /img/inv/<key>.jpg loads, then takes the image and drops the placeholder. */
-.edi{
+/* ── palettes ──
+   Sampled from the films themselves, then lifted to values type can sit on.
+   Defined on the veil root so the envelope and the invitation share one scope. */
+.edi-veil-root{
  --cream:#F6F0E4;--cream-hi:#FCF8F0;--beige:#EADFC8;--beige-dp:#DDCFB2;
  --gold:#B0801F;--gold-hi:#D9B25E;--gold-lo:#7A5A1C;--gold-pale:#EBD9AE;
  --ink:#3E3020;--ink-soft:#57452E;--ink-mute:#75603F;
- --blush:#E0BDB6;--plum:#7E3A50;--sage:#93A37E;
- position:fixed;inset:0;z-index:70;overflow-y:auto;overflow-x:hidden;
+ --blush:#E0BDB6;--plum:#7E3A50;--sage:#93A37E;--wax:#2A2622;
+ background:var(--cream)}
+/* قصر الرخام — warm marble, dried rose lifted from the garlands */
+.edi-veil-root.pal-marble{
+ --cream:#F4EDE4;--cream-hi:#FCF8F2;--beige:#E8DCCB;--beige-dp:#D8C7AF;
+ --gold:#B08A4E;--gold-hi:#E3C89A;--gold-lo:#8A6A2B;--gold-pale:#EFDFC2;
+ --ink:#43342A;--ink-soft:#61503F;--ink-mute:#8A7860;
+ --blush:#AE7E70;--plum:#7E4034;--sage:#9AA184;--wax:#7E4034}
+/* يومًا ما — measured at 0.06 saturation, so silver and charcoal, no gold */
+.edi-veil-root.pal-oneday{
+ --cream:#EDEDEF;--cream-hi:#FAFAFB;--beige:#DEDEE1;--beige-dp:#C6C6CB;
+ --gold:#8E8A86;--gold-hi:#CFCBC6;--gold-lo:#5E5A56;--gold-pale:#DCD9D6;
+ --ink:#1A1A1D;--ink-soft:#3E3E44;--ink-mute:#6E6A70;
+ --blush:#9A969C;--plum:#3A3A40;--sage:#8E9490;--wax:#141416}
+/* ظلال الوستارية — ivory door, lilac from the racemes, ivy green */
+.edi-veil-root.pal-wisteria{
+ --cream:#F1E9DA;--cream-hi:#FBF6EC;--beige:#E4D9C2;--beige-dp:#D2C4A6;
+ --gold:#A98A46;--gold-hi:#DEC894;--gold-lo:#7E6528;--gold-pale:#EADCBC;
+ --ink:#3B3326;--ink-soft:#5A5040;--ink-mute:#847761;
+ --blush:#8E7AA0;--plum:#4A3A60;--sage:#8B9C73;--wax:#4A3A60}
+/* خواتم النور — fully derived: window #5E88AA, ring #89553E */
+.edi-veil-root.pal-rings{
+ --cream:#EBF0F4;--cream-hi:#F8FBFD;--beige:#DAE3EA;--beige-dp:#C0CDD8;
+ --gold:#A97A4E;--gold-hi:#DCC49E;--gold-lo:#84592E;--gold-pale:#E6D6BE;
+ --ink:#2C3742;--ink-soft:#4A5866;--ink-mute:#70808E;
+ --blush:#5E88AA;--plum:#2E4256;--sage:#8298A0;--wax:#2E4256}
+
+.edi{position:fixed;inset:0;z-index:70;overflow-y:auto;overflow-x:hidden;
  background:var(--cream);scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
-.edi-veil-root{background:#F6F0E4}
 .edi-stage{position:fixed;inset:0;display:block;padding:0}
-.edi-bar{position:fixed;top:0;left:0;right:0;height:2px;z-index:20;background:rgba(185,138,47,.16)}
+.edi-bar{position:fixed;top:0;left:0;right:0;height:2px;z-index:20;background:color-mix(in srgb,var(--gold) 16%,transparent)}
 .edi-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#B98A2F,#EBD9AE);transition:width .18s linear}
-.edi-x{position:fixed;top:14px;inset-inline-end:14px;z-index:22;border:1px solid rgba(138,106,43,.4);
+.edi-x{position:fixed;top:14px;inset-inline-end:14px;z-index:22;border:1px solid color-mix(in srgb,var(--gold-lo) 40%,transparent);
  border-radius:999px;padding:8px 16px;font-size:.78rem;font-weight:600;letter-spacing:.06em;
- color:#7A5F30;background:rgba(255,255,255,.55);backdrop-filter:blur(8px)}
+ color:var(--gold-lo);background:rgba(255,255,255,.55);backdrop-filter:blur(8px)}
 
 /* --- section shell --- */
 .edi-s{position:relative;min-height:100svh;display:grid;place-items:center;overflow:hidden;
@@ -2142,12 +2170,12 @@ html[dir=rtl] .df-yes{translate:50% -50%}
  animation:ediKen 26s ease-in-out infinite alternate}
 @keyframes ediKen{from{transform:scale(1.02)}to{transform:scale(1.12)}}
 .edi-ph.p-hero{background:
- radial-gradient(84% 56% at 50% 10%,#FCF8F0 0%,#F2E9D6 52%,#E6D9BE 100%)}
+ radial-gradient(84% 56% at 50% 10%,var(--cream-hi) 0%,var(--cream) 52%,var(--beige) 100%)}
 .edi-ph.p-hall{background:
- radial-gradient(70% 48% at 50% 16%,#FDFAF3 0%,#F4ECDC 48%,#E7DBC3 100%)}
+ radial-gradient(70% 48% at 50% 16%,var(--cream-hi) 0%,var(--cream) 48%,var(--beige) 100%)}
 .edi-ph.p-detail{background:
- radial-gradient(76% 54% at 28% 22%,#FBEFE9 0%,#F3E7D9 52%,#E6D8C2 100%)}
-.edi-ph.p-venue{background:linear-gradient(180deg,#F3E9D7,#E7DAC1 62%,#DCCDB0)}
+ radial-gradient(76% 54% at 28% 22%,var(--cream-hi) 0%,var(--cream) 52%,var(--beige) 100%)}
+.edi-ph.p-venue{background:linear-gradient(180deg,var(--cream),var(--beige) 62%,var(--beige-dp))}
 .edi-ph.has::after{display:none}
 .edi-ph.soft{filter:saturate(.9)}
 /* keeps type legible once a real photograph is behind it */
@@ -2174,8 +2202,8 @@ html[dir=rtl] .df-yes{translate:50% -50%}
 
 /* --- ornate gold frame --- */
 .edi-frame{position:absolute;inset:clamp(16px,4.5vw,34px);z-index:2;pointer-events:none;
- color:var(--gold);border:1px solid rgba(176,128,31,.6)}
-.edi-frame::before{content:"";position:absolute;inset:5px;border:1px solid rgba(176,128,31,.34)}
+ color:var(--gold);border:1px solid color-mix(in srgb,var(--gold) 60%,transparent)}
+.edi-frame::before{content:"";position:absolute;inset:5px;border:1px solid color-mix(in srgb,var(--gold) 34%,transparent)}
 .edi-frame .fc{position:absolute;width:clamp(38px,10vw,58px);aspect-ratio:1}
 .edi-frame .fc svg{width:100%;height:100%;display:block}
 .edi-frame .fc.tl{top:-1px;inset-inline-start:-1px}
@@ -2216,7 +2244,7 @@ html[dir=rtl] .edi-mono .mg{font-family:var(--dispA)}
  font-size:clamp(1.55rem,6.4vw,2.6rem);line-height:1.42;letter-spacing:.2em;
  text-transform:uppercase;color:var(--gold-lo)}
 html[dir=rtl] .edi-names{font-family:var(--dispA);font-weight:700;letter-spacing:0;
- text-transform:none;font-size:clamp(1.8rem,8vw,2.9rem);color:#8A6A2B}
+ text-transform:none;font-size:clamp(1.8rem,8vw,2.9rem);color:var(--gold-lo)}
 .edi-rule{width:clamp(140px,50%,226px);margin:clamp(15px,2.8vh,24px) auto;color:var(--gold);opacity:.9}
 .edi-rule.sm{width:clamp(104px,36%,162px)}
 .edi-rule.dk{color:var(--gold-lo)}
@@ -2244,12 +2272,12 @@ html[dir=rtl] .edi-sign{font-family:var(--dispA);font-weight:700;font-size:clamp
 .edi-cue span{font-family:'Cormorant Garamond',serif;font-size:.68rem;letter-spacing:.3em;
  text-transform:uppercase;color:var(--ink-mute)}
 html[dir=rtl] .edi-cue span{font-family:var(--bodyA);letter-spacing:.1em;text-transform:none;font-size:.78rem}
-.edi-cue i{width:1px;height:32px;background:linear-gradient(rgba(138,106,43,.7),transparent);
+.edi-cue i{width:1px;height:32px;background:linear-gradient(color-mix(in srgb,var(--gold-lo) 70%,transparent),transparent);
  transform-origin:top;animation:ediCue 2.4s ease-in-out infinite}
 @keyframes ediCue{0%,100%{transform:scaleY(.4);opacity:.4}50%{transform:scaleY(1);opacity:1}}
 
 /* --- the date, under wax --- */
-.edi-date{background:radial-gradient(80% 56% at 50% 36%,#FDFAF3 0%,#F3EADA 54%,#E7DAC2 100%)}
+.edi-date{background:radial-gradient(80% 56% at 50% 36%,var(--cream-hi) 0%,var(--cream) 54%,var(--beige) 100%)}
 .edi-hint{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(.86rem,3vw,1rem);
  color:var(--ink-mute);margin-top:.85em;max-width:21rem;margin-inline:auto;line-height:1.8}
 html[dir=rtl] .edi-hint{font-family:var(--bodyA);font-style:normal}
@@ -2268,28 +2296,28 @@ html[dir=rtl] .edi-dt b,html[dir=rtl] .edi-dt span{font-family:var(--bodyA);lett
 html[dir=rtl] .edi-dt em{font-family:var(--dispA)}
 .edi-cv{position:absolute;inset:0;width:100%;height:100%;cursor:grab;
  filter:drop-shadow(0 10px 20px rgba(112,80,26,.34))}
-.edi-skip{display:block;margin:clamp(20px,3.6vh,30px) auto 0;border-bottom:1px solid rgba(138,106,43,.4);
+.edi-skip{display:block;margin:clamp(20px,3.6vh,30px) auto 0;border-bottom:1px solid color-mix(in srgb,var(--gold-lo) 40%,transparent);
  padding-bottom:3px;font-family:'Cormorant Garamond',serif;font-size:.8rem;letter-spacing:.2em;
  text-transform:uppercase;color:var(--gold-lo)}
 html[dir=rtl] .edi-skip{font-family:var(--bodyA);letter-spacing:.04em;text-transform:none;font-size:.88rem}
 
 /* --- venue + rsvp --- */
-.edi-s.light{background:radial-gradient(88% 60% at 50% 20%,#FDFAF3,#F4ECDD 58%,#E9DDC6)}
+.edi-s.light{background:radial-gradient(88% 60% at 50% 20%,var(--cream-hi),var(--cream) 58%,var(--beige))}
 .edi-venue .edi-in,.edi-rsvp .edi-in{max-width:28rem}
 .edi-venue-n{font-family:'Cormorant Garamond',serif;font-weight:300;
  font-size:clamp(1.45rem,5.8vw,2.2rem);line-height:1.4;color:var(--ink);letter-spacing:.06em}
-html[dir=rtl] .edi-venue-n{font-family:var(--dispA);font-weight:700;letter-spacing:0;color:#4A3A28}
+html[dir=rtl] .edi-venue-n{font-family:var(--dispA);font-weight:700;letter-spacing:0;color:var(--ink)}
 .edi-ph.frame{position:relative;inset:auto;width:min(100%,24rem);aspect-ratio:4/3;
  margin:clamp(24px,4.6vh,36px) auto 0;border-radius:1px;animation:none;z-index:4;
- box-shadow:0 20px 52px -24px rgba(112,86,48,.45),0 0 0 1px rgba(138,106,43,.32),
-  0 0 0 7px #FCF8F0,0 0 0 8px rgba(138,106,43,.28)}
+ box-shadow:0 20px 52px -24px rgba(112,86,48,.45),0 0 0 1px color-mix(in srgb,var(--gold-lo) 32%,transparent),
+  0 0 0 7px var(--cream-hi),0 0 0 8px color-mix(in srgb,var(--gold-lo) 28%,transparent)}
 .edi-btn{display:inline-block;margin-top:clamp(18px,3.6vh,28px);border:1px solid var(--gold-lo);
  border-radius:1px;padding:13px 30px;font-family:'Cormorant Garamond',serif;font-size:.82rem;
  letter-spacing:.22em;text-transform:uppercase;color:var(--ink);text-decoration:none;
  background:rgba(255,255,255,.4);transition:.3s}
 html[dir=rtl] .edi-btn{font-family:var(--bodyA);letter-spacing:.04em;text-transform:none;font-size:.92rem;font-weight:600}
-.edi-btn:hover{background:var(--gold-lo);border-color:var(--gold-lo);color:#FCF8F0}
-.edi-btn.ghost{border-color:rgba(138,106,43,.36);color:var(--ink-mute)}
+.edi-btn:hover{background:var(--gold-lo);border-color:var(--gold-lo);color:var(--cream-hi)}
+.edi-btn.ghost{border-color:color-mix(in srgb,var(--gold-lo) 36%,transparent);color:var(--ink-mute)}
 .edi-q{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1.05rem,4vw,1.3rem);
  color:var(--ink);margin-top:1em}
 html[dir=rtl] .edi-q{font-family:var(--serifA);font-style:normal}
@@ -2298,14 +2326,14 @@ html[dir=rtl] .edi-q{font-family:var(--serifA);font-style:normal}
 html[dir=rtl] .edi-thx{font-family:var(--dispA);font-weight:700;font-size:clamp(1.05rem,4vw,1.35rem)}
 
 /* --- programme --- */
-.edi-prog{background:radial-gradient(88% 62% at 50% 24%,#FBF5E9,#F1E7D4 58%,#E5D7BD)}
+.edi-prog{background:radial-gradient(88% 62% at 50% 24%,var(--cream-hi),var(--cream) 58%,var(--beige))}
 .edi-prog .edi-in{max-width:28rem;width:100%}
 .edi-tl{display:grid;gap:clamp(15px,2.8vh,24px);margin-top:clamp(24px,4.6vh,36px);text-align:start}
 .edi-tli{display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:clamp(12px,3vw,20px);
- padding-bottom:clamp(13px,2.4vh,19px);border-bottom:1px solid rgba(138,106,43,.22)}
+ padding-bottom:clamp(13px,2.4vh,19px);border-bottom:1px solid color-mix(in srgb,var(--gold-lo) 22%,transparent)}
 .edi-tli:last-child{border-bottom:none;padding-bottom:0}
 .edi-med{width:clamp(38px,10vw,46px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
- color:var(--gold-lo);border:1px solid rgba(185,138,47,.5);
+ color:var(--gold-lo);border:1px solid color-mix(in srgb,var(--gold) 50%,transparent);
  background:radial-gradient(circle at 36% 30%,rgba(255,255,255,.8),rgba(235,217,174,.34) 70%)}
 .edi-med svg{width:56%;height:56%;display:block}
 .edi-tli b{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(1rem,3.6vw,1.14rem);
@@ -2325,45 +2353,46 @@ html[dir=rtl] .edi-tlt{font-family:var(--bodyA);letter-spacing:.02em;text-transf
    Modelled on the minimal cream-and-black-wax reference. */
 .wenv{position:fixed;inset:0;z-index:72;display:grid;place-items:center;overflow:hidden;
  padding:clamp(20px,5vh,48px) clamp(18px,6vw,48px);
- background:
-  radial-gradient(120% 80% at 50% 8%,#FBF7EF 0%,#F2EBDD 46%,#E7DDCA 100%);
+ background:radial-gradient(120% 80% at 50% 8%,var(--cream-hi) 0%,var(--cream) 46%,var(--beige) 100%);
  transition:opacity 1s ease,transform 1s ease}
 .wenv.gone{opacity:0;transform:scale(1.06)}
-.wenv-grain{position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+.wenv-grain{position:absolute;inset:0;pointer-events:none;opacity:.34;mix-blend-mode:multiply;
  background:
   repeating-linear-gradient(90deg,rgba(122,96,58,.045) 0 1px,transparent 1px 3px),
   repeating-linear-gradient(0deg,rgba(122,96,58,.035) 0 1px,transparent 1px 3px),
   radial-gradient(rgba(122,96,58,.06) 1px,transparent 1.4px);
  background-size:auto,auto,7px 7px}
-.wenv-x{position:absolute;top:14px;inset-inline-end:14px;z-index:8;border:1px solid rgba(138,106,43,.4);
+.wenv-x{position:absolute;top:14px;inset-inline-end:14px;z-index:8;
+ border:1px solid color-mix(in srgb,var(--gold-lo) 45%,transparent);
  border-radius:999px;padding:8px 16px;font-size:.78rem;font-weight:600;letter-spacing:.06em;
- color:#7A5F30;background:rgba(255,255,255,.5);backdrop-filter:blur(6px)}
+ color:var(--gold-lo);background:rgba(255,255,255,.5);backdrop-filter:blur(6px)}
 .wenv-stack{position:relative;z-index:3;display:grid;justify-items:center;gap:clamp(16px,3.4vh,30px)}
 .wenv-to{font-family:'Cormorant Garamond',serif;font-size:clamp(.72rem,2.4vw,.86rem);
- letter-spacing:.32em;text-transform:uppercase;color:#9A7C4A}
+ letter-spacing:.32em;text-transform:uppercase;color:var(--ink-mute)}
 html[dir=rtl] .wenv-to{font-family:var(--bodyA);letter-spacing:.1em;text-transform:none;font-size:clamp(.84rem,3vw,1rem)}
 
 /* --- the envelope --- */
 .wenv-env{position:relative;width:min(84vw,392px);aspect-ratio:1/.72;perspective:1400px;
  filter:drop-shadow(0 30px 54px rgba(112,86,48,.28))}
-.wenv-lin{position:absolute;inset:0;background:linear-gradient(160deg,#FCF9F2,#F1EADC 52%,#E6DCC7);
- box-shadow:inset 0 0 0 1px rgba(160,132,86,.22)}
+.wenv-lin{position:absolute;inset:0;
+ background:linear-gradient(160deg,var(--cream-hi),var(--cream) 52%,var(--beige));
+ box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold) 24%,transparent)}
 .wenv-f{position:absolute;inset:0;display:block}
 /* hairline creases where the flaps meet, so the folds read as paper */
 .wenv-seams{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;
- color:rgba(150,120,74,.34)}
+ color:color-mix(in srgb,var(--gold) 36%,transparent)}
 /* the three fixed flaps, each a shade apart so the seams read */
 .wenv-f.l{clip-path:polygon(0 0,50% 50%,0 100%);
- background:linear-gradient(96deg,#FBF7EE,#EFE7D7 70%,#E7DDC9);
+ background:linear-gradient(96deg,var(--cream-hi),var(--cream) 70%,var(--beige));
  box-shadow:inset 1px 0 0 rgba(255,255,255,.6)}
 .wenv-f.r{clip-path:polygon(100% 0,50% 50%,100% 100%);
- background:linear-gradient(264deg,#FBF7EE,#ECE3D2 70%,#E2D7C0)}
+ background:linear-gradient(264deg,var(--cream-hi),var(--beige) 78%,var(--beige-dp))}
 .wenv-f.b{clip-path:polygon(0 100%,50% 50%,100% 100%);
- background:linear-gradient(2deg,#F6F0E3,#EDE5D4);
+ background:linear-gradient(2deg,var(--cream),var(--beige));
  box-shadow:inset 0 -1px 0 rgba(255,255,255,.5)}
 /* the flap that opens */
 .wenv-f.t{clip-path:polygon(0 0,50% 52%,100% 0);
- background:linear-gradient(184deg,#FDFAF4,#F2EBDD 60%,#E9E0CD);
+ background:linear-gradient(184deg,var(--cream-hi),var(--cream) 66%,var(--beige));
  transform-origin:top center;transform:rotateX(0deg);z-index:5;
  box-shadow:0 1px 0 rgba(160,132,86,.16);
  transition:transform 1.15s cubic-bezier(.55,0,.25,1)}
@@ -2371,16 +2400,16 @@ html[dir=rtl] .wenv-to{font-family:var(--bodyA);letter-spacing:.1em;text-transfo
 /* the card inside, rising once the flap is clear */
 .wenv-note{position:absolute;left:7%;right:7%;top:9%;bottom:14%;z-index:3;
  display:grid;align-content:center;justify-items:center;gap:.5em;text-align:center;
- background:linear-gradient(180deg,#FFFDF8,#F7F1E4);
- box-shadow:0 2px 10px rgba(112,86,48,.18),inset 0 0 0 1px rgba(160,132,86,.2);
+ background:linear-gradient(180deg,var(--cream-hi),var(--cream));
+ box-shadow:0 2px 10px rgba(60,44,20,.18),inset 0 0 0 1px color-mix(in srgb,var(--gold) 26%,transparent);
  transform:translateY(6%) scale(.97);opacity:0;
  transition:transform 1.05s cubic-bezier(.2,.8,.2,1),opacity .8s ease}
 .wenv-env.lift .wenv-note{transform:translateY(-16%) scale(1);opacity:1}
 .wenv-note span{font-family:'Cormorant Garamond',serif;font-size:clamp(.6rem,2.1vw,.72rem);
- letter-spacing:.3em;text-transform:uppercase;color:#A98B54}
+ letter-spacing:.3em;text-transform:uppercase;color:var(--ink-mute)}
 html[dir=rtl] .wenv-note span{font-family:var(--bodyA);letter-spacing:.1em;text-transform:none;font-size:clamp(.72rem,2.6vw,.84rem)}
 .wenv-note b{font-family:'Cormorant Garamond',serif;font-weight:300;letter-spacing:.14em;
- text-transform:uppercase;font-size:clamp(.94rem,4vw,1.3rem);color:#8A6A2B;line-height:1.4}
+ text-transform:uppercase;font-size:clamp(.94rem,4vw,1.3rem);color:var(--gold-lo);line-height:1.4}
 html[dir=rtl] .wenv-note b{font-family:var(--dispA);font-weight:700;letter-spacing:0;text-transform:none;
  font-size:clamp(1.1rem,5vw,1.6rem)}
 /* --- the seal --- */
@@ -2391,7 +2420,7 @@ html[dir=rtl] .wenv-note b{font-family:var(--dispA);font-weight:700;letter-spaci
 @keyframes wenvJolt{0%,100%{transform:none}30%{transform:translateY(-1.2%) rotate(-.5deg)}
  62%{transform:translateY(.6%) rotate(.3deg)}}
 .wenv-hint{font-family:'Cormorant Garamond',serif;font-size:clamp(.76rem,2.6vw,.9rem);
- letter-spacing:.2em;text-transform:uppercase;color:#A98B54;transition:opacity .5s ease;
+ letter-spacing:.2em;text-transform:uppercase;color:var(--ink-mute);transition:opacity .5s ease;
  animation:wenvPulse 2.8s ease-in-out infinite}
 html[dir=rtl] .wenv-hint{font-family:var(--bodyA);letter-spacing:.02em;text-transform:none;font-size:clamp(.88rem,3.2vw,1.02rem)}
 @keyframes wenvPulse{0%,100%{opacity:.55}50%{opacity:1}}
@@ -2507,7 +2536,53 @@ html[dir=rtl] .rd-meta b{font-family:var(--dispA);font-weight:700;letter-spacing
 .edi-ph.film video{width:100%;height:100%;object-fit:cover;display:block;
  transform:translateZ(0);backface-visibility:hidden}
 /* per-film grading, so type keeps its contrast over the footage */
-.edi.pal-mono .edi-ph.film video{filter:grayscale(1) contrast(1.04)}
-.edi.pal-mono .edi-wash{background:
- radial-gradient(112% 78% at 50% 40%,rgba(252,250,246,.78) 0%,rgba(244,241,234,.6) 60%,rgba(226,222,214,.44) 100%)}
-.edi.pal-cool .edi-ph.film video{filter:saturate(.92)}
+.pal-oneday .edi-ph.film video{filter:grayscale(1) contrast(1.04)}
+/* the scrim follows the palette rather than always being cream */
+.edi-wash,.edi-wash.deep{background:
+ radial-gradient(112% 78% at 50% 40%,color-mix(in srgb,var(--cream-hi) 72%,transparent) 0%,
+  color-mix(in srgb,var(--cream) 50%,transparent) 60%,color-mix(in srgb,var(--beige) 34%,transparent) 100%)}
+.pal-rings .edi-ph.film video{filter:saturate(.94)}
+
+/* ============ COUNTDOWN + DRESS CODE ============
+   Both sit inside the invitation: the clock immediately before the programme,
+   the dress code immediately after it. Every colour comes from the film's
+   palette, so these blocks change with the invitation. */
+.edi-ico{display:inline-grid;place-items:center;width:1.5em;height:1.5em;color:var(--gold)}
+.edi-ico svg{width:100%;height:100%;display:block}
+.edi-lbl{display:inline-flex;align-items:center;gap:.6em}
+
+/* --- the clock --- */
+.edi-count{background:radial-gradient(84% 58% at 50% 32%,var(--cream-hi),var(--cream) 56%,var(--beige))}
+.edi-clock{display:grid;grid-template-columns:repeat(4,1fr);
+ margin:clamp(22px,4.4vh,36px) auto 0;max-width:23rem;width:100%}
+.edi-clock > div{position:relative;padding:0 .3em;text-align:center}
+/* hairline between cells, none on the outside */
+.edi-clock > div + div::before{content:"";position:absolute;inset-inline-start:0;top:12%;bottom:22%;
+ width:1px;background:color-mix(in srgb,var(--gold) 38%,transparent)}
+.edi-clock b{display:block;font-family:'Cormorant Garamond',serif;font-weight:300;
+ font-size:clamp(2.1rem,9vw,3.1rem);line-height:1;color:var(--gold-lo);
+ font-variant-numeric:lining-nums tabular-nums;font-feature-settings:'lnum' 1,'tnum' 1}
+html[dir=rtl] .edi-clock b{font-family:var(--dispA);font-weight:400}
+.edi-clock span{display:block;margin-top:.5em;font-family:'Cormorant Garamond',serif;
+ font-size:clamp(.62rem,2.2vw,.74rem);letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute)}
+html[dir=rtl] .edi-clock span{font-family:var(--bodyA);letter-spacing:.04em;text-transform:none;
+ font-size:clamp(.72rem,2.6vw,.84rem)}
+.edi-clock .started{grid-column:1/-1;font-family:'Cormorant Garamond',serif;font-style:italic;
+ font-size:clamp(1.1rem,4.4vw,1.5rem);color:var(--gold-lo)}
+html[dir=rtl] .edi-clock .started{font-family:var(--dispA);font-style:normal;font-weight:700}
+.edi-cdnote{margin-top:clamp(20px,3.6vh,30px);font-family:'Cormorant Garamond',serif;
+ font-size:clamp(.8rem,2.9vw,.94rem);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-mute)}
+html[dir=rtl] .edi-cdnote{font-family:var(--bodyA);letter-spacing:.04em;text-transform:none}
+
+/* --- dress code --- */
+.edi-dress{background:radial-gradient(86% 60% at 50% 24%,var(--cream-hi),var(--cream) 58%,var(--beige))}
+.edi-dress .edi-in{max-width:26rem}
+.edi-dress-t{font-family:'Cormorant Garamond',serif;font-weight:300;letter-spacing:.16em;
+ text-transform:uppercase;font-size:clamp(1.3rem,5.4vw,1.9rem);color:var(--ink);line-height:1.4}
+html[dir=rtl] .edi-dress-t{font-family:var(--dispA);font-weight:700;letter-spacing:0;text-transform:none}
+.edi-dress-d{margin-top:.7em;font-family:'Cormorant Garamond',serif;font-style:italic;
+ font-size:clamp(.94rem,3.4vw,1.08rem);color:var(--ink-soft);line-height:1.9}
+html[dir=rtl] .edi-dress-d{font-family:var(--serifA);font-style:normal}
+.edi-sw{display:flex;gap:.9em;justify-content:center;margin-top:clamp(20px,3.8vh,32px)}
+.edi-sw .sw{width:clamp(30px,8vw,40px);aspect-ratio:1;border-radius:50%;
+ box-shadow:inset 0 0 0 1px rgba(0,0,0,.16),0 4px 12px -4px rgba(0,0,0,.3)}

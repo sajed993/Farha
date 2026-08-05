@@ -9,25 +9,25 @@ const FILMS_READY=[
   blurb:{ar:'سلالم رخامية وأكاليل ورد باهت الوردة، وأعمدة تصعد نحو النور',
    fr:'Un escalier de marbre, des guirlandes de roses poudrées et des colonnes qui montent vers la lumière',
    en:'A marble staircase, garlands of powder-rose blooms and columns rising into the light'},
-  pal:'warm'},
+  pal:'warm',dress:{ar:['أنيق رسمي','بدلة داكنة · فستان طويل'],fr:['Tenue de soirée','Costume sombre · robe longue'],en:['Black tie optional','Dark suit · long dress']},sw:['#43342A','#AE7E70','#EFDFC2']},
  {id:'oneday',v:'/media/inv/inv-2.mp4',p:'/media/inv/inv-2.jpg',design:3,
   name:{ar:'يومًا ما',fr:'One Day',en:'One Day'},
   blurb:{ar:'أبيض وأسود: كعبٌ وشمبانيا وعلبة خواتم على التول… ووعدٌ مكتوب بخفة',
    fr:'Noir et blanc : escarpins, champagne et un écrin sur le tulle… une promesse écrite tout en légèreté',
    en:'Black and white: heels, champagne and a ring box on tulle… a promise written lightly'},
-  pal:'mono'},
+  pal:'mono',dress:{ar:['أبيض وأسود','بلا ألوان — أناقة صافية'],fr:['Noir et blanc','Sans couleur — élégance pure'],en:['Black and white','No colour — pure elegance']},sw:['#1A1A1D','#8E8A86','#EDEDEF']},
  {id:'wisteria',v:'/media/inv/inv-4.mp4',p:'/media/inv/inv-4.jpg',design:4,
   name:{ar:'ظلال الوستارية',fr:'Ombres de Glycine',en:'Wisteria Shade'},
   blurb:{ar:'وستارية تتهدّل على بابٍ عاجي بحلقةٍ ذهبية، والضوء يرقص بين الأوراق',
    fr:"Une glycine retombe sur une porte ivoire cerclée d'or, la lumière danse entre les feuilles",
    en:'Wisteria spilling over an ivory door ringed in gold, light dancing through the leaves'},
-  pal:'warm'},
+  pal:'warm',dress:{ar:['أنيق ربيعي','ألوان فاتحة · لمسة ليلكية'],fr:['Chic printanier','Tons clairs · une touche lilas'],en:['Spring formal','Light tones · a touch of lilac']},sw:['#3B3326','#8E7AA0','#EADCBC']},
  {id:'rings',v:'/media/inv/inv-3.mp4',p:'/media/inv/inv-3.jpg',design:1,
   name:{ar:'خواتم النور',fr:'Anneaux de Lumière',en:'Rings of Light'},
   blurb:{ar:'خاتمان على أرضٍ كالمرآة، ونافذةٌ مقوّسة يعبرها ظلُّ العروس',
    fr:'Deux anneaux sur un sol-miroir et une fenêtre en arche que traverse l\'ombre de la mariée',
    en:'Two rings on a mirrored floor, and an arched window the bride\'s silhouette passes through'},
-  pal:'cool'}];
+  pal:'cool',dress:{ar:['أنيق كلاسيكي','أزرق داكن · عاجي'],fr:['Classique élégant','Bleu profond · ivoire'],en:['Classic formal','Deep blue · ivory']},sw:['#2C3742','#5E88AA','#E6D6BE']}];
 
 function readyFilm(id){return FILMS_READY.find(f=>f.id===id)||FILMS_READY[0];}
 
@@ -73,7 +73,8 @@ function openReady(id){
  S.c={...S.c,...dz.def[S.lang],font:0,pal:0,anim:'edi',music:1,autoplay:true,musicStart:'open',
   qr:false,maps:'https://maps.google.com',story:[],guest:'',
   when:when.toISOString().slice(0,16),program:ediDemoProgram(),
-  film:f.id,films:{hero:f.v,hall:f.v,detail:f.v,date:f.v,venue:f.p},ediPal:f.pal};
+  film:f.id,films:{hero:f.v,hall:f.v,detail:f.v,date:f.v,venue:f.p},ediPal:f.id,
+  dress:{t:(f.dress&&f.dress[S.lang]||[])[0]||'',d:(f.dress&&f.dress[S.lang]||[])[1]||'',sw:f.sw||null}};
  editorialOpen();}
 ;
 
