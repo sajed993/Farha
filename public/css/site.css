@@ -2626,3 +2626,52 @@ html[dir=ltr] .edi-pos{font-family:'Cormorant Garamond',serif;font-style:italic;
 .edi-pos i svg{width:100%;height:100%;display:block}
 .edi-pos a{color:inherit;text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--blush) 45%,transparent)}
 .edi-pos a:hover{color:var(--ink)}
+
+/* ── palettes for the new occasions, sampled from their own footage ── */
+/* شمعة العام — the crimson measured #BE3325 at 0.80 saturation */
+.edi-veil-root.pal-bdaycake{
+ --cream:#F6EFE6;--cream-hi:#FCF8F2;--beige:#E9DDCB;--beige-dp:#D8C6AC;
+ --gold:#B8823A;--gold-hi:#E0B878;--gold-lo:#8A5A20;--gold-pale:#EFDCB8;
+ --ink:#3A2018;--ink-soft:#5C3A2E;--ink-mute:#8A6558;
+ --blush:#BE3325;--plum:#8E2A20;--sage:#94906E;--wax:#8E2A20}
+/* بالونات وردية */
+.edi-veil-root.pal-bdayballoons{
+ --cream:#FAF0EE;--cream-hi:#FEF8F7;--beige:#EEDDD8;--beige-dp:#DEC6BE;
+ --gold:#C08A6C;--gold-hi:#E4BCA2;--gold-lo:#94643F;--gold-pale:#F0DACA;
+ --ink:#4A2E2A;--ink-soft:#6E4A44;--ink-mute:#9A7268;
+ --blush:#D48CA0;--plum:#A05464;--sage:#A8A088;--wax:#A05464}
+/* قدمان صغيرتان */
+.edi-veil-root.pal-babybasket{
+ --cream:#FAF2EA;--cream-hi:#FEFAF4;--beige:#EEDCCB;--beige-dp:#DCC6AE;
+ --gold:#C08558;--gold-hi:#E6BE96;--gold-lo:#925E33;--gold-pale:#F2DDC6;
+ --ink:#4A4036;--ink-soft:#6A5A4C;--ink-mute:#94806E;
+ --blush:#D1815E;--plum:#A06747;--sage:#A2A488;--wax:#A06747}
+/* أهلًا يا صغير — near neutral by measurement, so greige not gold */
+.edi-veil-root.pal-babycake{
+ --cream:#F4F3EF;--cream-hi:#FCFCFA;--beige:#E2E0D8;--beige-dp:#CCC9BE;
+ --gold:#9A9587;--gold-hi:#CAC6BA;--gold-lo:#6E6A5E;--gold-pale:#DEDBD2;
+ --ink:#3F3E3D;--ink-soft:#5C5A56;--ink-mute:#8A8880;
+ --blush:#8E8578;--plum:#4A4744;--sage:#969A88;--wax:#4A4744}
+/* قبّعة وورد — periwinkle sky measured #BCC9EC, roses lifted by hand */
+.edi-veil-root.pal-grad{
+ --cream:#EDF0F8;--cream-hi:#F9FAFE;--beige:#D8DEEE;--beige-dp:#BEC6DC;
+ --gold:#A08A4E;--gold-hi:#D2BE86;--gold-lo:#74622E;--gold-pale:#E4DAC0;
+ --ink:#1C2030;--ink-soft:#3A4056;--ink-mute:#6C7488;
+ --blush:#C86A8A;--plum:#2A3350;--sage:#8E9A82;--wax:#2A3350}
+/* قريبًا — pure warm ivory, 0.25 saturation */
+.edi-veil-root.pal-soon{
+ --cream:#F7F2EA;--cream-hi:#FDFAF4;--beige:#E8DDCE;--beige-dp:#D4C6B2;
+ --gold:#B09578;--gold-hi:#DCC8AE;--gold-lo:#82684E;--gold-pale:#EEE2D2;
+ --ink:#4A3E34;--ink-soft:#6A5B4C;--ink-mute:#94836F;
+ --blush:#A58E7C;--plum:#6E5A48;--sage:#A0A088;--wax:#6E5A48}
+/* the birthday films read warmer with a touch more saturation */
+.pal-bdaycake .edi-ph.film video,.pal-bdayballoons .edi-ph.film video{filter:saturate(1.06)}
+
+/* ── category chips + tag on the shelf ── */
+.rd-filters{margin-bottom:clamp(24px,4vw,38px)}
+#ready .chip{border-color:color-mix(in srgb,#B0801F 34%,transparent);color:#7A5A1C;background:rgba(255,255,255,.62)}
+#ready .chip:hover{border-color:#B0801F}
+#ready .chip.on{background:#7A5A1C;border-color:#7A5A1C;color:#FCF8F0}
+.rd-cat{display:block;font-family:'Reem Kufi',var(--bodyA);font-size:.66rem;letter-spacing:.14em;
+ color:#9A845E;margin-bottom:5px}
+html[dir=ltr] .rd-cat{font-family:'Cinzel',serif;text-transform:uppercase;letter-spacing:.18em}

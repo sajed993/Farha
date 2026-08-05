@@ -495,17 +495,36 @@ function editorialDemo(){
   when:when.toISOString().slice(0,16),program:ediDemoProgram()};
  editorialOpen();}
 
-function ediDemoProgram(){
- const L={
-  ar:[['16:00','استقبال الضيوف','بهو القصر'],['17:00','عقد القران','قاعة الياسمين'],
-   ['18:30','كوكتيل وصور','الشرفة المطلّة على البحر'],['20:00','العشاء','القاعة الكبرى'],
-   ['22:00','السهرة','الحديقة الخلفية']],
-  fr:[['16:00','Accueil des invités','Hall du palais'],['17:00','Cérémonie','Salle Yasmine'],
-   ['18:30','Cocktail & photos','Terrasse sur la mer'],['20:00','Dîner','Grande salle'],
-   ['22:00','Soirée','Jardin arrière']],
-  en:[['16:00','Guest welcome','Palace hall'],['17:00','Ceremony','Yasmine hall'],
-   ['18:30','Cocktail & photos','Sea-facing terrace'],['20:00','Dinner','The grand hall'],
-   ['22:00','Party','The back garden']]}[S.lang];
+function ediDemoProgram(cat){
+ const P={
+  wed:{ar:[['16:00','استقبال الضيوف','بهو القصر'],['17:00','عقد القران','قاعة الياسمين'],
+    ['18:30','كوكتيل وصور','الشرفة المطلّة على البحر'],['20:00','العشاء','القاعة الكبرى'],
+    ['22:00','السهرة','الحديقة الخلفية']],
+   fr:[['16:00','Accueil des invités','Hall du palais'],['17:00','Cérémonie','Salle Yasmine'],
+    ['18:30','Cocktail & photos','Terrasse sur la mer'],['20:00','Dîner','Grande salle'],
+    ['22:00','Soirée','Jardin arrière']],
+   en:[['16:00','Guest welcome','Palace hall'],['17:00','Ceremony','Yasmine hall'],
+    ['18:30','Cocktail & photos','Sea-facing terrace'],['20:00','Dinner','The grand hall'],
+    ['22:00','Party','The back garden']]},
+  bday:{ar:[['18:00','استقبال','الشرفة'],['19:00','إطفاء الشموع','الصالة'],
+    ['20:00','الهدايا والصور','ركن الصور'],['21:30','موسيقى ورقص','الحديقة']],
+   fr:[['18:00','Accueil','La terrasse'],['19:00','Les bougies','Le salon'],
+    ['20:00','Cadeaux & photos','Coin photo'],['21:30','Musique & danse','Le jardin']],
+   en:[['18:00','Welcome','The terrace'],['19:00','Blowing the candles','The lounge'],
+    ['20:00','Gifts & photos','Photo corner'],['21:30','Music & dancing','The garden']]},
+  baby:{ar:[['15:00','استقبال الضيوف','بيت العائلة'],['16:00','تسمية المولود','الصالة'],
+    ['17:00','الصور التذكارية','ركن الصور'],['18:00','الشاي والحلوى','الحديقة']],
+   fr:[['15:00','Accueil','Maison de famille'],['16:00','Le prénom','Le salon'],
+    ['17:00','Photos souvenirs','Coin photo'],['18:00','Thé & douceurs','Le jardin']],
+   en:[['15:00','Welcome','The family home'],['16:00','Naming the baby','The lounge'],
+    ['17:00','Keepsake photos','Photo corner'],['18:00','Tea & sweets','The garden']]},
+  grad:{ar:[['10:00','التجمّع','ساحة الكلية'],['11:00','تسليم الشهادات','القاعة الكبرى'],
+    ['12:30','الصور مع العائلة','الحديقة'],['14:00','الاحتفال','بيت العائلة']],
+   fr:[['10:00','Rassemblement','Cour de la faculté'],['11:00','Remise des diplômes','Grand amphi'],
+    ['12:30','Photos en famille','Le jardin'],['14:00','La fête','Maison de famille']],
+   en:[['10:00','Gathering','The faculty courtyard'],['11:00','Diplomas','The great hall'],
+    ['12:30','Family photos','The garden'],['14:00','The celebration','The family home']]}};
+ const L=(P[cat]||P.wed)[S.lang];
  return L.map(([time,title,place])=>({time:time,title:title,place:place,map:'',music:0,photos:[]}));}
 
 ;

@@ -4,30 +4,86 @@
    full scrolling invitation with that film as its plates. */
 
 const FILMS_READY=[
- {id:'marble',v:'/media/inv/inv-1.mp4',p:'/media/inv/inv-1.jpg',design:2,
+ /* ── weddings ── */
+ {id:'marble',cat:'wed',v:'/media/inv/inv-1.mp4',p:'/media/inv/inv-1.jpg',design:2,
   name:{ar:'قصر الرخام',fr:'Palais de Marbre',en:'Marble Palace'},
   blurb:{ar:'سلالم رخامية وأكاليل ورد باهت الوردة، وأعمدة تصعد نحو النور',
    fr:'Un escalier de marbre, des guirlandes de roses poudrées et des colonnes qui montent vers la lumière',
    en:'A marble staircase, garlands of powder-rose blooms and columns rising into the light'},
-  pal:'warm',dress:{ar:['أنيق رسمي','بدلة داكنة · فستان طويل'],fr:['Tenue de soirée','Costume sombre · robe longue'],en:['Black tie optional','Dark suit · long dress']},sw:['#43342A','#AE7E70','#EFDFC2']},
- {id:'oneday',v:'/media/inv/inv-2.mp4',p:'/media/inv/inv-2.jpg',design:3,
+  dress:{ar:['أنيق رسمي','بدلة داكنة · فستان طويل'],fr:['Tenue de soirée','Costume sombre · robe longue'],en:['Black tie optional','Dark suit · long dress']},
+  sw:['#43342A','#AE7E70','#EFDFC2']},
+ {id:'oneday',cat:'wed',v:'/media/inv/inv-2.mp4',p:'/media/inv/inv-2.jpg',design:3,
   name:{ar:'يومًا ما',fr:'One Day',en:'One Day'},
   blurb:{ar:'أبيض وأسود: كعبٌ وشمبانيا وعلبة خواتم على التول… ووعدٌ مكتوب بخفة',
    fr:'Noir et blanc : escarpins, champagne et un écrin sur le tulle… une promesse écrite tout en légèreté',
    en:'Black and white: heels, champagne and a ring box on tulle… a promise written lightly'},
-  pal:'mono',dress:{ar:['أبيض وأسود','بلا ألوان — أناقة صافية'],fr:['Noir et blanc','Sans couleur — élégance pure'],en:['Black and white','No colour — pure elegance']},sw:['#1A1A1D','#8E8A86','#EDEDEF']},
- {id:'wisteria',v:'/media/inv/inv-4.mp4',p:'/media/inv/inv-4.jpg',design:4,
+  dress:{ar:['أبيض وأسود','بلا ألوان — أناقة صافية'],fr:['Noir et blanc','Sans couleur — élégance pure'],en:['Black and white','No colour — pure elegance']},
+  sw:['#1A1A1D','#8E8A86','#EDEDEF']},
+ {id:'wisteria',cat:'wed',v:'/media/inv/inv-4.mp4',p:'/media/inv/inv-4.jpg',design:4,
   name:{ar:'ظلال الوستارية',fr:'Ombres de Glycine',en:'Wisteria Shade'},
   blurb:{ar:'وستارية تتهدّل على بابٍ عاجي بحلقةٍ ذهبية، والضوء يرقص بين الأوراق',
    fr:"Une glycine retombe sur une porte ivoire cerclée d'or, la lumière danse entre les feuilles",
    en:'Wisteria spilling over an ivory door ringed in gold, light dancing through the leaves'},
-  pal:'warm',dress:{ar:['أنيق ربيعي','ألوان فاتحة · لمسة ليلكية'],fr:['Chic printanier','Tons clairs · une touche lilas'],en:['Spring formal','Light tones · a touch of lilac']},sw:['#3B3326','#8E7AA0','#EADCBC']},
- {id:'rings',v:'/media/inv/inv-3.mp4',p:'/media/inv/inv-3.jpg',design:1,
+  dress:{ar:['أنيق ربيعي','ألوان فاتحة · لمسة ليلكية'],fr:['Chic printanier','Tons clairs · une touche lilas'],en:['Spring formal','Light tones · a touch of lilac']},
+  sw:['#3B3326','#8E7AA0','#EADCBC']},
+ {id:'rings',cat:'wed',v:'/media/inv/inv-3.mp4',p:'/media/inv/inv-3.jpg',design:1,
   name:{ar:'خواتم النور',fr:'Anneaux de Lumière',en:'Rings of Light'},
   blurb:{ar:'خاتمان على أرضٍ كالمرآة، ونافذةٌ مقوّسة يعبرها ظلُّ العروس',
-   fr:'Deux anneaux sur un sol-miroir et une fenêtre en arche que traverse l\'ombre de la mariée',
-   en:'Two rings on a mirrored floor, and an arched window the bride\'s silhouette passes through'},
-  pal:'cool',dress:{ar:['أنيق كلاسيكي','أزرق داكن · عاجي'],fr:['Classique élégant','Bleu profond · ivoire'],en:['Classic formal','Deep blue · ivory']},sw:['#2C3742','#5E88AA','#E6D6BE']}];
+   fr:"Deux anneaux sur un sol-miroir et une fenêtre en arche que traverse l'ombre de la mariée",
+   en:"Two rings on a mirrored floor, and an arched window the bride's silhouette passes through"},
+  dress:{ar:['أنيق كلاسيكي','أزرق داكن · عاجي'],fr:['Classique élégant','Bleu profond · ivoire'],en:['Classic formal','Deep blue · ivory']},
+  sw:['#2C3742','#5E88AA','#E6D6BE']},
+
+ /* ── birthdays ── */
+ {id:'bdaycake',cat:'bday',v:'/media/inv/bday-cake.mp4',p:'/media/inv/bday-cake.jpg',design:7,
+  name:{ar:'شمعة العام',fr:'La Bougie',en:'One Candle'},
+  blurb:{ar:'شمعةٌ واحدة فوق كعكة، وورودٌ داكنة حولها، والضوء وحده يحتفل',
+   fr:'Une seule bougie sur le gâteau, des fleurs sombres autour, et la lumière qui fête toute seule',
+   en:'A single candle on the cake, dark blooms around it, and only the light celebrating'},
+  dress:{ar:['أحمر وأسود','لمسة جريئة تكفي'],fr:['Rouge et noir','Une touche audacieuse suffit'],en:['Red and black','One bold touch is enough']},
+  sw:['#3A2018','#BE3325','#E9DDCB']},
+ {id:'bdayballoons',cat:'bday',v:'/media/inv/bday-balloons.mp4',p:'/media/inv/bday-balloons.jpg',design:7,
+  name:{ar:'بالونات وردية',fr:'Ballons Poudrés',en:'Blush Balloons'},
+  blurb:{ar:'بالوناتٌ وردية وهدايا وباقةٌ صغيرة — فرحٌ خفيف بلا ضجيج',
+   fr:'Ballons poudrés, cadeaux et un petit bouquet — une joie légère, sans bruit',
+   en:'Blush balloons, gifts and a small bouquet — light joy, no noise'},
+  dress:{ar:['وردي وناعم','ألوان الباستيل'],fr:['Rose et doux','Teintes pastel'],en:['Blush and soft','Pastel tones']},
+  sw:['#4A2E2A','#D48CA0','#EEDDD8']},
+
+ /* ── newborns ── */
+ {id:'babybasket',cat:'baby',v:'/media/inv/baby-basket.mp4',p:'/media/inv/baby-basket.jpg',design:8,
+  name:{ar:'قدمان صغيرتان',fr:'Deux Petits Pieds',en:'Two Small Feet'},
+  blurb:{ar:'قدمان صغيرتان في سلّةٍ من القشّ — أهدأ إعلانٍ يمكن أن ترسلوه',
+   fr:"Deux petits pieds dans un couffin d'osier — l'annonce la plus douce qui soit",
+   en:'Two small feet in a woven basket — the gentlest announcement there is'},
+  sw:['#4A4036','#D1815E','#EEDCCB']},
+ {id:'babycake',cat:'baby',v:'/media/inv/baby-cake.mp4',p:'/media/inv/baby-cake.jpg',design:8,
+  name:{ar:'أهلًا يا صغير',fr:'Oh Baby',en:'Oh Baby'},
+  blurb:{ar:'كعكةٌ بيضاء على لحافٍ ناعم، وكلمتان مكتوبتان بالكريمة',
+   fr:'Un gâteau blanc sur une couverture douce, et deux mots écrits à la crème',
+   en:'A white cake on a soft quilt, and two words piped in cream'},
+  sw:['#3F3E3D','#8E8578','#E2E0D8']},
+
+ /* ── graduation ── */
+ {id:'grad',cat:'grad',v:'/media/inv/grad.mp4',p:'/media/inv/grad.jpg',design:6,
+  name:{ar:'قبّعة وورد',fr:'Toque et Roses',en:'Cap and Roses'},
+  blurb:{ar:'قبّعة التخرّج وباقةٌ من الورد الوردي تحت سماءٍ صافية',
+   fr:'La toque et un bouquet de roses sous un ciel clair',
+   en:'The cap and an armful of pink roses under a clear sky'},
+  dress:{ar:['أنيق نهاري','ألوان فاتحة'],fr:['Chic de jour','Tons clairs'],en:['Daytime smart','Light tones']},
+  sw:['#1C2030','#C86A8A','#D8DEEE']},
+
+ /* ── save the date ── */
+ {id:'soon',cat:'save',v:'/media/inv/soon.mp4',p:'/media/inv/soon.jpg',design:3,
+  name:{ar:'قريبًا',fr:'Bientôt',en:'Coming Soon'},
+  blurb:{ar:'حريرٌ عاجي وظلٌّ يتحرك، وسطرٌ واحد: شيءٌ جميل قادم',
+   fr:"Soie ivoire, une ombre qui bouge, et une seule ligne : quelque chose de beau arrive",
+   en:'Ivory silk, a moving shadow, and one line: something lovely is coming'},
+  sw:['#4A3E34','#A58E7C','#E8DDCE']}
+];
+/* order matters — the chips read in this order */
+const RD_CATS=['all','wed','bday','baby','grad','save'];
+
 
 function readyFilm(id){return FILMS_READY.find(f=>f.id===id)||FILMS_READY[0];}
 /* Dashboard overrides: hide a film, rename it, or reprice it. */
@@ -44,11 +100,18 @@ function iphoneHTML(inner,cls){
    <div class="iph-scr">${inner}<span class="iph-isl"></span><span class="iph-glare"></span></div>
   </div>`;}
 
+function setRdFilter(k){S.rdFilter=k;render();setTimeout(()=>{try{scrollSec('ready')}catch(e){}},0);}
 function filmShelfHTML(){
+ const cur=S.rdFilter||'all';
+ const avail=readyShown();
+ const chips=RD_CATS.filter(k=>k==='all'||avail.some(f=>f.cat===k))
+  .map(k=>`<button class="chip ${cur===k?'on':''}" onclick="setRdFilter('${k}')">${t().rdCats[k]}</button>`).join('');
+ const list=avail.filter(f=>cur==='all'||f.cat===cur);
  return `<section id="ready">
   <div class="sec-head"><span class="kicker">${t().rdKick}</span>
    <h2>${t().rdTitle}</h2><p>${t().rdSub}</p></div>
-  <div class="rd-grid">${readyShown().map(f=>`
+  <div class="filters rd-filters">${chips}</div>
+  <div class="rd-grid">${list.map(f=>`
    <article class="rd-card">
     <div class="rd-stage" onclick="openReady('${f.id}')">
      <div class="rd-bleed" style="background-image:url('${f.p}')"></div>
@@ -58,6 +121,7 @@ function filmShelfHTML(){
      <span class="rd-play">▶</span>
     </div>
     <div class="rd-meta">
+     <span class="rd-cat">${t().rdCats[f.cat]}</span>
      <b>${esc(readyName(f))}</b>
      <p>${f.blurb[S.lang]}</p>
      <div class="rd-acts">
@@ -77,10 +141,12 @@ function openReady(id){
  const when=new Date(Date.now()+37*864e5+5*36e5);
  S.c={...S.c,...dz.def[S.lang],font:0,pal:0,anim:'edi',music:1,autoplay:true,musicStart:'open',
   qr:false,maps:'https://maps.google.com',story:[],guest:'',
-  when:when.toISOString().slice(0,16),program:ediDemoProgram(),
+  when:when.toISOString().slice(0,16),
   film:f.id,films:{hero:f.v,hall:f.v,detail:f.v,date:f.v,venue:f.p},ediPal:f.id,
-  dress:{t:(f.dress&&f.dress[S.lang]||[])[0]||'',d:(f.dress&&f.dress[S.lang]||[])[1]||'',sw:f.sw||null},
-  dir:ediDemoNote('dir'),stay:ediDemoNote('stay')};
+  dress:f.dress?{t:(f.dress[S.lang]||[])[0]||'',d:(f.dress[S.lang]||[])[1]||'',sw:f.sw||null}:null,
+  dir:f.cat==='wed'?ediDemoNote('dir'):null,
+  stay:f.cat==='wed'?ediDemoNote('stay'):null,
+  program:ediDemoProgram(f.cat)};
  editorialOpen();}
 ;
 
