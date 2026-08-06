@@ -5,13 +5,13 @@ const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'far
    so a phone that had ever stored a config kept showing old sections and
    old prices while a fresh browser showed the new ones. Bumping this drops
    the stored sec/price once; everything the owner typed is kept. */
-const CFG_VER=3;
+const CFG_VER=4;
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 /* Everything except the newest section is off for now; each is one switch
    away in the dashboard. */
 const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,
-  cats:0,gallery:0,ready:1},
+  cats:0,gallery:0,design:0,ready:1},
  price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},
  edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},
  envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},
@@ -148,6 +148,11 @@ function applyCFGdom(){
   if(e)e.style.display=on?'':'none';
   document.querySelectorAll('[onclick*="scrollSec(\''+k+'\')"]').forEach(a=>a.style.display=on?'':'none');}
  const aw=document.getElementById('aiwrap');if(aw)aw.style.display=CFG.sec.ai?'':'none';
+ /* the editor is reachable from several buttons; with the design flow off they
+    would all land on a page the visitor was not offered */
+ const dz=!!CFG.sec.design;
+ document.querySelectorAll('[onclick*="openScratch"],[data-needs="design"]')
+  .forEach(b=>{b.style.display=dz?'':'none';});
  const ex=document.querySelector('.cfg-banner');
  const want=!!(CFG.banner&&CFG.banner.on&&CFG.banner.txt&&S.view==='land');
  if(!want&&ex)ex.remove();

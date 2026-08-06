@@ -130,7 +130,9 @@ function landView(){
    <p class="sub">${t().heroSub}</p>
    <div class="hero-ctas">
     <button class="btn-gold" onclick="openScratch()">${t().ctaDesign}</button>
-    <button class="btn-line" onclick="scrollSec('${CFG.sec.gallery?'gallery':'ready'}')">${t().ctaExplore}</button>
+    <button class="${CFG.sec.design?'btn-line':'btn-gold'}"
+     onclick="scrollSec('${CFG.sec.gallery?'gallery':'ready'}')">${
+      CFG.sec.gallery?t().ctaExplore:t().rdNav}</button>
    </div>
   </div>
  </header>
