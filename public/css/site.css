@@ -14,6 +14,12 @@
  --acc-grad:#C86A8A;   /* قبّعة وورد */
  --acc-save:#8E7AA0;   /* ظلال الوستارية — lilac */
  --acc-cool:#5E88AA;   /* خواتم النور — the window, fully derived */
+ /* the brand itself. Everything used to be beige and gold, which said
+    "wedding stationery" and nothing else. The signature is now the carmine
+    measured off ليلة الحنّة — #8E221C at 0.80 saturation — with gold kept for
+    hairlines and ornament rather than carrying the whole identity. */
+ --brand:#9E2B22;--brand-d:#6E1A14;--brand-l:#C0564A;--brand-pale:#F5DED8;
+ --brandFoil:linear-gradient(105deg,#6E1A14,#C0564A 24%,#9E2B22 46%,#D8806F 70%,#7E2018);
  --rose:#AE7E70;--roseS:#F0DCD5;--sage:#9AA184;--blue:#5E88AA;--emerald:#1A4A3E;
  --line:rgba(126,95,38,.24);--line2:rgba(126,95,38,.13);
  --foil:linear-gradient(105deg,#7E5F26,#E6CE96 28%,#A9803A 52%,#F4E6C6 76%,#9A742C);
@@ -33,19 +39,24 @@ body{font-family:var(--body);background:var(--cream);color:var(--ink);overflow-x
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input,textarea,select{font-family:inherit;color:var(--ink)}
 img{display:block}
-.foil{background:var(--foil);background-size:200% auto;-webkit-background-clip:text;background-clip:text;
+.foil{background:var(--brandFoil);background-size:200% auto;-webkit-background-clip:text;background-clip:text;
  color:transparent;animation:foilshift 6s ease-in-out infinite}
+/* the old gold foil is still available where ornament wants it */
+.foil-gold{background:var(--foil);background-size:200% auto;-webkit-background-clip:text;
+ background-clip:text;color:transparent;animation:foilshift 6s ease-in-out infinite}
 @keyframes foilshift{0%,100%{background-position:0% center}50%{background-position:100% center}}
-.kicker{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;
- padding:8px 18px;font-size:.82rem;font-weight:700;color:var(--gold3);letter-spacing:.06em;background:rgba(255,249,236,.7)}
-.kicker::before{content:"✦";color:var(--gold)}
+.kicker{display:inline-flex;align-items:center;gap:8px;border-radius:999px;
+ padding:8px 18px;font-size:.82rem;font-weight:700;color:var(--brand-d);letter-spacing:.06em;
+ background:color-mix(in srgb,var(--brand-pale) 66%,var(--paper));
+ box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--brand) 26%,transparent)}
+.kicker::before{content:"✦";color:var(--brand)}
 
 /* ============ NAV ============ */
 .nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
  padding:14px min(4.5vw,54px);background:rgba(250,246,239,.62);backdrop-filter:blur(14px);
  border-bottom:1px solid var(--line)}
 .logo{font-family:var(--dispA);font-size:1.8rem;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;gap:10px}
-.logo b{background:var(--foil);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo b{background:var(--brandFoil);-webkit-background-clip:text;background-clip:text;color:transparent}
 .logo small{font-family:var(--script);font-size:1.05rem;color:var(--taupe);font-weight:400;letter-spacing:.04em}
 .menu{display:flex;gap:clamp(10px,2.4vw,30px);align-items:center;font-weight:600;font-size:.93rem}
 .menu a{color:var(--ink2);text-decoration:none;position:relative;padding:6px 2px;transition:.25s}
@@ -61,36 +72,41 @@ img{display:block}
    bright inner rim along the top edge, a darker one along the bottom, and a
    shadow tinted with the gold instead of neutral grey. */
 .btn-gold{position:relative;overflow:hidden;isolation:isolate;
- background:var(--foilD);background-size:180% 180%;background-position:22% 30%;
- color:#FFFBF2;border-radius:12px;padding:13px 27px;font-weight:700;font-size:.94rem;
+ background:linear-gradient(158deg,var(--brand-l) 0%,var(--brand) 38%,var(--brand-d) 100%);
+ background-size:180% 180%;background-position:22% 30%;
+ color:#FFF6F3;border-radius:12px;padding:13px 27px;font-weight:700;font-size:.94rem;
  letter-spacing:.01em;
- box-shadow:0 10px 24px -10px rgba(126,95,38,.7),0 2px 5px -2px rgba(126,95,38,.5),
-  inset 0 1px 0 rgba(255,246,222,.55),inset 0 -1px 0 rgba(74,54,16,.4),
-  inset 0 0 0 1px rgba(255,240,205,.18);
- text-shadow:0 1px 1px rgba(74,54,16,.42);
+ box-shadow:0 10px 24px -10px color-mix(in srgb,var(--brand-d) 72%,transparent),
+  0 2px 5px -2px color-mix(in srgb,var(--brand-d) 55%,transparent),
+  inset 0 1px 0 rgba(255,225,218,.4),inset 0 -1px 0 rgba(60,10,6,.45),
+  inset 0 0 0 1px color-mix(in srgb,var(--gold) 30%,transparent);
+ text-shadow:0 1px 1px rgba(60,10,6,.45);
  transition:background-position .5s ease,transform .22s ease,box-shadow .3s ease}
 /* the sweep that crosses on hover */
 .btn-gold::after{content:"";position:absolute;top:0;bottom:0;width:44%;inset-inline-start:-60%;
  transform:skewX(-18deg);z-index:-1;
  background:linear-gradient(90deg,transparent,rgba(255,250,230,.55),transparent);transition:.65s}
 .btn-gold:hover{transform:translateY(-2px);background-position:78% 70%;
- box-shadow:0 18px 38px -12px rgba(126,95,38,.85),0 3px 7px -2px rgba(126,95,38,.55),
-  inset 0 1px 0 rgba(255,246,222,.65),inset 0 -1px 0 rgba(74,54,16,.45),
-  inset 0 0 0 1px rgba(255,240,205,.26)}
+ box-shadow:0 18px 38px -12px color-mix(in srgb,var(--brand-d) 85%,transparent),
+  0 3px 7px -2px color-mix(in srgb,var(--brand-d) 60%,transparent),
+  inset 0 1px 0 rgba(255,225,218,.5),inset 0 -1px 0 rgba(60,10,6,.5),
+  inset 0 0 0 1px color-mix(in srgb,var(--gold) 46%,transparent)}
 .btn-gold:hover::after{inset-inline-start:120%}
 .btn-gold:active{transform:translateY(0);
- box-shadow:0 5px 14px -8px rgba(126,95,38,.7),inset 0 2px 5px rgba(74,54,16,.4)}
+ box-shadow:0 5px 14px -8px color-mix(in srgb,var(--brand-d) 70%,transparent),
+  inset 0 2px 5px rgba(60,10,6,.45)}
 
 /* the quiet one: paper with a gold hairline, filling on hover */
 .btn-line{position:relative;border-radius:12px;padding:13px 27px;font-weight:700;font-size:.94rem;
- color:var(--gold3);background:color-mix(in srgb,var(--paper) 86%,transparent);
+ color:var(--brand-d);background:color-mix(in srgb,var(--paper) 88%,transparent);
  backdrop-filter:blur(6px);
- box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold) 52%,transparent),
-  0 6px 16px -10px rgba(126,95,38,.5);
+ box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--brand) 40%,transparent),
+  0 6px 16px -10px color-mix(in srgb,var(--brand-d) 45%,transparent);
  transition:.28s}
-.btn-line:hover{color:var(--paper);background:var(--gold3);transform:translateY(-2px);
- box-shadow:inset 0 0 0 1px var(--gold3),0 14px 30px -12px rgba(126,95,38,.7),
-  inset 0 1px 0 rgba(255,246,222,.3)}
+.btn-line:hover{color:#FFF6F3;background:var(--brand-d);transform:translateY(-2px);
+ box-shadow:inset 0 0 0 1px var(--brand-d),
+  0 14px 30px -12px color-mix(in srgb,var(--brand-d) 70%,transparent),
+  inset 0 1px 0 rgba(255,225,218,.28)}
 .btn-line:active{transform:translateY(0)}
 
 @media(prefers-reduced-motion:reduce){
