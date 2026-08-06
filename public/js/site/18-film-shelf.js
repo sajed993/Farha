@@ -180,3 +180,28 @@ function ediDemoNote(k){
    fr:['Tarifs négociés','Deux hôtels à quelques minutes — mentionnez les mariés à la réservation'],
    en:['Negotiated rates','Two hotels minutes away — mention the couple when booking']}}[k][S.lang];
  return {t:L[0],d:L[1]};}
+
+/* Dashboard preview: index.html?vidPreview=<film>&vidStyle=<style> opens that
+   film straight into the invitation with the envelope skipped, so the admin
+   iframe shows the real thing rather than a copy of it. */
+function vidPreviewBoot(){
+ let q;try{q=new URLSearchParams(location.search);}catch(e){return;}
+ const film=q.get('vidPreview');if(!film)return;
+ const sec=q.get('vidSec')||'hall';
+ document.documentElement.classList.add('is-preview');
+ setTimeout(()=>{
+  try{openReady(film);}catch(e){return;}
+  /* skip the seal — the preview is about the film plate, not the envelope */
+  setTimeout(()=>{
+   const w=document.getElementById('wenvWax');
+   if(w&&w.__open)w.__open();
+   setTimeout(()=>{
+    const r=document.getElementById('edi');if(!r)return;
+    r.querySelectorAll('.edi-in,.edi-cue').forEach(e=>e.classList.add('in'));
+    const t=r.querySelector('.edi-'+sec)||r.querySelector('.edi-hero');
+    r.style.scrollBehavior='auto';
+    if(t)t.scrollIntoView({block:'start'});
+   },2600);
+  },420);
+ },260);}
+if(typeof window!=='undefined')window.addEventListener('load',()=>{try{vidPreviewBoot()}catch(e){}});

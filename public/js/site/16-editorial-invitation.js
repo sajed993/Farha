@@ -21,6 +21,22 @@ function ediPreload(done){
 
 /* Sections share one film, so each enters it at a different moment — the
    scroll then reads as a journey rather than the same shot four times. */
+/* ---- film plate style ----
+   Two scopes: the ready films we ship, and invitations a customer builds.
+   A film may override the scope default; the URL may override both, which is
+   how the dashboard previews a style without saving it. */
+const EDI_VID=['full','window','arch','medal','split','band','duo'];
+function ediVidStyle(){
+ try{
+  const q=new URLSearchParams(location.search).get('vidStyle');
+  if(q&&EDI_VID.indexOf(q)>=0)return q;
+ }catch(e){}
+ if(S.c.vidStyle&&EDI_VID.indexOf(S.c.vidStyle)>=0)return S.c.vidStyle;
+ const V=(typeof CFG!=='undefined'&&CFG&&CFG.vid)||{};
+ const scope=S.c.film?'site':'customer';
+ const w=V[scope];
+ return (w&&EDI_VID.indexOf(w)>=0)?w:'full';}
+
 const EDI_CUE={hero:0,hall:.28,detail:.52,date:.74,venue:.88};
 /* Seconds into each clip, so a #t= fragment can be baked into the src. Seeking
    in JS after load stalls the decoder and shows as a freeze; the fragment lets
@@ -326,7 +342,7 @@ function ediHTML(){
  const cart=n=>`<div class="edi-mono ${n||''}">${EDI_CART}<span class="mg">${mono}</span></div>`;
  const prog=ediSecOn('prog')?(c.program&&c.program.length?c.program:[]).slice(0,6):[];
 
- return `<div class="edi" id="edi">
+ return `<div class="edi" id="edi" data-vid="${ediVidStyle()}">
   <div class="edi-bar"><i id="ediBar"></i></div>
   <button class="edi-x" onclick="closeVeil()">${t().closePrev}</button>
 

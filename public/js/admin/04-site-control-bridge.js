@@ -2,12 +2,13 @@
 const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'farha_meta'};
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-const CFG_DEF={sec:{ultra:1,premium:1,ai:1,sites:1,datef:1,open:1,wishes:1,ready:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},price:{ultra:199,ai:249,site:149,design:79},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[]}};
+const CFG_DEF={sec:{ultra:1,premium:1,ai:1,sites:1,datef:1,open:1,wishes:1,ready:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},vid:{site:'full',customer:'full'},price:{ultra:199,ai:249,site:149,design:79},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[]}};
 function loadCFG(){const cc=lsGet(LSK.cfg,{})||{};const o=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(o.sec,cc.sec||{});Object.assign(o.price,cc.price||{});o.wa=cc.wa||CFG_DEF.wa;o.d17=cc.d17||CFG_DEF.d17;
  Object.assign(o.banner,cc.banner||{});o.designs=cc.designs||{};
  Object.assign(o.edi,cc.edi||{});o.films=cc.films||{};
  if(cc.envStyle)o.envStyle=cc.envStyle;Object.assign(o.env,cc.env||{});
+ Object.assign(o.vid,cc.vid||{});
  o.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),cc.media||{});return o;}
 let CFG=loadCFG();
 function saveCFG(){lsSet(LSK.cfg,CFG);if(window.__dbSaveCfg)window.__dbSaveCfg(CFG);toast('حُفظ — سيظهر على الموقع فورًا ✓');}
@@ -36,6 +37,60 @@ function ctlEnvOn(k,v){CFG.env[k]=v?1:0;
  if(!v&&CFG.envStyle===k)CFG.envStyle='classic';
  saveCFG();}
 function ctlEnvPick(k){if(CFG.env[k]===0)CFG.env[k]=1;CFG.envStyle=k;saveCFG();}
+
+/* ── how the film is shown inside the invitation ──
+   Two scopes: our own ready films, and invitations customers build. Nothing is
+   saved until confirmed; the preview runs the real site in an iframe so what
+   you see is what ships, not a drawing of it. */
+const VIDL=[['full','اللوح الكامل','الفيلم يملأ القسم والنص فوقه — الحالي'],
+ ['window','النافذة','مركّب على الورق كصورة مؤطّرة بحافة ذهبية'],
+ ['arch','المحراب','داخل قوس أندلسي — الأقوى هويةً'],
+ ['medal','المدالية','دائرة محاطة بحلقة ذهبية'],
+ ['split','الشطر','الفيلم أعلى والورق أسفل — الأوضح قراءةً'],
+ ['band','الشريط السينمائي','شريط عريض في المنتصف'],
+ ['duo','ثنائي اللون','أبيض وأسود مصبوغ بلوني اللوحة']];
+const VIDSCOPE=[['site','أفلام الموقع','الدعوات الجاهزة التي نعرضها'],
+ ['customer','فيديوهات الزبائن','الدعوات التي يبنيها الزبون بفيديو خاص']];
+/* pending choice per scope, applied only on confirm */
+let VIDTRY={site:null,customer:null};
+let VIDFILM='marble', VIDSEC='hall';
+function vidPick(scope,k){VIDTRY[scope]=k;renderContent();}
+function vidConfirm(scope){
+ const k=VIDTRY[scope];if(!k)return;
+ CFG.vid[scope]=k;VIDTRY[scope]=null;saveCFG();renderContent();}
+function vidCancel(scope){VIDTRY[scope]=null;renderContent();}
+function vidFilm(v){VIDFILM=v;renderContent();}
+function vidSec(v){VIDSEC=v;renderContent();}
+function vidView(){
+ return VIDSCOPE.map(([scope,nm,ds])=>{
+  const cur=CFG.vid[scope]||'full';
+  const tryK=VIDTRY[scope];
+  const shown=tryK||cur;
+  const url='index.html?vidPreview='+encodeURIComponent(VIDFILM)
+   +'&vidStyle='+encodeURIComponent(shown)+'&vidSec='+encodeURIComponent(VIDSEC)
+   +'&_='+shown+VIDFILM+VIDSEC;
+  return ctlCard('🎞️ عرض الفيلم — '+nm,ds+'. اضغطوا على شكل لتجرّبوه في المعاينة، ثم أكّدوا.',
+   `<div class="vidpick">${VIDL.map(([k,n,d])=>`
+     <button class="vidopt ${shown===k?'on':''} ${cur===k?'cur':''}" onclick="vidPick('${scope}','${k}')">
+      <b>${n}</b><span>${d}</span>${cur===k?'<i>الحالي</i>':''}</button>`).join('')}</div>
+    <div class="vidprev">
+     <div class="vidprev-ctl">
+      <select onchange="vidFilm(this.value)">${RDFILMS.map(([id,fn])=>
+        `<option value="${id}" ${VIDFILM===id?'selected':''}>${fn}</option>`).join('')}</select>
+      <select onchange="vidSec(this.value)">${[['hero','الغلاف'],['hall','الدعوة'],
+        ['msg','الرسالة'],['venue','المكان'],['prog','البرنامج']].map(([v,n])=>
+        `<option value="${v}" ${VIDSEC===v?'selected':''}>${n}</option>`).join('')}</select>
+      <span class="cmut" style="font-size:.76rem">معاينة حيّة من الموقع نفسه</span>
+     </div>
+     <div class="vidphone"><iframe src="${url}" title="preview" loading="lazy"></iframe></div>
+    </div>
+    ${tryK&&tryK!==cur?`<div class="vidconfirm">
+      <span>تجربة: <b>${VIDL.find(v=>v[0]===tryK)[1]}</b> — غير محفوظ بعد</span>
+      <span style="display:flex;gap:8px">
+       <button class="act gold" onclick="vidConfirm('${scope}')">تأكيد وحفظ</button>
+       <button class="act" onclick="vidCancel('${scope}')">إلغاء</button>
+      </span></div>`:''}`);
+ }).join('');}
 function ctlFilm(id,k,v){CFG.films[id]=CFG.films[id]||{};
  if(k==='vis')CFG.films[id].vis=!!v;
  else if(k==='price')CFG.films[id].price=Math.max(0,parseInt(v)||0);
@@ -112,7 +167,7 @@ function envView(){
 
 function mediaView(){
  const M=CFG.media;const cloud=window.__dbMode?'':`<p class="cmut" style="color:#A33">⚠️ لرفع الفيديوهات سجّلوا الدخول السحابي أولًا (الأزرار الأخرى تعمل).</p>`;
- return `<div class="cgrid">`+envView()+readyView()+
+ return `<div class="cgrid">`+envView()+vidView()+readyView()+
   ctlCard('🎬 أفلام سينما AI — فيديوهاتها','ولّدوا الفيديو بأزرار «نسخ البرومبت» في الموقع، ثم ارفعوه هنا ليظهر فورًا لكل الزوّار'+(cloud?'':''),
    cloud+AIN.map((n,i)=>{const has=M.films[i]&&M.films[i].url;
     return `<div class="ctlrow"><span>${AIE[i]} ${n} ${has?'<b style="color:#2F6B3A">· سحابي ✓</b>':''}</span>

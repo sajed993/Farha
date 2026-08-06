@@ -2827,3 +2827,67 @@ html[dir=rtl] .es-nm{font-family:var(--dispA);font-weight:700;letter-spacing:.02
  .es-full .es-flap,.es-macro .es-diag,.es-silk .es-flap,.es-silk .es-flapfoil,
  .es-silk .es-card,.es-press .es-deboss,.es-press .es-ring{transition-duration:.01ms!important}
 }
+
+/* ============ FILM PLATE STYLES ============
+   Seven ways to show the film inside a section. One data-vid on the .edi root
+   switches every plate at once, so nothing in the markup changes between them.
+   "full" is the original: the film covers the section and the text sits on it.
+   The other six inset the film and drop the text into the space below it. */
+
+/* shared: an inset plate is an object on paper, so it gets an edge and a shadow */
+.edi[data-vid]:not([data-vid="full"]):not([data-vid="duo"]) .edi-ph.film{
+ box-shadow:0 14px 32px -14px rgba(60,42,18,.5),
+  0 0 0 1px color-mix(in srgb,var(--gold) 44%,transparent),
+  0 0 0 7px var(--cream-hi),
+  0 0 0 8px color-mix(in srgb,var(--gold) 24%,transparent)}
+/* the scrim only earns its place when the text sits on the film */
+.edi[data-vid]:not([data-vid="full"]):not([data-vid="duo"]) .edi-wash{display:none}
+/* the content is grid-centred by default, which would put it under the plate;
+   anchor it to the foot of the section instead so the two never overlap */
+.edi[data-vid]:not([data-vid="full"]):not([data-vid="duo"]) .edi-s{align-content:end}
+.edi[data-vid]:not([data-vid="full"]):not([data-vid="duo"]) .edi-in{padding-bottom:2vh}
+
+/* ── ب · window ── */
+.edi[data-vid="window"] .edi-ph.film{inset:10% 14% 52% 14%}
+/* ── ج · arch ── */
+.edi[data-vid="arch"] .edi-ph.film{inset:8% 13% 52% 13%;
+ border-radius:50% 50% 3px 3px/32% 32% 3px 3px}
+/* ── د · medallion ── */
+.edi[data-vid="medal"] .edi-ph.film{left:21%;right:21%;top:11%;bottom:auto;
+ aspect-ratio:1;border-radius:50%}
+/* ── هـ · split: film above, paper below ── */
+.edi[data-vid="split"] .edi-ph.film{inset:0 0 52% 0;box-shadow:none}
+.edi[data-vid="split"] .edi-ph.film::after{content:"";position:absolute;
+ left:0;right:0;bottom:0;height:32%;pointer-events:none;
+ background:linear-gradient(transparent,var(--cream))}
+/* ── و · band: a strip, held inside the gold frame ── */
+.edi[data-vid="band"] .edi-ph.film{inset:16% 7.5% 52% 7.5%;box-shadow:
+ 0 0 0 1px color-mix(in srgb,var(--gold) 44%,transparent)}
+/* ── ز · duotone: desaturate, then dye in the palette ── */
+.edi[data-vid="duo"] .edi-ph.film video{filter:grayscale(1) contrast(1.16) brightness(1.02)}
+.edi[data-vid="duo"] .edi-ph.film::after{content:"";position:absolute;inset:0;
+ pointer-events:none;mix-blend-mode:multiply;opacity:.9;
+ background:linear-gradient(158deg,var(--cream-hi) 0%,var(--blush) 46%,var(--plum) 100%)}
+
+/* the hero carries only the names, so its film can take more room */
+.edi[data-vid="window"] .edi-hero .edi-ph.film{inset:8% 12% 44% 12%}
+.edi[data-vid="arch"] .edi-hero .edi-ph.film{inset:7% 11% 44% 11%}
+.edi[data-vid="medal"] .edi-hero .edi-ph.film{top:10%;left:16%;right:16%}
+.edi[data-vid="band"] .edi-hero .edi-ph.film{inset:14% 7.5% 46% 7.5%}
+.edi[data-vid="split"] .edi-hero .edi-ph.film{inset:0 0 44% 0}
+
+/* on paper the type needs no shadow */
+.edi[data-vid]:not([data-vid="full"]):not([data-vid="duo"]) .edi-names,
+.edi[data-vid]:not([data-vid="full"]):not([data-vid="duo"]) .edi-venue-n{text-shadow:none}
+
+@media(max-width:420px){
+ .edi[data-vid="window"] .edi-ph.film{inset:9% 9% 54% 9%}
+ .edi[data-vid="arch"] .edi-ph.film{inset:7% 8% 54% 8%}
+ .edi[data-vid="medal"] .edi-ph.film{left:17%;right:17%}
+}
+
+/* the dashboard preview frame: no close button, no scrollbars, no chat bubble */
+html.is-preview .wenv-x,html.is-preview .edi-x,html.is-preview .wa-float,
+html.is-preview .cart-fab,html.is-preview .close-x{display:none!important}
+html.is-preview .edi{scrollbar-width:none}
+html.is-preview .edi::-webkit-scrollbar{display:none}
