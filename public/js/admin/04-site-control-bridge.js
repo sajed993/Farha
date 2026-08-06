@@ -11,7 +11,7 @@ function loadCFG(){const cc=lsGet(LSK.cfg,{})||{};const o=JSON.parse(JSON.string
  Object.assign(o.vid,cc.vid||{});
  o.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),cc.media||{});return o;}
 let CFG=loadCFG();
-function saveCFG(){lsSet(LSK.cfg,CFG);if(window.__dbSaveCfg)window.__dbSaveCfg(CFG);toast('حُفظ — سيظهر على الموقع فورًا ✓');}
+function saveCFG(){CFG.v=3;lsSet(LSK.cfg,CFG);if(window.__dbSaveCfg)window.__dbSaveCfg(CFG);toast('حُفظ — سيظهر على الموقع فورًا ✓');}
 function ctlExport(){const pub=lsGet(LSK.wishes,[]).filter(w=>w.ok).slice(0,20).map(w=>({txt:w.txt,n:w.n}));
  const obj=Object.assign(JSON.parse(JSON.stringify(CFG)),{pub:pub});
  const js='window.FARHA_CFG='+JSON.stringify(obj)+';';

@@ -5,7 +5,11 @@ function cdChip(when){
  if(diff<=0)return `<div class="i-cd">${t().started}</div>`;
  const days=Math.ceil(diff/864e5);
  return `<div class="i-cd">⏳ ${t().daysLeft} ${S.lang==='ar'?toAr(days):days} ${t().dayW}</div>`;}
-function toAr(n){return String(n).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);}
+/* Numerals stay Latin in every language. Arabic-Indic digits were used for
+   a while but read as inconsistent next to prices, times and years, so the
+   whole site is on one set. Kept as a function because the call sites are
+   spread out and some of them may want the old behaviour again. */
+function toAr(n){return String(n);}
 /* --- monogram: split "مريم و يوسف" / "Nour & Karim" into initials --- */
 const NAME_SEP=/\s*&\s*|\s*\+\s*|\s+و\s+|\s+and\s+|\s+et\s+/i;
 function inNameParts(n){return String(n==null?'':n).replace(/\s+/g,' ').trim()

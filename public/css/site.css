@@ -124,7 +124,7 @@ img{display:block}
 .hero{position:relative;min-height:100svh;display:grid;place-items:center;
  padding:104px 20px 56px;overflow:hidden;isolation:isolate;background:var(--cream)}
 
-.spec{position:absolute;inset:0;z-index:0;display:grid;grid-template-columns:repeat(3,1fr)}
+.spec{position:absolute;inset:0;z-index:0;display:grid;grid-template-columns:repeat(5,1fr)}
 .spec-b{position:relative;overflow:hidden}
 .spec-b video,.spec-b img{width:100%;height:100%;object-fit:cover;display:block;
  filter:saturate(1.08) contrast(1.04);transform:translateZ(0);backface-visibility:hidden}
@@ -134,8 +134,7 @@ img{display:block}
  font-family:'Reem Kufi',var(--bodyA);font-weight:500;font-size:.6rem;letter-spacing:.18em;
  color:#FFF;text-shadow:0 2px 10px rgba(0,0,0,.62);opacity:.92}
 html[dir=ltr] .spec-b b{font-family:'Cinzel',serif;text-transform:uppercase}
-/* the two extra bands only exist once the screen can carry them */
-.spec-b.x{display:none}
+/* every band shows at every width — the phone reads like the laptop */
 /* a clearing in the middle so the words never fight the footage */
 .spec-veil{position:absolute;inset:0;z-index:1;pointer-events:none;
  background:radial-gradient(52% 30% at 50% 47%,color-mix(in srgb,var(--paper) 95%,transparent) 0%,
@@ -168,28 +167,30 @@ html[dir=ltr] .spec-b b{font-family:'Cinzel',serif;text-transform:uppercase}
 /* phones: three bands, a wider clearing, buttons full width */
 @media(max-width:560px){
  .hero{padding:96px 16px 46px}
- /* the clearing is now tight around the words instead of a wash over the
-    whole screen, so the films actually read on a phone */
- .spec-veil{background:radial-gradient(62% 24% at 50% 47%,
-   color-mix(in srgb,var(--paper) 96%,transparent) 0%,
-   color-mix(in srgb,var(--paper) 86%,transparent) 52%,
-   color-mix(in srgb,var(--paper) 20%,transparent) 84%,transparent 100%)}
- .spec-b i{opacity:.3}
+ /* the phone gets the same five bands as the laptop; only the plate behind
+    the words changes, and it is kept small so the films stay in view */
+ .spec-b i{opacity:.34}
  .spec-b video,.spec-b img{filter:saturate(1.14) contrast(1.08)}
- /* a soft plate behind the copy carries legibility instead */
- .hero-copy{background:radial-gradient(112% 74% at 50% 46%,
-   color-mix(in srgb,var(--paper) 92%,transparent) 0%,
-   color-mix(in srgb,var(--paper) 66%,transparent) 62%,transparent 100%);
-   padding:18px 10px;border-radius:26px}
+ .spec-b b{font-size:.46rem;letter-spacing:.1em}
+ /* the plate is inset from the edges and only as tall as the words need,
+    so the bands keep breathing around it */
+ .hero-copy{margin:0 4px;padding:18px 14px 20px;border-radius:24px;
+   background:linear-gradient(180deg,
+     color-mix(in srgb,var(--paper) 88%,transparent) 0%,
+     color-mix(in srgb,var(--paper) 80%,transparent) 76%,
+     color-mix(in srgb,var(--paper) 56%,transparent) 100%);
+   -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+   box-shadow:0 20px 46px -24px rgba(60,42,18,.32),
+     inset 0 0 0 1px color-mix(in srgb,var(--brand) 11%,transparent)}
+ .hero h1{font-size:clamp(1.95rem,7vw,2.5rem);margin:14px 0 12px}
+ .hero .sub{font-size:.9rem;line-height:1.85;margin-bottom:20px}
+ .hero .kicker{font-size:.74rem;padding:6px 14px}
  .spec-b b{font-size:.52rem;letter-spacing:.13em;bottom:max(14px,2.4vh)}
  .hero .sub{margin-bottom:24px}
  .hero-ctas{flex-direction:column;align-items:stretch}
  .hero-ctas .btn-gold,.hero-ctas .btn-line{width:100%;padding:15px 20px}
 }
-@media(min-width:561px){
- .spec{grid-template-columns:repeat(5,1fr)}
- .spec-b.x{display:block}
-}
+
 @media(min-width:1000px){
  .hero{padding:130px min(4.5vw,54px) 70px}
  .hero-copy{max-width:44rem}

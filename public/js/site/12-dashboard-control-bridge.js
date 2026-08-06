@@ -1,6 +1,11 @@
 const EM={gift:String.fromCodePoint(0x1F381),check:String.fromCodePoint(0x2705),phone:String.fromCodePoint(0x1F4F1),clip:String.fromCodePoint(0x1F4CE),heart:String.fromCodePoint(0x1F49B),spark:String.fromCodePoint(0x2728),receipt:String.fromCodePoint(0x1F9FE)};
 /* ============ dashboard control bridge ============ */
 const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'farha_meta'};
+/* Anything saved from the dashboard used to win over the defaults forever,
+   so a phone that had ever stored a config kept showing old sections and
+   old prices while a fresh browser showed the new ones. Bumping this drops
+   the stored sec/price once; everything the owner typed is kept. */
+const CFG_VER=3;
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 /* Everything except the newest section is off for now; each is one switch
@@ -27,7 +32,12 @@ let T0=null;
 function loadCFG(){
  if(!T0){T0={};['uOrder','aiOrderB','stOrder'].forEach(k=>{T0[k]={ar:T.ar[k],fr:T.fr[k],en:T.en[k]};});}
  const fc=(typeof window!=='undefined'&&window.FARHA_CFG)?window.FARHA_CFG:{};
- const lc=lsGet(LSK.cfg,{})||{};
+ let lc=lsGet(LSK.cfg,{})||{};
+ if((lc.v|0)<CFG_VER){
+  const keep=Object.assign({},lc);
+  delete keep.sec;delete keep.price;      /* these are ours to set */
+  keep.v=CFG_VER;lc=keep;lsSet(LSK.cfg,lc);
+ }
  const cc={sec:Object.assign({},fc.sec||{},lc.sec||{}),price:Object.assign({},fc.price||{},lc.price||{}),
   wa:(lc.wa!==undefined&&lc.wa!=='')?lc.wa:(fc.wa||''),
   d17:(lc.d17!==undefined&&lc.d17!=='')?lc.d17:(fc.d17||''),

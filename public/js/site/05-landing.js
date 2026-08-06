@@ -10,7 +10,7 @@
    <img>, which paints immediately and costs nothing, and is upgraded to a
    real video only while it is on screen — then torn back down, returning the
    decoder. */
-const LAZYV_MAX = 4;            /* never hold more than this many decoders */
+const LAZYV_MAX = 5;            /* never hold more than this many decoders */
 const lazyvLive = [];
 
 function lazyvPoster(src){ return src.slice(0, -4) + '.jpg'; }
