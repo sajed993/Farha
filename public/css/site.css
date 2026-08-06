@@ -2762,6 +2762,12 @@ html[dir=ltr] .edi-pos{font-family:'Cormorant Garamond',serif;font-style:italic;
  --gold:#A08A4E;--gold-hi:#D2BE86;--gold-lo:#74622E;--gold-pale:#E4DAC0;
  --ink:#1C2030;--ink-soft:#3A4056;--ink-mute:#6C7488;
  --blush:#C86A8A;--plum:#2A3350;--sage:#8E9A82;--wax:#2A3350}
+/* ليلة الحنّة — the carmine measured #8E221C at 0.80 saturation, on brass and ivory */
+.edi-veil-root.pal-henna{
+ --cream:#F7EFE4;--cream-hi:#FFFAF3;--beige:#EBDCC6;--beige-dp:#D9C4A6;
+ --gold:#B8863C;--gold-hi:#E8CB93;--gold-lo:#7E5518;--gold-pale:#F0DFBE;
+ --ink:#3A211C;--ink-soft:#5C3A30;--ink-mute:#8A6555;
+ --blush:#8E221C;--plum:#6E1A16;--sage:#94906E;--wax:#8E221C}
 /* قريبًا — pure warm ivory, 0.25 saturation */
 .edi-veil-root.pal-soon{
  --cream:#F7F2EA;--cream-hi:#FDFAF4;--beige:#E8DDCE;--beige-dp:#D4C6B2;

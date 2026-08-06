@@ -7,7 +7,7 @@ const TRACKS={1:'/media/snd/piano.webm'};
    which clips. These gains level everything to ~0.06 RMS and pull every peak
    back under 1, so switching films does not jump in volume. */
 const TRACK_VOL={'marble.webm':.32,'oneday.webm':.48,'wisteria.webm':.23,
- 'rings.webm':.68,'piano.webm':1};
+ 'rings.webm':.68,'piano.webm':1,'henna.webm':.30};
 function trackVol(url){return TRACK_VOL[String(url).split('/').pop()]||.6;}
 const MEL={
  2:{wave:'triangle',bpm:138,notes:[[523,1],[523,1],[659,2],[523,2],[698,2],[659,4],[523,1],[523,1],[659,2],[523,2],[784,2],[698,4],[880,2],[784,2],[698,2],[659,4]]},

@@ -77,6 +77,18 @@ const FILMS_READY=[
   dress:{ar:['أنيق نهاري','ألوان فاتحة'],fr:['Chic de jour','Tons clairs'],en:['Daytime smart','Light tones']},
   sw:['#1C2030','#C86A8A','#D8DEEE']},
 
+ /* ── henna night ── */
+ {id:'henna',cat:'henna',v:'/media/inv/henna.mp4',p:'/media/inv/henna.jpg',design:10,
+  name:{ar:'ليلة الحنّة',fr:'Nuit du Henné',en:'Henna Night'},
+  blurb:{ar:'ورد قرمزي في جرارٍ من فخّار، وضوءٌ دافئ على الجدار — ليلة الحنّة كما هي',
+   fr:'Des fleurs carmin dans des jarres de terre cuite et une lumière chaude sur le mur — la nuit du henné',
+   en:'Carmine blooms in clay jars and warm light on the wall — the henna night as it is'},
+  dress:{ar:['قفطان أو جبّة','أحمر وذهبي — كما تقتضي الليلة'],
+   fr:['Caftan ou jebba','Rouge et or, comme le veut la nuit'],
+   en:['Caftan or jebba','Red and gold, as the night asks']},
+  sw:['#3A211C','#8E221C','#EBDCC6'],
+  snd:'/media/snd/henna.webm',sndN:'جيبوا الحنّة'},
+
  /* ── save the date ── */
  {id:'soon',cat:'save',v:'/media/inv/soon.mp4',p:'/media/inv/soon.jpg',design:3,
   name:{ar:'قريبًا',fr:'Bientôt',en:'Coming Soon'},
@@ -86,7 +98,7 @@ const FILMS_READY=[
   sw:['#4A3E34','#A58E7C','#E8DDCE']}
 ];
 /* order matters — the chips read in this order */
-const RD_CATS=['all','wed','bday','baby','grad','save'];
+const RD_CATS=['all','wed','henna','bday','baby','grad','save'];
 
 
 function readyFilm(id){return FILMS_READY.find(f=>f.id===id)||FILMS_READY[0];}
