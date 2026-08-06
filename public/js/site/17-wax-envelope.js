@@ -1,7 +1,35 @@
 /* ================= wax envelope opening =================
-   The screen a guest lands on: a cream envelope, four fold seams meeting at
-   the centre, one black wax seal. Press the seal and the flap folds back.
-   No photography — cream paper, fold geometry and a wax blob on canvas. */
+   The screen a guest lands on. Five styles share one wax canvas and one
+   opening sequence; only the paper around it differs. The dashboard picks
+   which is active and can switch any of them off. */
+
+const ENV_STYLES=['classic','full','macro','silk','press'];
+/* Fall back to classic when the chosen style has been switched off, so the
+   guest never lands on a blank screen. */
+function envStyleActive(){
+ const C=(typeof CFG!=='undefined'&&CFG)||{};
+ const want=C.envStyle||'classic';
+ if(ENV_STYLES.indexOf(want)<0)return 'classic';
+ if(C.env&&C.env[want]===0)return 'classic';
+ return want;}
+
+/* foil hairlines traced along the folds of the full-bleed envelope */
+const ENV_EDGE='<svg class="es-edge" viewBox="0 0 100 213" preserveAspectRatio="none" aria-hidden="true">'
+ +'<defs><linearGradient id="esfa" x1="0" y1="0" x2="1" y2="1">'
+ +'<stop offset="0" stop-color="var(--gold-lo)"/><stop offset=".18" stop-color="var(--gold-hi)"/>'
+ +'<stop offset=".36" stop-color="var(--gold)"/><stop offset=".54" stop-color="var(--gold-hi)"/>'
+ +'<stop offset=".72" stop-color="var(--gold-lo)"/><stop offset=".88" stop-color="var(--gold-hi)"/>'
+ +'<stop offset="1" stop-color="var(--gold-lo)"/></linearGradient></defs>'
+ +'<g fill="none" stroke="url(#esfa)" vector-effect="non-scaling-stroke" stroke-width="2">'
+ +'<path d="M-2 0 L50 115 L102 0"/><path d="M-1 0 L52 111"/>'
+ +'<path d="M101 0 L48 111"/><path d="M-1 213 L50 118 L101 213"/></g></svg>';
+const ENV_FLAPFOIL='<svg class="es-flapfoil" viewBox="0 0 100 213" preserveAspectRatio="none" aria-hidden="true">'
+ +'<defs><linearGradient id="esfc" x1="0" y1="0" x2="1" y2=".4">'
+ +'<stop offset="0" stop-color="var(--gold-lo)"/><stop offset=".22" stop-color="var(--gold-hi)"/>'
+ +'<stop offset=".48" stop-color="var(--gold)"/><stop offset=".72" stop-color="var(--gold-hi)"/>'
+ +'<stop offset="1" stop-color="var(--gold-lo)"/></linearGradient></defs>'
+ +'<path d="M-2 63 L50 98 L102 63" fill="none" stroke="url(#esfc)" '
+ +'vector-effect="non-scaling-stroke" stroke-width="2.2"/></svg>';
 
 /* Shift a hex toward white or black — used to build the wax's relief from the
    single --wax colour the palette gives us. */
@@ -92,24 +120,50 @@ function envWax(cv,initials){
  window.addEventListener('resize',paint);
  return ()=>{done=true;};}
 
+/* Markup per style. Each returns the paper; the wax canvas is added by the
+   mounter so the crumble interaction stays identical across all five. */
+function envBody(style,c){
+ const nm=esc(c.n), kick=esc(c.t);
+ const NAMES=`<p class="es-nm">${nm}<small>${kick}</small></p>`;
+ if(style==='full')return `
+   <span class="es-pl"></span><span class="es-pr"></span>
+   <span class="es-fshade"></span><span class="es-flap"></span>
+   ${ENV_EDGE}<span class="es-rule"></span>${NAMES}`;
+ if(style==='macro')return `
+   <span class="es-diag"><i></i></span><span class="es-dof"></span>${NAMES}`;
+ if(style==='silk')return `
+   <span class="es-weave"></span><span class="es-sheen"></span>
+   <span class="es-card"><b>${nm}</b><span>${kick}</span></span>
+   <span class="es-pocket"><i></i></span>
+   <span class="es-flap"></span>${ENV_FLAPFOIL}`;
+ if(style==='press')return `
+   <span class="es-deboss"><span>${esc(inInitials(c.n).join(' '))}</span></span>
+   <span class="es-ring"></span><span class="es-rule"></span>${NAMES}`;
+ /* classic */
+ return `
+   <div class="wenv-lin"></div>
+   <span class="wenv-f l"></span><span class="wenv-f r"></span><span class="wenv-f b"></span>
+   <svg class="wenv-seams" viewBox="0 0 100 72" preserveAspectRatio="none" aria-hidden="true">
+    <g fill="none" stroke="currentColor" vector-effect="non-scaling-stroke" stroke-width="1">
+     <path d="M0 0 L50 37"/><path d="M100 0 L50 37"/>
+     <path d="M0 72 L50 37"/><path d="M100 72 L50 37"/>
+    </g></svg>
+   <div class="wenv-note"><span>${kick}</span><b>${nm}</b></div>
+   <span class="wenv-f t"></span>`;}
+
 /* Mount the envelope. `after` runs once the flap has finished opening. */
 function waxEnvelope(host,after){
  const c=S.c,ini=inInitials(c.n).join('');
- host.innerHTML=`<div class="wenv" id="wenv">
+ const style=envStyleActive();
+ const full=style!=='classic';
+ host.innerHTML=`<div class="wenv es-${style} ${full?'es-bleed':''}" id="wenv">
    <div class="wenv-grain"></div>
+   ${full?'<div class="es-fib"></div><div class="es-rake"></div><div class="es-vig"></div>':''}
    <button class="wenv-x" onclick="closeVeil()">${t().closePrev}</button>
    <div class="wenv-stack">
     <p class="wenv-to">${c.guest?esc(t().helloGuest)+' '+esc(c.guest):esc(t().helloAll)}</p>
     <div class="wenv-env" id="wenvEnv">
-     <div class="wenv-lin"></div>
-     <span class="wenv-f l"></span><span class="wenv-f r"></span><span class="wenv-f b"></span>
-     <svg class="wenv-seams" viewBox="0 0 100 72" preserveAspectRatio="none" aria-hidden="true">
-      <g fill="none" stroke="currentColor" vector-effect="non-scaling-stroke" stroke-width="1">
-       <path d="M0 0 L50 37"/><path d="M100 0 L50 37"/>
-       <path d="M0 72 L50 37"/><path d="M100 72 L50 37"/>
-      </g></svg>
-     <div class="wenv-note"><span>${esc(c.t)}</span><b>${esc(c.n)}</b></div>
-     <span class="wenv-f t"></span>
+     ${envBody(style,c)}
      <canvas class="wenv-wax" id="wenvWax"></canvas>
     </div>
     <p class="wenv-hint" id="wenvHint">${t().uSealHint}</p>

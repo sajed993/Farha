@@ -5,6 +5,7 @@ function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 const CFG_DEF={sec:{ultra:1,premium:1,ai:1,sites:1,datef:1,open:1,wishes:1,ready:1},price:{ultra:199,ai:249,site:149,design:79},
  edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},
+ envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},
  tiers:[
   {id:'ess',em:'🌱',name:{ar:'Essentiel — أساسي',fr:'Essentiel',en:'Essential'},price:29,feats:{ar:['تصميم واحد','الأسماء والتاريخ والمكان','افتتاح بسيط'],fr:['Un design','Noms, date, lieu','Ouverture simple'],en:['One design','Names, date, place','Simple opening']}},
   {id:'prem',em:'✦',name:{ar:'Premium — مميّز',fr:'Premium',en:'Premium'},price:69,feats:{ar:['كل ما في الأساسي','موسيقى + معرض صور','افتتاح سينمائي','تأكيد حضور RSVP'],fr:['Tout Essentiel','Musique + galerie','Ouverture cinématique','RSVP'],en:['All Essential','Music + gallery','Cinematic opening','RSVP']}},
@@ -28,11 +29,14 @@ function loadCFG(){
   banner:Object.assign({},fc.banner||{},lc.banner||{}),
   designs:Object.assign({},fc.designs||{},lc.designs||{}),
   edi:Object.assign({},fc.edi||{},lc.edi||{}),
-  films:Object.assign({},fc.films||{},lc.films||{})};
+  films:Object.assign({},fc.films||{},lc.films||{}),
+  envStyle:lc.envStyle||fc.envStyle||'',
+  env:Object.assign({},fc.env||{},lc.env||{})};
  CFG=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(CFG.sec,cc.sec||{});Object.assign(CFG.price,cc.price||{});
  CFG.wa=cc.wa||CFG_DEF.wa;CFG.d17=cc.d17||CFG_DEF.d17;Object.assign(CFG.banner,cc.banner||{});CFG.designs=cc.designs||{};
  Object.assign(CFG.edi,cc.edi||{});CFG.films=cc.films||{};
+ if(cc.envStyle)CFG.envStyle=cc.envStyle;Object.assign(CFG.env,cc.env||{});
  CFG.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),(fc.media||{}),(lc.media||{}));
  for(let i=DESIGNS.length-1;i>=0;i--)if(DESIGNS[i]._custom)DESIGNS.splice(i,1);
  (CFG.media.customDesigns||[]).forEach((cd,ix)=>{const nm=cd.nm||('قالب '+(ix+1));
