@@ -307,10 +307,8 @@ function ediDressHTML(){
 /* The light sections had no film behind them and read as flat cream. This bleeds
    the film's own poster through at low opacity so the colour keeps flowing. */
 function ediTint(seed){
- const f=S.c.films&&(S.c.films.venue||S.c.films.hero);
- if(!f)return '';
- const img=/\.mp4$/i.test(f)?f.replace(/\.mp4$/i,'.jpg'):f;
- return `<div class="edi-tint t${(seed||0)%3}" style="background-image:url('${img}')"></div>`;}
+ if(!(S.c.films&&(S.c.films.venue||S.c.films.hero)))return '';
+ return `<div class="edi-tint t${(seed||0)%3}"></div>`;}
 
 /* ---- optional notes: directions, accommodation ----
    Same shape for both, so adding another later costs one entry. */
@@ -486,6 +484,9 @@ function mountEditorial(stage){
 
 function editorialOpen(){
  closeVeil(true);
+ /* the landing page is still behind the veil; give its decoders back before
+    the invitation asks for its own */
+ try{lazyvReleaseAll()}catch(e){}
  veil=document.createElement('div');
  veil.className='veil edi-veil-root'+(S.c.ediPal?' pal-'+S.c.ediPal:'');
  document.body.appendChild(veil);document.body.style.overflow='hidden';

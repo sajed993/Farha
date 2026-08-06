@@ -118,10 +118,9 @@ function filmShelfHTML(){
   <div class="rd-grid">${list.map(f=>`
    <article class="rd-card">
     <div class="rd-stage" onclick="openReady('${f.id}')">
-     <div class="rd-bleed" style="background-image:url('${f.p}')"></div>
+     <div class="rd-bleed" style="--b1:${(f.sw&&f.sw[1])||'#AE7E70'};--b2:${(f.sw&&f.sw[2])||'#EFDFC2'}"></div>
      <div class="rd-glow"></div>
-     ${iphoneHTML(`<video class="rd-v" src="${f.v}" poster="${f.p}"
-        muted loop playsinline preload="none"></video>`)}
+     ${iphoneHTML(lazyvHTML(f.v,'rd-v'))}
      <span class="rd-play">▶</span>
     </div>
     <div class="rd-meta">
@@ -161,14 +160,7 @@ function filmShelfMount(){
  const host=document.getElementById('ready');
  if(!host||host.dataset.mounted)return;
  host.dataset.mounted='1';
- const vids=[...host.querySelectorAll('.rd-v')];
- if(!vids.length)return;
- if(!('IntersectionObserver' in window)){vids.forEach(v=>{v.preload='auto';v.play().catch(()=>{})});return;}
- const io=new IntersectionObserver(es=>es.forEach(e=>{
-  const v=e.target;
-  if(e.isIntersecting){if(v.preload!=='auto')v.preload='auto';v.play().catch(()=>{});}
-  else if(!v.paused)v.pause();}),{threshold:.35});
- vids.forEach(v=>io.observe(v));}
+ lazyvWatch([...host.querySelectorAll('.iph-scr')]);}
 
 /* Placeholder copy for the optional notes until the couple fills them in. */
 function ediDemoNote(k){

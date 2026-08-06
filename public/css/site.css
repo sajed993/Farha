@@ -2535,8 +2535,15 @@ html[dir=rtl] .wenv-hint{font-family:var(--bodyA);letter-spacing:.02em;text-tran
  background:#E8DAC0;box-shadow:0 26px 60px -30px rgba(90,68,36,.5),inset 0 0 0 1px rgba(176,128,31,.2);
  transition:transform .55s cubic-bezier(.2,.8,.2,1),box-shadow .55s}
 .rd-card:hover .rd-stage{transform:translateY(-8px);box-shadow:0 40px 80px -32px rgba(90,68,36,.6),inset 0 0 0 1px rgba(176,128,31,.35)}
-.rd-bleed{position:absolute;inset:-14%;background-size:cover;background-position:center;
- filter:blur(32px) saturate(1.22) brightness(1.06) contrast(.96);transform:scale(1.12);opacity:.92}
+/* The colour wash behind each card. This used to be a 32px blur of the
+   poster; ten of those at a third of a megapixel each is a large part of why
+   the shelf crawled on iOS. Two radial stops in the film's own colours read
+   the same and cost nothing. */
+.rd-bleed{position:absolute;inset:-14%;opacity:.9;
+ background:
+  radial-gradient(56% 48% at 32% 26%,var(--b1,#AE7E70),transparent 70%),
+  radial-gradient(58% 52% at 70% 74%,var(--b2,#EFDFC2),transparent 72%),
+  linear-gradient(160deg,var(--b2,#EFDFC2),var(--b1,#AE7E70))}
 .rd-glow{position:absolute;inset:0;mix-blend-mode:soft-light;background:
  radial-gradient(74% 56% at 50% 6%,rgba(255,247,228,.72),transparent 64%),
  linear-gradient(180deg,rgba(255,246,224,.3),transparent 42%,rgba(120,82,30,.34))}
@@ -2686,12 +2693,24 @@ html[dir=rtl] .edi-note-d{font-family:var(--serifA);font-style:normal}
    Heavily blurred and low opacity: it reads as a tint in the palette's own
    hues, not as a picture. Each variant crops differently so consecutive
    sections do not look identical. */
-.edi-tint{position:absolute;inset:-18%;z-index:0;pointer-events:none;
- background-size:cover;background-position:center;
- filter:blur(58px) saturate(1.45) brightness(1.06);opacity:.42;
- transform:scale(1.12)}
-.edi-tint.t1{background-position:28% 34%;transform:scale(1.2) rotate(6deg);opacity:.36}
-.edi-tint.t2{background-position:70% 68%;transform:scale(1.16) rotate(-5deg);opacity:.32}
+/* Seven of these, each a 58px blur over more than a full screen, came to
+   about four megapixels of live blur inside one invitation. The palette's own
+   colours in a gradient give the same wash for nothing. */
+.edi-tint{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5;
+ background:
+  radial-gradient(58% 46% at 26% 22%,color-mix(in srgb,var(--blush) 78%,transparent),transparent 70%),
+  radial-gradient(54% 48% at 76% 76%,color-mix(in srgb,var(--gold) 62%,transparent),transparent 72%),
+  linear-gradient(158deg,var(--cream-hi),var(--beige))}
+.edi-tint.t1{opacity:.42;
+ background:
+  radial-gradient(56% 48% at 72% 26%,color-mix(in srgb,var(--blush) 72%,transparent),transparent 70%),
+  radial-gradient(56% 50% at 24% 74%,color-mix(in srgb,var(--sage) 52%,transparent),transparent 72%),
+  linear-gradient(196deg,var(--cream-hi),var(--beige))}
+.edi-tint.t2{opacity:.38;
+ background:
+  radial-gradient(52% 46% at 50% 18%,color-mix(in srgb,var(--gold-hi) 66%,transparent),transparent 68%),
+  radial-gradient(58% 52% at 40% 82%,color-mix(in srgb,var(--blush) 58%,transparent),transparent 72%),
+  linear-gradient(172deg,var(--cream-hi),var(--beige))}
 /* a wash of the palette over the tint keeps type legible.
    Note: no blanket rule on `.edi-tint + *` — that outranks .edi-frame's
    position:absolute and collapses the frame into the flow. */
@@ -2976,3 +2995,19 @@ html.is-preview .wenv-x,html.is-preview .edi-x,html.is-preview .wa-float,
 html.is-preview .cart-fab,html.is-preview .close-x{display:none!important}
 html.is-preview .edi{scrollbar-width:none}
 html.is-preview .edi::-webkit-scrollbar{display:none}
+
+/* ── lazy film plates ──
+   The poster is a real <img> so it paints on the first frame; the video is
+   laid under it and the poster only fades once a frame is actually showing,
+   so there is never a gap where the black backing shows through. */
+.lazyv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+ display:block;z-index:1;transition:opacity .45s ease}
+.lazyv-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+ display:block;z-index:0;transform:translateZ(0);backface-visibility:hidden}
+/* the phone screen no longer sits on black, so any gap reads as paper */
+.iph-scr{background:var(--cream2)}
+.spec-b{background:var(--cream2)}
+
+/* skip layout and paint for sections still well below the fold */
+#cats,#gallery,#open,#premium,#ultra,#sites,#datef{
+ content-visibility:auto;contain-intrinsic-size:auto 900px}

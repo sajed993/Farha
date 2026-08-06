@@ -1,4 +1,85 @@
 /* ================= landing ================= */
+/* ================= lazy film plates =================
+   Safari keeps a small, shared pool of video decoders and a <video> element
+   holds a slot even while paused. The landing page was building fifteen of
+   them up front, which is why iPhones crawled. It also explains the black
+   rectangles: with preload="none" Safari often will not paint the poster
+   attribute at all, so the black screen behind it showed through.
+
+   So no <video> exists until it is needed. Every plate starts as a plain
+   <img>, which paints immediately and costs nothing, and is upgraded to a
+   real video only while it is on screen — then torn back down, returning the
+   decoder. */
+const LAZYV_MAX = 4;            /* never hold more than this many decoders */
+const lazyvLive = [];
+
+function lazyvPoster(src){ return src.slice(0, -4) + '.jpg'; }
+
+/* <img> stand-in. data-v carries the clip it will become. */
+function lazyvHTML(src, cls){
+ return '<img class="lazyv ' + (cls || '') + '" src="' + lazyvPoster(src) +
+        '" data-v="' + src + '" alt="" decoding="async" loading="lazy">';
+}
+
+function lazyvDown(host){
+ const v = host.__lv;
+ if (!v) return;
+ try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {}
+ v.remove();
+ host.__lv = null;
+ const img = host.querySelector('.lazyv');
+ if (img) img.style.opacity = '';
+ const i = lazyvLive.indexOf(host);
+ if (i > -1) lazyvLive.splice(i, 1);
+}
+
+function lazyvUp(host){
+ if (host.__lv) return;
+ const img = host.querySelector('.lazyv');
+ if (!img) return;
+ const src = img.dataset.v;
+ if (!src) return;
+ /* free the oldest decoder before taking another */
+ while (lazyvLive.length >= LAZYV_MAX) lazyvDown(lazyvLive[0]);
+ const v = document.createElement('video');
+ v.muted = true; v.loop = true; v.playsInline = true;
+ v.setAttribute('playsinline', '');
+ v.setAttribute('webkit-playsinline', '');
+ v.preload = 'auto';
+ v.className = 'lazyv-v';
+ v.poster = img.currentSrc || img.src;
+ v.src = src;
+ /* the poster stays put until a frame is actually on screen, so there is
+    never a gap where the black backing shows */
+ v.addEventListener('playing', function(){ img.style.opacity = '0'; }, { once: true });
+ host.insertBefore(v, img.nextSibling);
+ host.__lv = v;
+ lazyvLive.push(host);
+ const go = v.play();
+ if (go && go.catch) go.catch(function(){});
+}
+
+/* Hand every decoder back at once — used when a full-screen veil takes over. */
+function lazyvReleaseAll(){ while (lazyvLive.length) lazyvDown(lazyvLive[0]); }
+
+/* Watch a set of hosts and keep only the visible ones upgraded. */
+function lazyvWatch(hosts){
+ if (!hosts.length) return;
+ const still = window.matchMedia &&
+   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const saver = navigator.connection && navigator.connection.saveData;
+ if (still || saver) return;            /* posters only */
+ if (!('IntersectionObserver' in window)) { hosts.slice(0, 2).forEach(lazyvUp); return; }
+ const io = new IntersectionObserver(function(es){
+  es.forEach(function(e){
+   const h = e.target;
+   if (e.isIntersecting && h.offsetParent !== null) lazyvUp(h);
+   else lazyvDown(h);
+  });
+ }, { threshold: .25 });
+ hosts.forEach(function(h){ io.observe(h); });
+}
+
 function navHTML(){return `<div class="nav">
  <div class="logo" onclick="go('land')"><b>${S.lang==='ar'?'فرحة':'Far7a'}</b><small>${t().brandS}</small></div>
  <nav class="menu">
@@ -25,10 +106,9 @@ const SPEC_BANDS=[
  {f:'/media/inv/soon.mp4',       c:'var(--acc-save)', k:'save', x:0}
 ];
 function heroSpectrum(){
- const poster=f=>f.slice(0,-4)+'.jpg';
  return `<div class="spec">${SPEC_BANDS.map(b=>`
   <span class="spec-b ${b.x?'x':''}">
-   <video src="${b.f}" poster="${poster(b.f)}" muted loop playsinline preload="none"></video>
+   ${lazyvHTML(b.f)}
    <i style="background:${b.c}"></i><b>${t().rdCats[b.k]}</b>
   </span>`).join('')}</div>
   <div class="spec-veil"></div><div class="hero-grain"></div>`;}
@@ -39,18 +119,7 @@ function heroSpectrumMount(){
  const h=document.querySelector('.hero');
  if(!h||h.dataset.specMounted)return;
  h.dataset.specMounted='1';
- const vids=[...h.querySelectorAll('.spec-b video')];
- if(!vids.length)return;
- const still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- if(still)return;                    /* posters only, nothing decodes */
- const play=v=>{if(v.preload!=='auto')v.preload='auto';v.play().catch(()=>{});};
- if(!('IntersectionObserver' in window)){vids.forEach(play);return;}
- const io=new IntersectionObserver(es=>es.forEach(e=>{
-  const v=e.target;
-  /* a band hidden at this width has no layout box, so it never starts */
-  if(e.isIntersecting&&v.offsetParent!==null)play(v);
-  else if(!v.paused)v.pause();}),{threshold:.05});
- vids.forEach(v=>io.observe(v));}
+ lazyvWatch([...h.querySelectorAll('.spec-b')]);}
 function landView(){
  return navHTML()+`
  <header class="hero">
