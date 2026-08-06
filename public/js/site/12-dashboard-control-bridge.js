@@ -296,7 +296,7 @@ function render(){applyCFGdom._raf=requestAnimationFrame(function(){try{applyCFG
  const sameView=prevView===S.view;
  const keepY=sameView?window.scrollY:0;
  app.innerHTML=S.view==='land'?landView():editorView();
- if(S.view==='land'){ambient();try{filmShelfMount()}catch(e){}}
+ if(S.view==='land'){ambient();try{filmShelfMount()}catch(e){}try{heroSpectrumMount()}catch(e){}}
  window.scrollTo(0,sameView?keepY:0);
  prevView=S.view;}
 function go(v){S.view=v;render();}
@@ -404,9 +404,18 @@ function spawnDust(host,init){if(!host||!host.isConnected)return;const d=documen
  d.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;--dx:${(Math.random()*80-40).toFixed(0)}px;
   animation-duration:${(7+Math.random()*8).toFixed(1)}s;animation-delay:${init?(-Math.random()*8).toFixed(1):0}s`;
  host.appendChild(d);setTimeout(()=>d.remove(),16000);}
-function spawnPetal(host,init){if(!host||!host.isConnected)return;const p=document.createElement('span');p.className='petal';
- p.textContent=['🌸','🌺','✿'][Math.floor(Math.random()*3)];
- p.style.cssText=`left:${Math.random()*100}%;--dx:${(Math.random()*120-60).toFixed(0)}px;font-size:${(0.8+Math.random()*0.8).toFixed(2)}rem;
-  animation-duration:${(9+Math.random()*7).toFixed(1)}s;animation-delay:${init?(-Math.random()*9).toFixed(1):0}s;opacity:.75`;
+/* A drawn petal rather than an emoji, so it takes the palette's colour and
+   renders the same on every device. */
+const PETAL_SVG='<svg viewBox="0 0 40 30" fill="none" aria-hidden="true">'
+ +'<path d="M20 3c9 0 17 6 17 12s-8 12-17 12S3 21 3 15 11 3 20 3Z" fill="currentColor" fill-opacity=".62"/>'
+ +'<path d="M20 3v24" stroke="currentColor" stroke-opacity=".4" stroke-width="1"/></svg>';
+function spawnPetal(host,init){if(!host||!host.isConnected)return;
+ const p=document.createElement('span');p.className='petal';
+ p.innerHTML=PETAL_SVG;
+ const w=(13+Math.random()*16).toFixed(0);
+ p.style.cssText=`left:${Math.random()*100}%;--dx:${(Math.random()*120-60).toFixed(0)}px;
+  width:${w}px;height:${Math.round(w*0.75)}px;transform:rotate(${(Math.random()*80-40).toFixed(0)}deg);
+  animation-duration:${(9+Math.random()*7).toFixed(1)}s;animation-delay:${init?(-Math.random()*9).toFixed(1):0}s;
+  opacity:${(0.26+Math.random()*0.22).toFixed(2)}`;
  host.appendChild(p);setTimeout(()=>p.remove(),17000);}
 

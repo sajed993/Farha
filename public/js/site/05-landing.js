@@ -5,22 +5,56 @@ function navHTML(){return `<div class="nav">
   <a onclick="scrollSec('gallery')" href="javascript:void(0)">${t().navTpl}</a>
   <a onclick="scrollSec('cats')" href="javascript:void(0)">${t().navCats}</a>
   <a onclick="scrollSec('open')" href="javascript:void(0)">${t().navOpen}</a>
-  <a class="prem" onclick="scrollSec('ready')" href="javascript:void(0)" style="color:#B0801F">✦ ${t().rdNav}</a>
-  <a class="prem" onclick="scrollSec('ultra')" href="javascript:void(0)" style="color:#E3C77E">✦ ${t().uBadge}</a>
+  <a class="prem" onclick="scrollSec('ready')" href="javascript:void(0)" style="color:var(--gold2)">✦ ${t().rdNav}</a>
+  <a class="prem" onclick="scrollSec('ultra')" href="javascript:void(0)" style="color:var(--gold3)">✦ ${t().uBadge}</a>
   <a class="prem" onclick="scrollSec('premium')" href="javascript:void(0)">${t().navPrem}</a>
   <a class="prem" onclick="scrollSec('sites')" href="javascript:void(0)">${t().navSites}</a>
-  <a class="prem" onclick="scrollSec('datef')" href="javascript:void(0)" style="color:#C24C72">${t().dfKick.split(' ')[0]} ❤️</a>
+  <a class="prem" onclick="scrollSec('datef')" href="javascript:void(0)" style="color:var(--acc-grad)">${t().dfKick.split(' ')[0]} ❤️</a>
  </nav>
  <div class="nav-actions">
   <button class="lang-btn" onclick="toggleLang()">${t().langBtn}</button>
   <button class="btn-gold" onclick="openScratch()">${t().navStart}</button>
  </div></div>`;}
-function heroCards(){
- const picks=[DESIGNS[0],DESIGNS[8],DESIGNS[4]];
- return picks.map((d,i)=>`<div class="fcard fc${i+1}">${inviteHTML(d,{...d.def[S.lang],font:0,pal:0,frame:true})}</div>`).join('');}
+/* الطيف — one band per occasion, each showing that film under its own colour.
+   The two marked .x only render on screens wide enough to carry five. */
+const SPEC_BANDS=[
+ {f:'/media/inv/inv-1.mp4',      c:'var(--acc-wed)',  k:'wed',  x:0},
+ {f:'/media/inv/bday-cake.mp4',  c:'var(--acc-bday)', k:'bday', x:1},
+ {f:'/media/inv/baby-basket.mp4',c:'var(--acc-baby)', k:'baby', x:0},
+ {f:'/media/inv/grad.mp4',       c:'var(--acc-grad)', k:'grad', x:1},
+ {f:'/media/inv/soon.mp4',       c:'var(--acc-save)', k:'save', x:0}
+];
+function heroSpectrum(){
+ const poster=f=>f.slice(0,-4)+'.jpg';
+ return `<div class="spec">${SPEC_BANDS.map(b=>`
+  <span class="spec-b ${b.x?'x':''}">
+   <video src="${b.f}" poster="${poster(b.f)}" muted loop playsinline preload="none"></video>
+   <i style="background:${b.c}"></i><b>${t().rdCats[b.k]}</b>
+  </span>`).join('')}</div>
+  <div class="spec-veil"></div><div class="hero-grain"></div>`;}
+
+/* Decode only while the hero is on screen. Five clips playing behind a
+   scrolled-past hero is what makes a phone run hot. */
+function heroSpectrumMount(){
+ const h=document.querySelector('.hero');
+ if(!h||h.dataset.specMounted)return;
+ h.dataset.specMounted='1';
+ const vids=[...h.querySelectorAll('.spec-b video')];
+ if(!vids.length)return;
+ const still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(still)return;                    /* posters only, nothing decodes */
+ const play=v=>{if(v.preload!=='auto')v.preload='auto';v.play().catch(()=>{});};
+ if(!('IntersectionObserver' in window)){vids.forEach(play);return;}
+ const io=new IntersectionObserver(es=>es.forEach(e=>{
+  const v=e.target;
+  /* a band hidden at this width has no layout box, so it never starts */
+  if(e.isIntersecting&&v.offsetParent!==null)play(v);
+  else if(!v.paused)v.pause();}),{threshold:.05});
+ vids.forEach(v=>io.observe(v));}
 function landView(){
  return navHTML()+`
  <header class="hero">
+  ${heroSpectrum()}
   <div class="hero-copy">
    <span class="kicker">${t().badge}</span>
    <h1>${t().h1a}<br><span class="foil">${t().h1b}</span></h1>
@@ -30,7 +64,6 @@ function landView(){
     <button class="btn-line" onclick="scrollSec('gallery')">${t().ctaExplore}</button>
    </div>
   </div>
-  <div class="hero-art" id="heroArt">${heroCards()}</div>
  </header>
  ${filmShelfHTML()}
  <section id="cats">
