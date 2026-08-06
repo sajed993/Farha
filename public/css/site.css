@@ -14,12 +14,14 @@
  --acc-grad:#C86A8A;   /* قبّعة وورد */
  --acc-save:#8E7AA0;   /* ظلال الوستارية — lilac */
  --acc-cool:#5E88AA;   /* خواتم النور — the window, fully derived */
- /* the brand itself. Everything used to be beige and gold, which said
-    "wedding stationery" and nothing else. The signature is now the carmine
-    measured off ليلة الحنّة — #8E221C at 0.80 saturation — with gold kept for
-    hairlines and ornament rather than carrying the whole identity. */
- --brand:#9E2B22;--brand-d:#6E1A14;--brand-l:#C0564A;--brand-pale:#F5DED8;
- --brandFoil:linear-gradient(105deg,#6E1A14,#C0564A 24%,#9E2B22 46%,#D8806F 70%,#7E2018);
+ /* The brand accent, picked in OKLCH rather than by eye. The page's accent
+    family sits at mean L .621 / C .096; the carmine tried before was C .153,
+    1.59x that chroma, which is exactly why it read as a foreign colour rather
+    than one of the set. This is a dusty rose held at the family's own chroma,
+    on a hue between the marble rose (37deg) and the graduation pink (0deg).
+    White on the fill measures 4.57:1, and the deep-on-pale pair 6.16:1. */
+ --brand:#AA606A;--brand-d:#813F49;--brand-l:#D6959C;--brand-pale:#F8E1E3;
+ --brandFoil:linear-gradient(105deg,#813F49,#D6959C 24%,#AA606A 46%,#E2ABB1 70%,#8E4852);
  --rose:#AE7E70;--roseS:#F0DCD5;--sage:#9AA184;--blue:#5E88AA;--emerald:#1A4A3E;
  --line:rgba(126,95,38,.24);--line2:rgba(126,95,38,.13);
  --foil:linear-gradient(105deg,#7E5F26,#E6CE96 28%,#A9803A 52%,#F4E6C6 76%,#9A742C);
@@ -136,9 +138,9 @@ html[dir=ltr] .spec-b b{font-family:'Cinzel',serif;text-transform:uppercase}
 .spec-b.x{display:none}
 /* a clearing in the middle so the words never fight the footage */
 .spec-veil{position:absolute;inset:0;z-index:1;pointer-events:none;
- background:radial-gradient(58% 34% at 50% 47%,color-mix(in srgb,var(--paper) 97%,transparent) 0%,
-  color-mix(in srgb,var(--paper) 90%,transparent) 44%,
-  color-mix(in srgb,var(--paper) 30%,transparent) 76%,transparent 100%)}
+ background:radial-gradient(52% 30% at 50% 47%,color-mix(in srgb,var(--paper) 95%,transparent) 0%,
+  color-mix(in srgb,var(--paper) 84%,transparent) 48%,
+  color-mix(in srgb,var(--paper) 22%,transparent) 80%,transparent 100%)}
 .hero-grain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.3;mix-blend-mode:multiply;
  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='.4'/%3E%3C/svg%3E")}
 
@@ -166,11 +168,19 @@ html[dir=ltr] .spec-b b{font-family:'Cinzel',serif;text-transform:uppercase}
 /* phones: three bands, a wider clearing, buttons full width */
 @media(max-width:560px){
  .hero{padding:96px 16px 46px}
- .spec-veil{background:radial-gradient(78% 31% at 50% 48%,
-   color-mix(in srgb,var(--paper) 98%,transparent) 0%,
-   color-mix(in srgb,var(--paper) 94%,transparent) 46%,
-   color-mix(in srgb,var(--paper) 38%,transparent) 78%,transparent 100%)}
- .spec-b i{opacity:.55}
+ /* the clearing is now tight around the words instead of a wash over the
+    whole screen, so the films actually read on a phone */
+ .spec-veil{background:radial-gradient(62% 24% at 50% 47%,
+   color-mix(in srgb,var(--paper) 96%,transparent) 0%,
+   color-mix(in srgb,var(--paper) 86%,transparent) 52%,
+   color-mix(in srgb,var(--paper) 20%,transparent) 84%,transparent 100%)}
+ .spec-b i{opacity:.3}
+ .spec-b video,.spec-b img{filter:saturate(1.14) contrast(1.08)}
+ /* a soft plate behind the copy carries legibility instead */
+ .hero-copy{background:radial-gradient(112% 74% at 50% 46%,
+   color-mix(in srgb,var(--paper) 92%,transparent) 0%,
+   color-mix(in srgb,var(--paper) 66%,transparent) 62%,transparent 100%);
+   padding:18px 10px;border-radius:26px}
  .spec-b b{font-size:.52rem;letter-spacing:.13em;bottom:max(14px,2.4vh)}
  .hero .sub{margin-bottom:24px}
  .hero-ctas{flex-direction:column;align-items:stretch}
@@ -2572,18 +2582,21 @@ html[dir=rtl] .wenv-hint{font-family:var(--bodyA);letter-spacing:.02em;text-tran
 
 .rd-meta{padding:20px 6px 0;text-align:center}
 .rd-meta b{display:block;font-family:'Cinzel','Cormorant Garamond',serif;font-weight:400;
- font-size:clamp(1.05rem,3vw,1.3rem);letter-spacing:.12em;text-transform:uppercase;color:#7A5A1C}
+ font-size:clamp(1.05rem,3vw,1.3rem);letter-spacing:.12em;text-transform:uppercase;color:var(--brand-d)}
 html[dir=rtl] .rd-meta b{font-family:var(--dispA);font-weight:700;letter-spacing:0;text-transform:none;
  font-size:clamp(1.3rem,4vw,1.65rem)}
 .rd-meta p{margin-top:8px;font-size:.85rem;line-height:1.78;color:#6B583C;min-height:4.6em}
 .rd-acts{display:grid;gap:8px;justify-content:stretch;margin-top:16px}
 .rd-btn{border-radius:2px;padding:11px 16px;font-weight:600;font-size:.82rem;transition:.3s;
  border:1px solid #8A6A2B;letter-spacing:.02em;width:100%}
-.rd-btn.gold{background:linear-gradient(120deg,#B0801F,#8A6A2B);color:#FCF8F0;
+.rd-btn.gold{background:linear-gradient(158deg,var(--brand-l),var(--brand) 40%,var(--brand-d));
+ color:#FFF6F3;box-shadow:inset 0 1px 0 rgba(255,225,218,.34),
+  inset 0 0 0 1px color-mix(in srgb,var(--gold) 26%,transparent);
  box-shadow:0 12px 28px -14px rgba(138,106,43,.8)}
 .rd-btn.gold:hover{transform:translateY(-2px)}
-.rd-btn.ghost{background:transparent;color:#7A5A1C;border-color:rgba(138,106,43,.4)}
-.rd-btn.ghost:hover{background:rgba(138,106,43,.1)}
+.rd-btn.ghost{background:transparent;color:var(--brand-d);
+ border-color:color-mix(in srgb,var(--brand) 38%,transparent)}
+.rd-btn.ghost:hover{background:color-mix(in srgb,var(--brand) 10%,transparent)}
 
 /* ---- the phone ----
    Titanium rail built from a multi-stop gradient so the light reads as
@@ -2795,11 +2808,12 @@ html[dir=ltr] .edi-pos{font-family:'Cormorant Garamond',serif;font-style:italic;
 
 /* ── category chips + tag on the shelf ── */
 .rd-filters{margin-bottom:clamp(24px,4vw,38px)}
-#ready .chip{border-color:color-mix(in srgb,#B0801F 34%,transparent);color:#7A5A1C;background:rgba(255,255,255,.62)}
-#ready .chip:hover{border-color:#B0801F}
-#ready .chip.on{background:#7A5A1C;border-color:#7A5A1C;color:#FCF8F0}
+#ready .chip{border-color:color-mix(in srgb,var(--brand) 30%,transparent);color:var(--brand-d);
+ background:rgba(255,255,255,.66)}
+#ready .chip:hover{border-color:var(--brand)}
+#ready .chip.on{background:var(--brand-d);border-color:var(--brand-d);color:#FFF6F3}
 .rd-cat{display:block;font-family:'Reem Kufi',var(--bodyA);font-size:.66rem;letter-spacing:.14em;
- color:#9A845E;margin-bottom:5px}
+ color:var(--taupe);margin-bottom:5px}
 html[dir=ltr] .rd-cat{font-family:'Cinzel',serif;text-transform:uppercase;letter-spacing:.18em}
 
 /* ============ ENVELOPE STYLES ============
@@ -3033,3 +3047,11 @@ html.is-preview .edi::-webkit-scrollbar{display:none}
 /* skip layout and paint for sections still well below the fold */
 #cats,#gallery,#open,#premium,#ultra,#sites,#datef{
  content-visibility:auto;contain-intrinsic-size:auto 900px}
+
+/* the ready-made films carry an opening price against a struck original */
+.rd-price{display:inline-flex;align-items:baseline;gap:.5em;direction:rtl}
+.rd-price s{opacity:.6;font-weight:500;text-decoration-thickness:1px}
+.rd-price b{font-weight:800}
+.rd-save{display:inline-block;margin-inline-start:.5em;border-radius:99px;padding:2px 8px;
+ font-size:.68rem;font-weight:700;color:#FFF6F3;
+ background:linear-gradient(158deg,var(--brand-l),var(--brand) 45%,var(--brand-d))}

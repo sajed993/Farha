@@ -3,7 +3,11 @@ const EM={gift:String.fromCodePoint(0x1F381),check:String.fromCodePoint(0x2705),
 const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'farha_meta'};
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-const CFG_DEF={sec:{ultra:1,premium:1,ai:1,sites:1,datef:1,open:1,wishes:1,ready:1},price:{ultra:199,ai:249,site:149,design:79},
+/* Everything except the newest section is off for now; each is one switch
+   away in the dashboard. */
+const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,
+  cats:0,gallery:0,ready:1},
+ price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},
  edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},
  envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},
  vid:{site:'full',customer:'full'},
@@ -128,7 +132,8 @@ function cfgShow(d){return !d._hide;}
 function applyCFGdom(){
  try{ensureWaFloat()}catch(e){}
  try{cartFab()}catch(e){}
- const map={ultra:'#ultra',premium:'#premium',sites:'#sites',datef:'#datef',open:'#open',ready:'#ready'};
+ const map={ultra:'#ultra',premium:'#premium',sites:'#sites',datef:'#datef',open:'#open',
+  ready:'#ready',cats:'#cats',gallery:'#gallery'};
  for(const k in map){const on=!!CFG.sec[k];const e=document.querySelector(map[k]);
   if(e)e.style.display=on?'':'none';
   document.querySelectorAll('[onclick*="scrollSec(\''+k+'\')"]').forEach(a=>a.style.display=on?'':'none');}

@@ -106,7 +106,13 @@ function readyFilm(id){return FILMS_READY.find(f=>f.id===id)||FILMS_READY[0];}
 function readyCfg(id){return (typeof CFG!=='undefined'&&CFG&&CFG.films&&CFG.films[id])||{};}
 function readyShown(){return FILMS_READY.filter(f=>readyCfg(f.id).vis!==false);}
 function readyName(f){const o=readyCfg(f.id);return (o.nm&&o.nm.trim())||f.name[S.lang];}
-function readyPrice(f){const o=readyCfg(f.id);return o.price||CFG.price.ultra;}
+function readyPrice(f){const o=readyCfg(f.id);return o.price||CFG.price.ready||CFG.price.ultra;}
+/* the price it is discounted from; hidden when it is not actually lower */
+/* Arabic-Indic digits in Arabic, Latin elsewhere — matches the invitations */
+function rdNum(n){return S.lang==='ar'?toAr(n):String(n);}
+function readyWas(f){const o=readyCfg(f.id);
+ const was=o.was||CFG.price.readyWas||0;
+ return was>readyPrice(f)?was:0;}
 
 /* An iPhone: titanium rail, Dynamic Island, side buttons, a little screen glare. */
 function iphoneHTML(inner,cls){
@@ -136,12 +142,16 @@ function filmShelfHTML(){
      <span class="rd-play">▶</span>
     </div>
     <div class="rd-meta">
-     <span class="rd-cat">${t().rdCats[f.cat]}</span>
+     <span class="rd-cat">${t().rdCats[f.cat]}${readyWas(f)?`<i class="rd-save">${t().save}</i>`:''}</span>
      <b>${esc(readyName(f))}</b>
      <p>${f.blurb[S.lang]}</p>
      <div class="rd-acts">
       <button class="rd-btn gold" onclick="openReady('${f.id}')">${t().rdOpen}</button>
-      <button class="rd-btn ghost" onclick="addToCart('${readyName(f).replace(/'/g,'')}',${readyPrice(f)})">${t().rdOrder}</button>
+      <button class="rd-btn ghost" onclick="addToCart('${readyName(f).replace(/'/g,'')}',${readyPrice(f)})">
+       ${t().rdOrder}
+       <span class="rd-price">${readyWas(f)?`<s>${rdNum(readyWas(f))}</s>`:''}
+        <b>${rdNum(readyPrice(f))} ${t().cur}</b></span>
+      </button>
      </div>
     </div>
    </article>`).join('')}</div>
