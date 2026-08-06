@@ -1,7 +1,15 @@
 /* ================= music ================= */
 let AC=null,playing=[],AUD=null;
+/* Slot 1 used to be a synthesised oscillator melody — the "romantic piano".
+   It is now a real recording; 2 and 3 remain synth until they are replaced too. */
+const TRACKS={1:'/media/snd/piano.webm'};
+/* Measured RMS per clip ran from 0.049 to 0.258 and wisteria peaked at 1.053,
+   which clips. These gains level everything to ~0.06 RMS and pull every peak
+   back under 1, so switching films does not jump in volume. */
+const TRACK_VOL={'marble.webm':.32,'oneday.webm':.48,'wisteria.webm':.23,
+ 'rings.webm':.68,'piano.webm':1};
+function trackVol(url){return TRACK_VOL[String(url).split('/').pop()]||.6;}
 const MEL={
- 1:{wave:'sine',bpm:66,notes:[[392,2],[523,2],[659,3],[587,2],[523,2],[659,4],[784,2],[659,2],[587,3],[523,2],[494,2],[523,6]]},
  2:{wave:'triangle',bpm:138,notes:[[523,1],[523,1],[659,2],[523,2],[698,2],[659,4],[523,1],[523,1],[659,2],[523,2],[784,2],[698,4],[880,2],[784,2],[698,2],[659,4]]},
  3:{wave:'sine',bpm:88,notes:[[587,2],[622,2],[740,3],[622,2],[587,2],[554,3],[587,2],[698,2],[622,3],[587,2],[554,2],[587,5]]}};
 let fadeI=null;
@@ -11,8 +19,16 @@ function fadeTo(v,ms,cb){if(!AUD){if(cb)cb();return;}
  fadeI=setInterval(()=>{k++;if(!AUD){clearInterval(fadeI);return;}
   AUD.volume=Math.min(1,Math.max(0,from+dv*k));
   if(k>=steps){clearInterval(fadeI);if(AUD)AUD.volume=Math.min(1,Math.max(0,v));if(cb)cb();}},40);}
+/* Loop a real audio file. Used by the built-in tracks and by each ready film. */
+function playTrack(url,vol){
+ if(!url)return;
+ AUD=new Audio(url);AUD.loop=true;AUD.volume=0;
+ AUD.play().catch(()=>{});
+ fadeTo(vol===undefined?trackVol(url):vol,1400);}
 function playMusic(i){stopMusic();
  if(!i)return;
+ if(S.c.trackUrl){playTrack(S.c.trackUrl);return;}
+ if(TRACKS[i]){playTrack(TRACKS[i]);return;}
  if(i===4&&S.c.track){
   AUD=new Audio(S.c.track.url);
   const st=Math.max(0,+S.c.trackStart||0);
