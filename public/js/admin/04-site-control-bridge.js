@@ -259,6 +259,10 @@ function readyView(){
       <option value="">الافتراضي</option>${envOpt(o.env||'')}</select></label>
      <label>عرض الفيلم<select onchange="ctlFilm('${id}','vid',this.value)">
       <option value="">الافتراضي</option>${vidOpt(o.vid||'')}</select></label>
+     <label>رابط الموسيقى<input placeholder="/media/snd/….webm"
+      value="${escA(o.snd||'')}" onchange="ctlFilm('${id}','snd',this.value)"></label>
+     <label>اسم الأغنية<input placeholder="الفنّان — العنوان"
+      value="${escA(o.sndN||'')}" onchange="ctlFilm('${id}','sndN',this.value)"></label>
     </div>
    </div>`;}).join(''))
  + ctlCard('🧩 أقسام الدعوة','ما يظهر داخل الدعوة نفسها — بلا أي شيء عن الطعام أو الحساسية.',

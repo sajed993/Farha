@@ -125,6 +125,7 @@ img{display:block}
  padding:104px 20px 56px;overflow:hidden;isolation:isolate;background:var(--cream)}
 
 .spec{position:absolute;inset:0;z-index:0;display:grid;grid-template-columns:repeat(5,1fr)}
+/* the column count is written inline from however many bands the shelf gives */
 .spec-b{position:relative;overflow:hidden}
 .spec-b video,.spec-b img{width:100%;height:100%;object-fit:cover;display:block;
  filter:saturate(1.08) contrast(1.04);transform:translateZ(0);backface-visibility:hidden}

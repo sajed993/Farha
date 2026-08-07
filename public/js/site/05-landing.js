@@ -96,18 +96,34 @@ function navHTML(){return `<div class="nav">
   <button class="lang-btn" onclick="toggleLang()">${t().langBtn}</button>
   <button class="btn-gold" onclick="openScratch()">${t().navStart}</button>
  </div></div>`;}
-/* الطيف — one band per occasion, each showing that film under its own colour.
-   The two marked .x only render on screens wide enough to carry five. */
-const SPEC_BANDS=[
- {f:'/media/inv/inv-1.mp4',      c:'var(--acc-wed)',  k:'wed',  x:0},
- {f:'/media/inv/bday-cake.mp4',  c:'var(--acc-bday)', k:'bday', x:1},
- {f:'/media/inv/baby-basket.mp4',c:'var(--acc-baby)', k:'baby', x:0},
- {f:'/media/inv/grad.mp4',       c:'var(--acc-grad)', k:'grad', x:1},
- {f:'/media/inv/soon.mp4',       c:'var(--acc-save)', k:'save', x:0}
-];
+/* الطيف — one band per occasion. The films used to be named here by
+   filename, which meant adding an invitation left the hero showing the old
+   five and hiding one left the hero still playing it. The bands are drawn from
+   the shelf now: the first visible film of each occasion, in category order. */
+const SPEC_TINT={wed:'var(--acc-wed)',henna:'var(--acc-bday)',bday:'var(--acc-bday)',
+ baby:'var(--acc-baby)',grad:'var(--acc-grad)',save:'var(--acc-save)'};
+function specBands(){
+ let films=[];
+ try{films=readyShown();}catch(e){}
+ if(!films.length)return [];
+ const seen={},out=[];
+ RD_CATS.forEach(k=>{
+  if(k==='all')return;
+  const f=films.find(x=>x.cat===k&&!seen[x.id]);
+  if(f){seen[f.id]=1;out.push({f:f.v,c:SPEC_TINT[k]||'var(--acc-wed)',k:k});}
+ });
+ /* if the shelf holds fewer occasions than bands, fill from whatever is left
+    so the hero is never half empty */
+ for(let i=0;out.length<5&&i<films.length;i++){
+  const f=films[i];
+  if(!seen[f.id]){seen[f.id]=1;out.push({f:f.v,c:SPEC_TINT[f.cat]||'var(--acc-wed)',k:f.cat});}
+ }
+ return out.slice(0,5);}
 function heroSpectrum(){
- return `<div class="spec">${SPEC_BANDS.map(b=>`
-  <span class="spec-b ${b.x?'x':''}">
+ const bands=specBands();
+ if(!bands.length)return '';
+ return `<div class="spec" style="grid-template-columns:repeat(${bands.length},1fr)">${bands.map(b=>`
+  <span class="spec-b">
    ${lazyvHTML(b.f)}
    <i style="background:${b.c}"></i><b>${t().rdCats[b.k]}</b>
   </span>`).join('')}</div>

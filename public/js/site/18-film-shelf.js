@@ -94,7 +94,8 @@ function openReady(id){
   /* whatever the dashboard set for this film, else the scope default */
   envStyle:readyCfg(f.id).env||'',vidStyle:readyCfg(f.id).vid||'',
   dress:f.dress?{t:(f.dress[S.lang]||[])[0]||'',d:(f.dress[S.lang]||[])[1]||'',sw:f.sw||null}:null,
-  trackUrl:f.snd||'',trackName:f.sndN||'',
+  trackUrl:readyCfg(f.id).snd||f.snd||'',
+  trackName:readyCfg(f.id).sndN||f.sndN||'',
   dir:f.cat==='wed'?ediDemoNote('dir'):null,
   stay:f.cat==='wed'?ediDemoNote('stay'):null,
   program:ediDemoProgram(f.cat)};
