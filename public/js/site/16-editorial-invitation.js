@@ -515,7 +515,7 @@ function editorialOpen(){
  veil.className='veil edi-veil-root'+(S.c.ediPal?' pal-'+S.c.ediPal:'');
  /* a film added from the dashboard carries its colours rather than a class */
  if(S.c.ediSw){const v=ediPaletteVars(S.c.ediSw);if(v)veil.setAttribute('style',v);}
- document.body.appendChild(veil);document.body.style.overflow='hidden';
+ document.body.appendChild(veil);scrollSync();
  const stage=document.createElement('div');stage.className='cstage edi-stage';
  veil.appendChild(stage);
  /* The guest meets the envelope first; the invitation mounts behind it

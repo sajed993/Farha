@@ -12,7 +12,7 @@ const AIPAL=[['#F2C879','#8A5A3A','#2E5E66'],['#E9F0DF','#7C9482','#3A5E42'],['#
  ['#22304F','#5570B8','#0A0E1E'],['#F0A868','#C4667F','#2E5E66'],['#F7D3E2','#E3C77E','#7088C0']];
 let AIV=[null,null,null,null,null,null];
 function aiPremiere(url,title){closeVeil(true);
- veil=document.createElement('div');veil.className='veil premium';document.body.appendChild(veil);document.body.style.overflow='hidden';
+ veil=document.createElement('div');veil.className='veil premium';document.body.appendChild(veil);scrollSync();
  veil.innerHTML=`<div class="cstage" style="display:grid;place-items:center;background:#000">
   <div style="width:100%;max-width:760px;padding:14px;text-align:center">
    <div style="color:#E9C87B;font-weight:800;font-size:1.05rem;margin-bottom:10px">🎬 ${esc(title||'')}</div>
@@ -39,7 +39,7 @@ function aiPlay(i){
  const _f=aiList().find(x=>x.i===i);if(!_f||!_f.url){toast(t().aiNoVid);return;}
  closeVeil(true);
  veil=document.createElement('div');veil.className='veil';veil.style.background='#000';
- document.body.appendChild(veil);document.body.style.overflow='hidden';
+ document.body.appendChild(veil);scrollSync();
  veil.innerHTML=`<div class="aiplay">
    <video id="aivid" src="${_f.url}" playsinline autoplay></video>
    <div class="lbx t"></div><div class="lbx d"></div><div class="grainfx"></div>

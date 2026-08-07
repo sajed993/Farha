@@ -8,7 +8,7 @@ function cineShell(inner){
 function ceremony(intro){
  closeVeil(true);
  veil=document.createElement('div');veil.className='veil';
- document.body.appendChild(veil);document.body.style.overflow='hidden';
+ document.body.appendChild(veil);scrollSync();
  for(let i=0;i<22;i++){const d=document.createElement('span');d.className='dust';
   const s=(2+Math.random()*3.5).toFixed(1);
   d.style.cssText=`position:fixed;left:${Math.random()*100}%;width:${s}px;height:${s}px;--dx:${(Math.random()*70-35).toFixed(0)}px;
@@ -354,7 +354,7 @@ function demoAnim(i){
 function closeVeil(silent){
  const mv=veil&&veil.querySelector('#mv');if(mv){try{mv.pause()}catch(e){}}
  if(veil){veil.remove();veil=null;}
- document.body.style.overflow='';stopMusic();clearInterval(cdTimer);clearTimeout(showEndT);
+ scrollSync();stopMusic();clearInterval(cdTimer);clearTimeout(showEndT);
  try{clearInterval(ediCdT)}catch(e){}try{if(typeof ambT!=='undefined')clearInterval(ambT);}catch(e){}
  clearFilm();
  if(!silent&&demoBackup){S.design=demoBackup.design;S.c=demoBackup.c;demoBackup=null;}

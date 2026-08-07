@@ -131,13 +131,13 @@ function openOrder(filmId, tier) {
     <p class="frm-note">${esc(t().ordSkipNote)}</p>
   </div>`;
   document.body.appendChild(d);
-  document.body.style.overflow = 'hidden';
+  scrollSync();
   setTimeout(() => { const n = document.getElementById('ordName'); if (n) n.focus(); }, 60);
 }
 function closeOrder() {
   const d = document.getElementById('ordveil');
   if (d) d.remove();
-  if (!document.querySelector('.veil,.frm-veil')) document.body.style.overflow = '';
+  scrollSync();
 }
 function frmVal(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; }
 function frmCollect() {
@@ -194,6 +194,7 @@ function orderThanks(o) {
     <button class="frm-alt" onclick="closeOrder()">${esc(t().ordClose)}</button>
   </div>`;
   document.body.appendChild(d);
+  scrollSync();
 }
 
 /* ---- guest RSVP ------------------------------------------------------ */
@@ -212,9 +213,10 @@ function openRsvp(coming) {
     <button class="frm-go" onclick="submitRsvp(${coming ? 1 : 0})">${esc(t().rvSend)}</button>
   </div>`;
   document.body.appendChild(d);
+  scrollSync();
   setTimeout(() => { const n = document.getElementById('rvName'); if (n) n.focus(); }, 60);
 }
-function closeRsvp() { const d = document.getElementById('rvveil'); if (d) d.remove(); }
+function closeRsvp() { const d = document.getElementById('rvveil'); if (d) d.remove(); scrollSync(); }
 function submitRsvp(coming) {
   const name = frmVal('rvName');
   if (!name) { toast(t().rvNeed); return; }

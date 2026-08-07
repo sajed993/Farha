@@ -31,7 +31,7 @@ function ultraOpen(i){
  uIdx=i;const u=ULTRA[i];
  closeVeil(true);
  veil=document.createElement('div');veil.className='veil u-'+u.k;
- document.body.appendChild(veil);document.body.style.overflow='hidden';
+ document.body.appendChild(veil);scrollSync();
  const st=document.createElement('div');st.className='uveil';veil.appendChild(st);
  st.innerHTML=`
   <div class="uenv-wrap" id="uenvw" onclick="ultraCrack()">

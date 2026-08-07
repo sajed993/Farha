@@ -43,7 +43,7 @@ function playDateFlow(){
  closeVeil(true);
  S.df={step:0,style:-1,addr:'',day:null,time:-1,mon:6,yr:2026,noTries:0,noGone:false};
  veil=document.createElement('div');veil.className='veil';
- document.body.appendChild(veil);document.body.style.overflow='hidden';
+ document.body.appendChild(veil);scrollSync();
  const bg=document.createElement('div');bg.className='df-stage';veil.appendChild(bg);
  veil.insertAdjacentHTML('beforeend',`<button class="df-x" onclick="closeVeil()">✕</button>`);
  let hh='';for(let i=0;i<10;i++)hh+=`<i style="left:${5+i*10}%;bottom:-6%;--d:${(10+Math.random()*8).toFixed(1)}s;animation-delay:${(-Math.random()*14).toFixed(1)}s;font-size:${(1.4+Math.random()*1.8).toFixed(1)}rem">${['🤍','🌷','💗','✨'][i%4]}</i>`;
@@ -208,7 +208,7 @@ let showEndT=null;
 function playShow(){
  closeVeil(true);
  veil=document.createElement('div');veil.className='veil premium show-veil';
- document.body.appendChild(veil);document.body.style.overflow='hidden';
+ document.body.appendChild(veil);scrollSync();
  veil.insertAdjacentHTML('afterbegin',`<div class="cine-fx"><div class="vign"></div></div>`);
  veil.insertAdjacentHTML('beforeend',`<button class="close-x" onclick="closeVeil()">${t().closePrev}</button>`);
  const style=S.st.style,phs=stPhotoList(),n=phs.length;

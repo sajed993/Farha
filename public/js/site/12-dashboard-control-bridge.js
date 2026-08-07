@@ -326,6 +326,9 @@ function render(){
  app.innerHTML=S.view==='land'?landView():editorView();
  if(S.view==='land'){ambient();try{filmShelfMount()}catch(e){}try{heroSpectrumMount()}catch(e){}}
  window.scrollTo(0,sameView?keepY:0);
+ /* a backstop: whatever happened before this repaint, the page's ability to
+    scroll should match what is actually on screen once it finishes */
+ try{scrollSync()}catch(e){}
  prevView=S.view;}
 function go(v){S.view=v;render();}
 function scrollSec(id){
