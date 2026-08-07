@@ -2,7 +2,7 @@
 const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'farha_meta'};
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,cats:0,gallery:0,design:0,ready:1,offers:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,signPrice:249,signWas:0,signRevs:5,signDays:7},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},vid:{site:'full',customer:'full'},price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[],readyFilms:[]}};
+const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,cats:0,gallery:0,design:0,ready:1,offers:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,signPrice:249,signWas:0,signRevs:5,signDays:7,ribbonOn:1,noteOn:1,txt:{}},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},vid:{site:'full',customer:'full'},price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[],readyFilms:[]}};
 function loadCFG(){const cc=lsGet(LSK.cfg,{})||{};const o=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(o.sec,cc.sec||{});Object.assign(o.price,cc.price||{});o.wa=cc.wa||CFG_DEF.wa;o.d17=cc.d17||CFG_DEF.d17;
  Object.assign(o.banner,cc.banner||{});o.designs=cc.designs||{};
@@ -643,22 +643,106 @@ const OFFL=[
   'الزبون يختار فيلمًا ممّا نعرضه. أزرار الأسعار تحت كل فيلم تؤدّي إلى هذه الباقة.'],
  ['التوقيع','signPrice','signWas','signRevs','signDays',
   'دعوة تُصنع من الصفر. نموذج الطلب يفتح على «فيلم جديد» مباشرة.']];
+/* ---- the words on the cards, one language at a time ----
+   Every field is an override: leave it empty and the shipped line shows. The
+   tokens are what keep an edited card from going stale — {n} counts the films
+   on the shelf, {c} the occasions they cover, {r} the rounds set below, {d}
+   the days. Write them into any sentence and they stay live. */
+let OFFLANG='ar';
+function offLang(v){OFFLANG=v;renderContent();}
+function offTxtGet(k){
+ const T=(CFG.offers.txt||{})[OFFLANG]||{};
+ return T[k]===undefined?'':T[k];}
+function offTxtSet(k,v){
+ CFG.offers.txt=CFG.offers.txt||{};
+ CFG.offers.txt[OFFLANG]=CFG.offers.txt[OFFLANG]||{};
+ const o=CFG.offers.txt[OFFLANG];
+ if(String(v).trim()==='')delete o[k]; else o[k]=v;
+ saveCFG();}
+/* the bullets are edited as a block, one line each — the shape they are read in */
+function offLinesSet(k,v){
+ CFG.offers.txt=CFG.offers.txt||{};
+ CFG.offers.txt[OFFLANG]=CFG.offers.txt[OFFLANG]||{};
+ const arr=String(v||'').split('\n').map(x=>x.trim()).filter(Boolean);
+ const o=CFG.offers.txt[OFFLANG];
+ if(!arr.length)delete o[k]; else o[k]=arr;
+ saveCFG();}
+function offLinesGet(k){
+ const v=((CFG.offers.txt||{})[OFFLANG]||{})[k];
+ return Array.isArray(v)?v.join('\n'):'';}
+function offReset(){
+ if(!confirm('إعادة نصوص هذه اللغة إلى الأصل؟'))return;
+ if(CFG.offers.txt)delete CFG.offers.txt[OFFLANG];
+ saveCFG();renderContent();}
+
+const OFFLANGS=[['ar','العربية'],['fr','Français'],['en','English']];
+const OFFHEAD=[['kick','الشارة فوق العنوان','طريقتان'],
+ ['title','عنوان القسم','اختاروا فيلمًا صنعناه…'],
+ ['sub','السطر تحت العنوان','الأولى جاهزة وتصلكم بسرعة…']];
+const OFFCARD=[
+ ['ready','البطاقة الأولى — من الأفلام المعروضة',
+  [['rName','اسم الباقة','المجموعة'],
+   ['rRibbon','الشريط المائل (فارغ = بلا شريط)','الأكثر اختيارًا'],
+   ['rFor','لمن هي؟','لمن رأى فيلمًا من أفلامنا فأحبّه.'],
+   ['rCta','زرّ الطلب','اطلبوا من المجموعة'],
+   ['rSee','الزرّ الثاني','شاهدوا الأفلام أوّلًا']],
+  'rLines','{n} أفلام جاهزة على {c} مناسبات\nظرف يُفتح، شمع يُكسر\n{r} جولات تعديل\nتصلكم خلال {d} أيّام'],
+ ['sign','البطاقة الثانية — الدعوة الخاصة',
+  [['sName','اسم الباقة','التوقيع'],
+   ['sFor','لمن هي؟','لمن يريد دعوة لا توجد إلاّ عنده.'],
+   ['sCta','زرّ الطلب','ابدأوا دعوة خاصة'],
+   ['sNote','السطر تحت الزرّ (فارغ = بلا)','عدد محدود كلّ شهر…']],
+  'sLines','كل ما في «المجموعة»، ثمّ\nفيلم يُصنع من الصفر\n{r} جولات تعديل\nتصلكم خلال {d} أيّام']];
+
+function ctlOffOn(k,v){CFG.offers[k]=v?1:0;saveCFG();}
+function offSwitch(k,lbl){
+ return `<label class="ctlrow"><span>${lbl}</span>
+   <input type="checkbox" ${CFG.offers[k]===0?'':'checked'} onchange="ctlOffOn('${k}',this.checked)"></label>`;}
+function offField(k,lbl,ph){
+ return `<label class="offf"><span>${lbl}</span>
+   <input value="${escA(offTxtGet(k))}" placeholder="${escA(ph)}"
+    onchange="offTxtSet('${k}',this.value)"></label>`;}
+
 function offView(){
  let n=0;try{n=readyCatalogue().filter(f=>!(CFG.films[f.id]&&CFG.films[f.id].vis===false)).length;}catch(e){}
  const row=(lbl,k,suf)=>`<div class="ctlrow"><span>${lbl}</span>
    <span style="display:flex;align-items:center;gap:6px">
     <input class="cnum" type="number" min="0" value="${CFG.offers[k]|0}" onchange="ctlOff('${k}',this.value)">
     <small style="color:#8A7A63">${suf}</small></span></div>`;
- return OFFL.map(([nm,pk,wk,rk,dk,ds])=>ctlCard('\u{1F48E} باقة «'+nm+'»',ds,
+
+ const numbers=OFFL.map(([nm,pk,wk,rk,dk,ds])=>ctlCard('💎 أرقام «'+nm+'»',ds,
    row('السعر',pk,'د.ت')
   +row('السعر المشطوب (0 = بلا)',wk,'د.ت')
-  +row('جولات التعديل',rk,'جولة')
-  +row('مدة التسليم',dk,'يوم')
-  )).join('')
- +ctlCard('\u{1F522} عدد الأفلام المعروض في الباقة',
+  +row('جولات التعديل — {r}',rk,'جولة')
+  +row('مدة التسليم — {d}',dk,'يوم')
+  )).join('');
+
+ const shown=ctlCard('👁 ما يظهر على البطاقتين',
+   'الخانات الفارغة تعني «اعرضوا النصّ الأصلي»، فالإخفاء له مفتاحه.',
+   offSwitch('ribbonOn','الشريط المائل على البطاقة الأولى')
+  +offSwitch('noteOn','السطر تحت زرّ البطاقة الثانية'));
+
+ const tabs=`<div class="offtabs">${OFFLANGS.map(([k,nm])=>
+   `<button class="chip ${OFFLANG===k?'on':''}" onclick="offLang('${k}')">${nm}</button>`).join('')}
+   <button class="act" style="margin-inline-start:auto" onclick="offReset()">↺ إعادة للأصل</button></div>`;
+
+ const cards=OFFCARD.map(([id,nm,fields,lk,lph])=>ctlCard('✍️ '+nm,'',
+   fields.map(([k,l,ph])=>offField(k,l,ph)).join('')
+  +`<label class="offf"><span>بنود القائمة — سطر لكل بند</span>
+     <textarea rows="6" placeholder="${escA(lph)}"
+      onchange="offLinesSet('${lk}',this.value)">${escA(offLinesGet(lk))}</textarea></label>`)).join('');
+
+ return ctlCard('🌐 لغة النصوص',
+   'كل لغة نصوصها. اتركوا خانة فارغة فيظهر النصّ الأصلي. الرموز تعمل داخل أيّ جملة: '
+  +'{n} عدد الأفلام، {c} عدد المناسبات، {r} جولات التعديل، {d} أيام التسليم.',tabs)
+ +ctlCard('✍️ رأس القسم','',
+   OFFHEAD.map(([k,l,ph])=>offField(k,l,ph)).join(''))
+ +cards
+ +shown
+ +numbers
+ +ctlCard('🔢 عدد الأفلام — {n}',
    'لا يُكتب يدويًا — القسم يعدّ الرفّ بنفسه. أطفئوا فيلمًا من «المحتوى والأفلام» وينقص الرقم وحده.',
    `<div class="ctlrow"><span>الظاهر الآن على الموقع</span><b style="font-size:1.4rem;color:#8A6210">${n}</b></div>`);}
-
 function realOrdersHTML(){if(window.__dbOrdersHTML)return window.__dbOrdersHTML();const a=lsGet(LSK.orders,[]);if(!a.length)return '';
  const sum=a.reduce((s,o)=>s+(+o.price||0),0);
  return `<div class="ctlcard" style="margin-bottom:16px"><h3>🛎️ طلبات واردة من الموقع (${a.length}) — ${sum} د.ت</h3>`+

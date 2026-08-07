@@ -55,7 +55,10 @@ function frmWaText(o) {
   const bits = [head, ''];
   const add = (k, v) => { if (v && String(v).trim()) bits.push(lbl[k] + ': ' + v); };
   /* say which offer, so the conversation starts where the page left off */
-  try { const O = t().off; bits.push(lbl.offer + ': ' + (o.tier === 'sign' ? O.sName : O.rName)); } catch (e) {}
+  try { const O = t().off;
+    const nm = (typeof offName === 'function') ? offName(o.tier === 'sign' ? 'sign' : 'ready')
+             : (o.tier === 'sign' ? O.sName : O.rName);
+    bits.push(lbl.offer + ': ' + nm); } catch (e) {}
   add('film', o.filmName); add('name', o.name); add('names', o.names);
   add('when', o.when); add('place', o.place); add('wish', o.wish);
   return bits.join('\n');
@@ -92,11 +95,11 @@ function openOrder(filmId, tier) {
   d.onclick = e => { if (e.target === d) closeOrder(); };
   d.innerHTML = `<div class="frm-sheet ${sign ? 'is-sign' : ''}" role="dialog" aria-modal="true">
     <button class="frm-x" onclick="closeOrder()" aria-label="${esc(t().ordClose)}">✕</button>
-    <h3 class="frm-t">${esc(sign ? O.sCta : t().ordT)}</h3>
-    <p class="frm-sub">${esc(sign ? O.sFor : t().ordSub)}</p>
+    <h3 class="frm-t">${esc(sign ? (typeof offOne==='function'?offOne('sCta',O.sCta,'sign'):O.sCta) : t().ordT)}</h3>
+    <p class="frm-sub">${esc(sign ? (typeof offOne==='function'?offOne('sFor',O.sFor,'sign'):O.sFor) : t().ordSub)}</p>
     ${f ? `<div class="frm-pick"><img src="${f.p}" alt="" loading="lazy">
       <span><b>${esc(nm)}</b><em>${price} ${esc(t().cur)}</em></span></div>`
-      : `<div class="frm-pick tier"><span class="frm-tiern">${esc(sign ? O.sName : O.rName)}</span>
+      : `<div class="frm-pick tier"><span class="frm-tiern">${esc(typeof offName==='function'?offName(FRM_TIER):(sign?O.sName:O.rName))}</span>
       <span><em>${price} ${esc(t().cur)}</em></span></div>`}
 
     <label class="frm-l">${esc(t().ordWho)}</label>

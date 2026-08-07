@@ -303,3 +303,13 @@ label.cmini{cursor:pointer}
  border:1px solid var(--line);background:#fff;font-family:inherit;font-size:.88rem}
 .glout{margin-top:10px;font-family:var(--num);font-size:.78rem;color:#2F6B3A;
  word-break:break-all;direction:ltr;text-align:start}
+
+/* -- offer text editor -- */
+.offtabs{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.offf{display:block;margin-bottom:13px}
+.offf>span{display:block;font-size:.78rem;font-weight:600;color:#6A5A3E;margin-bottom:5px}
+.offf input,.offf textarea{width:100%;padding:10px 12px;border-radius:10px;
+ border:1px solid var(--line);background:#fff;font-family:inherit;font-size:.9rem;
+ color:#3A2B10;resize:vertical;line-height:1.7}
+.offf input:focus,.offf textarea:focus{outline:none;border-color:#B98A2F;
+ box-shadow:0 0 0 3px rgba(185,138,47,.16)}

@@ -40,6 +40,36 @@ function offCounts() {
   return { films: films.length, cats: Object.keys(cats).length };
 }
 
+/* ---- every word on the cards, and where it comes from ------------------
+   Anything typed in the dashboard for the language being read wins; anything
+   left empty falls through to the copy that ships. So a half-translated card
+   is still a whole card, and clearing a field is how you undo an edit. */
+function offTxt() {
+  const o = (typeof CFG !== 'undefined' && CFG && CFG.offers && CFG.offers.txt) || {};
+  return o[S.lang] || {};
+}
+/* Numbers stay live inside whatever sentence the owner writes: {n} films on
+   the shelf, {c} occasions they cover, {r} rounds of changes, {d} days to
+   deliver. That is what keeps the copy editable without freezing the counts. */
+function offFill(str, tier) {
+  const C = offCounts(), P = offTier()[tier] || {};
+  return String(str || '')
+    .replace(/\{n\}/g, C.films).replace(/\{c\}/g, C.cats)
+    .replace(/\{r\}/g, P.revs).replace(/\{d\}/g, P.days);
+}
+/* one field: dashboard text if there is any, else the shipped line */
+function offOne(key, fallback, tier) {
+  const v = offTxt()[key];
+  return offFill((v && String(v).trim()) ? v : fallback, tier);
+}
+/* the bullet list: a written list replaces the shipped one wholesale, because
+   picking which shipped lines survive an edit would be guesswork */
+function offLines(key, fallback, tier) {
+  const raw = offTxt()[key];
+  const own = Array.isArray(raw) ? raw.filter(x => String(x || '').trim()) : [];
+  return (own.length ? own : fallback).map(x => offFill(x, tier));
+}
+
 /* ── drawn marks, not emoji ── */
 const OFF_MARK = {
   /* three plates stacked: the shelf, in one glyph */
@@ -66,50 +96,59 @@ const OFF_FLOUR = `<svg class="off-flour" viewBox="0 0 120 120" fill="none" aria
 
 function offerNum(n) { return String(n); }
 
-function offersHTML() {
-  const T = t(), O = T.off, P = offTier(), C = offCounts();
-  /* the headline of the first card is the shelf counting itself */
-  const line1 = O.rFilms.replace('{n}', offerNum(C.films)).replace('{c}', offerNum(C.cats));
-  const rRevs = O.revs.replace('{n}', offerNum(P.ready.revs));
-  const sRevs = O.revs.replace('{n}', offerNum(P.sign.revs));
-  const rDays = O.days.replace('{n}', offerNum(P.ready.days));
-  const sDays = O.days.replace('{n}', offerNum(P.sign.days));
+/* the shipped bullet lists, written with the same tokens the dashboard uses */
+function offDefLines(tier) {
+  const O = t().off;
+  return tier === 'ready'
+    ? [O.rFilms, O.rInter, O.rNames, O.revs, O.days]
+    : [O.sAll, O.sMade, O.sCalli, O.sHand, O.revs, O.days];
+}
+/* the card names are wanted in more than one place — the order form titles its
+   sheet with whichever the visitor clicked */
+function offName(tier) {
+  const O = t().off;
+  return tier === 'sign' ? offOne('sName', O.sName, 'sign') : offOne('rName', O.rName, 'ready');
+}
 
+function offersHTML() {
+  const T = t(), O = T.off, P = offTier();
   const price = (p, cur) => `<div class="off-price">
     ${p.was > p.price ? `<s>${offerNum(p.was)}</s>` : ''}
     <b>${offerNum(p.price)}</b><i>${esc(cur)}</i></div>`;
-  const li = s => `<li>${esc(s)}</li>`;
+  const list = ls => `<ul class="off-list">${ls.map(s => `<li>${esc(s)}</li>`).join('')}</ul>`;
+  /* Emptying a field means «use the shipped line», so it cannot also mean
+     «remove this». The two optional bits get their own switch. */
+  const oc = (typeof CFG !== 'undefined' && CFG && CFG.offers) || {};
+  const ribbon = (oc.ribbonOn === 0) ? '' : offOne('rRibbon', O.rRibbon, 'ready');
+  const note = (oc.noteOn === 0) ? '' : offOne('sNote', O.sNote, 'sign');
 
   return `<section id="offers">
-   <div class="sec-head"><span class="kicker">${esc(O.kick)}</span>
-    <h2>${esc(O.title)}</h2><p>${esc(O.sub)}</p></div>
+   <div class="sec-head"><span class="kicker">${esc(offOne('kick', O.kick, 'ready'))}</span>
+    <h2>${esc(offOne('title', O.title, 'ready'))}</h2>
+    <p>${esc(offOne('sub', O.sub, 'ready'))}</p></div>
 
    <div class="off-grid">
 
     <article class="off-card off-ready">
-     <span class="off-ribbon">${esc(O.rRibbon)}</span>
+     ${ribbon ? `<span class="off-ribbon">${esc(ribbon)}</span>` : ''}
      <div class="off-mark">${OFF_MARK.ready}</div>
-     <h3>${esc(O.rName)}</h3>
-     <p class="off-for">${esc(O.rFor)}</p>
+     <h3>${esc(offName('ready'))}</h3>
+     <p class="off-for">${esc(offOne('rFor', O.rFor, 'ready'))}</p>
      ${price(P.ready, T.cur)}
-     <ul class="off-list">
-      ${li(line1)}${li(O.rInter)}${li(O.rNames)}${li(rRevs)}${li(rDays)}
-     </ul>
-     <button class="off-go" onclick="openOrder('','ready')">${esc(O.rCta)}</button>
-     <button class="off-see" onclick="scrollSec('ready')">${esc(O.rSee)}</button>
+     ${list(offLines('rLines', offDefLines('ready'), 'ready'))}
+     <button class="off-go" onclick="openOrder('','ready')">${esc(offOne('rCta', O.rCta, 'ready'))}</button>
+     <button class="off-see" onclick="scrollSec('ready')">${esc(offOne('rSee', O.rSee, 'ready'))}</button>
     </article>
 
     <article class="off-card off-sign">
      ${OFF_FLOUR}
      <div class="off-mark">${OFF_MARK.sign}</div>
-     <h3>${esc(O.sName)}</h3>
-     <p class="off-for">${esc(O.sFor)}</p>
+     <h3>${esc(offName('sign'))}</h3>
+     <p class="off-for">${esc(offOne('sFor', O.sFor, 'sign'))}</p>
      ${price(P.sign, T.cur)}
-     <ul class="off-list">
-      ${li(O.sAll)}${li(O.sMade)}${li(O.sCalli)}${li(O.sHand)}${li(sRevs)}${li(sDays)}
-     </ul>
-     <button class="off-go" onclick="openOrder('','sign')">${esc(O.sCta)}</button>
-     <p class="off-note">${esc(O.sNote)}</p>
+     ${list(offLines('sLines', offDefLines('sign'), 'sign'))}
+     <button class="off-go" onclick="openOrder('','sign')">${esc(offOne('sCta', O.sCta, 'sign'))}</button>
+     ${note ? `<p class="off-note">${esc(note)}</p>` : ''}
     </article>
 
    </div>
