@@ -3400,3 +3400,37 @@ html[dir=rtl] .off-flour{transform:scaleX(-1)}
 @media(max-width:330px){
  .frm-g2{grid-template-columns:1fr;gap:0}
 }
+
+/* ============ THE HERO, IN FRENCH ============
+   Arabic and English set well already; French does not, and for reasons that
+   belong to the language rather than the design.
+
+   Measured at 390px against the other two: the French headline ran to three
+   lines with a 32% difference between the longest and the shortest, and the
+   sub-line to four where English needs three — ending on «cinématique.»
+   alone, a quarter the width of the line above it. French words are simply
+   longer, and «inoubliable», «événements» and «cinématique» all land in the
+   worst place.
+
+   Nothing here touches ar or en: the language is on the html element, so the
+   attribute selector is the whole scope. */
+html[lang=fr] .hero h1{
+ /* let the browser choose breaks that even the lines out rather than filling
+    each one greedily and leaving the last short */
+ text-wrap:balance;
+ /* a shade tighter, because the words are longer and the tracking of a heavy
+    serif at this size opens French up more than it does English */
+ font-size:clamp(1.95rem,7vw,3.95rem);
+ letter-spacing:-.012em;
+ line-height:1.24}
+html[lang=fr] .hero .sub{
+ /* pretty forbids the lone last word; the small reduction is what brings the
+    paragraph back to three lines at phone widths */
+ text-wrap:pretty;
+ font-size:clamp(.9rem,3.2vw,1.08rem);
+ line-height:1.85;
+ max-width:33rem}
+@media(max-width:520px){
+ html[lang=fr] .hero h1{font-size:clamp(1.8rem,6.4vw,2.35rem);margin:14px 0 12px}
+ html[lang=fr] .hero .sub{font-size:.86rem;line-height:1.8}
+}
