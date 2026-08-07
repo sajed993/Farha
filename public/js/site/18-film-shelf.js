@@ -101,6 +101,21 @@ const FILMS_READY=[
 const RD_CATS=['all','wed','henna','bday','baby','grad','save'];
 
 
+/* Text written in the dashboard for one film, in the language being shown.
+   Empty fields fall through to the copy that ships with the film. */
+function readyTxt(id){
+ const o=readyCfg(id).txt;
+ return (o&&o[S.lang])||{};}
+function readyBlurb(f){const x=readyTxt(f.id);
+ return (x.blurb&&x.blurb.trim())||f.blurb[S.lang];}
+/* the programme, if the owner wrote one; rows with no title are dropped */
+function readyProg(f){
+ const rows=(readyCfg(f.id).prog||{})[S.lang];
+ if(!rows||!rows.length)return null;
+ const keep=rows.filter(r=>(r.title||'').trim());
+ return keep.length?keep.map(r=>({time:r.time||'',title:r.title||'',
+   place:r.place||'',map:r.map||'',music:0,photos:[]})):null;}
+
 function readyFilm(id){return FILMS_READY.find(f=>f.id===id)||FILMS_READY[0];}
 /* Dashboard overrides: hide a film, rename it, or reprice it. */
 function readyCfg(id){return (typeof CFG!=='undefined'&&CFG&&CFG.films&&CFG.films[id])||{};}
@@ -144,7 +159,7 @@ function filmShelfHTML(){
     <div class="rd-meta">
      <span class="rd-cat">${t().rdCats[f.cat]}${readyWas(f)?`<i class="rd-save">${t().save}</i>`:''}</span>
      <b>${esc(readyName(f))}</b>
-     <p>${f.blurb[S.lang]}</p>
+     <p>${esc(readyBlurb(f))}</p>
      <div class="rd-acts">
       <button class="rd-btn gold" onclick="openReady('${f.id}')">${t().rdOpen}</button>
       <button class="rd-btn ghost" onclick="addToCart('${readyName(f).replace(/'/g,'')}',${readyPrice(f)})">
@@ -175,6 +190,19 @@ function openReady(id){
   dir:f.cat==='wed'?ediDemoNote('dir'):null,
   stay:f.cat==='wed'?ediDemoNote('stay'):null,
   program:ediDemoProgram(f.cat)};
+
+ /* anything typed in the dashboard wins over the shipped copy */
+ const x=readyTxt(f.id), pick=(v,fb)=>(v&&String(v).trim())?v:fb;
+ S.c.t=pick(x.t,S.c.t); S.c.n=pick(x.n,S.c.n); S.c.d=pick(x.d,S.c.d);
+ S.c.p=pick(x.p,S.c.p); S.c.m=pick(x.m,S.c.m);
+ if(x.when&&x.when.trim())S.c.when=x.when;
+ if(x.dressT||x.dressD){
+  S.c.dress={t:pick(x.dressT,(S.c.dress||{}).t||''),
+             d:pick(x.dressD,(S.c.dress||{}).d||''),sw:f.sw||null};}
+ if(x.dirT||x.dirD)S.c.dir={t:x.dirT||'',d:x.dirD||''};
+ if(x.stayT||x.stayD)S.c.stay={t:x.stayT||'',d:x.stayD||''};
+ const pr=readyProg(f); if(pr)S.c.program=pr;
+
  editorialOpen();}
 ;
 

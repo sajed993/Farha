@@ -1,6 +1,6 @@
 /* ================= render ================= */
-const TITLES={over:'نظرة عامة',ctl:'التحكم بالموقع',media:'المحتوى والأفلام',orders:'الطلبات',inv:'الدعوات',tpl:'القوالب والأفلام',guests:'الضيوف والردود',wish:'التهاني',ana:'التحليلات',set:'الإعدادات'};
-function viewHTML(){return {over:overView,ctl:ctlView,media:mediaView,orders:ordersView,inv:invView,tpl:tplView,guests:guestsView,wish:wishView,ana:anaView,set:setView}[S.view]();}
+const TITLES={over:'نظرة عامة',ctl:'التحكم بالموقع',media:'المحتوى والأفلام',txt:'نصوص الدعوات',orders:'الطلبات',inv:'الدعوات',tpl:'القوالب والأفلام',guests:'الضيوف والردود',wish:'التهاني',ana:'التحليلات',set:'الإعدادات'};
+function viewHTML(){return {over:overView,ctl:ctlView,media:mediaView,txt:txtView,orders:ordersView,inv:invView,tpl:tplView,guests:guestsView,wish:wishView,ana:anaView,set:setView}[S.view]();}
 function render(){app.innerHTML=shell(viewHTML(),TITLES[S.view]);}
 function renderContent(){const c=document.getElementById('content');
  if(c)c.innerHTML=viewHTML();

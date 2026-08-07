@@ -204,6 +204,107 @@ function envView(){
    <span class="sw-toggle ${E[k]===0?'':'on'}" onclick="ctlEnvOn('${k}',${E[k]===0});renderContent()"></span>
   </div>`).join(''));}
 
+/* ================= نصوص الدعوات الجاهزة =================
+   One film at a time, one language at a time. Every field is an override:
+   leaving it empty keeps the copy the film ships with, so the panel never
+   forces the owner to retype what is already right. */
+let TXF='marble', TXL='ar';
+const TXLANGS=[['ar','العربية'],['fr','Français'],['en','English']];
+function txPick(id){TXF=id;render();window.scrollTo(0,0);}
+function txLang(l){TXL=l;renderContent();}
+function txGet(id){const o=(CFG.films[id]||{}).txt||{};return o[TXL]||{};}
+function txSet(id,k,v){
+ CFG.films[id]=CFG.films[id]||{};
+ CFG.films[id].txt=CFG.films[id].txt||{};
+ CFG.films[id].txt[TXL]=CFG.films[id].txt[TXL]||{};
+ CFG.films[id].txt[TXL][k]=v;
+ saveCFG();}
+function txProgRows(id){
+ const p=(CFG.films[id]||{}).prog||{};
+ return (p[TXL]||[]).slice();}
+function txProgSet(id,rows){
+ CFG.films[id]=CFG.films[id]||{};
+ CFG.films[id].prog=CFG.films[id].prog||{};
+ CFG.films[id].prog[TXL]=rows;
+ saveCFG();}
+function txProgEdit(id,i,k,v){const r=txProgRows(id);
+ while(r.length<=i)r.push({time:'',title:'',place:''});
+ r[i][k]=v;txProgSet(id,r);}
+function txProgAdd(id){const r=txProgRows(id);
+ r.push({time:'',title:'',place:''});txProgSet(id,r);renderContent();}
+function txProgDel(id,i){const r=txProgRows(id);
+ r.splice(i,1);txProgSet(id,r);renderContent();}
+function txClear(id){
+ if(CFG.films[id]){delete CFG.films[id].txt;delete CFG.films[id].prog;}
+ saveCFG();renderContent();
+ toast('أُعيدت النصوص الأصلية ✓');}
+
+function txtView(){
+ const id=TXF, x=txGet(id), rows=txProgRows(id);
+ const row=(k,label,hint,area)=>`<div class="txf">
+   <label>${label}${hint?`<em>${hint}</em>`:''}</label>
+   ${area?`<textarea rows="3" placeholder="${escA(hint||'')}"
+      oninput="txSet('${id}','${k}',this.value)">${escA(x[k]||'')}</textarea>`
+        :`<input value="${escA(x[k]||'')}" placeholder="${escA(hint||'')}"
+      oninput="txSet('${id}','${k}',this.value)">`}
+  </div>`;
+ return `<div class="cgrid">
+  ${ctlCard('🎞️ اختاروا الدعوة',
+   'كل دعوة نصوصها الخاصة وبكل لغة على حدة.',
+   `<div class="txpick">${RDFILMS.map(([fid,nm,cat])=>{
+     const has=((CFG.films[fid]||{}).txt)||((CFG.films[fid]||{}).prog);
+     const off=(CFG.films[fid]||{}).vis===false;
+     return `<button class="txchip ${TXF===fid?'on':''}" onclick="txPick('${fid}')">
+       ${nm}<em>${cat}</em>${has?'<i class="txdot" title="معدّل"></i>':''}
+       ${off?'<s>مخفي</s>':''}</button>`;}).join('')}</div>`)}
+
+  ${ctlCard('✒️ نصوص «'+ (RDFILMS.find(r=>r[0]===id)||['','',''])[1] +'»',
+   'اتركوا أي حقل فارغًا ليبقى النص الأصلي. الحفظ فوري.',
+   `<div class="txlangs">${TXLANGS.map(([l,n])=>
+     `<button class="txlang ${TXL===l?'on':''}" onclick="txLang('${l}')">${n}</button>`).join('')}</div>
+
+    <h4 class="txh">في الرفّ</h4>
+    ${row('blurb','الوصف تحت الاسم','سطر قصير يظهر على البطاقة',1)}
+
+    <h4 class="txh">داخل الدعوة</h4>
+    ${row('t','العنوان الصغير','دعوة زفاف')}
+    ${row('n','الأسماء','مريم و يوسف')}
+    ${row('d','التاريخ كما يُكتب','14 سبتمبر 2026')}
+    ${row('when','تاريخ العدّ التنازلي','2026-09-14T19:00')}
+    ${row('p','المكان','رياض الأندلس')}
+    ${row('m','الرسالة','يتشرفان بدعوتكم…',1)}
+
+    <h4 class="txh">قواعد اللباس</h4>
+    ${row('dressT','العنوان','أنيق رسمي')}
+    ${row('dressD','التفصيل','بدلة داكنة · فستان طويل')}
+
+    <h4 class="txh">الوصول</h4>
+    ${row('dirT','العنوان','موقف مجاني')}
+    ${row('dirD','التفصيل','خدمة صفّ السيارات…',1)}
+
+    <h4 class="txh">الإقامة</h4>
+    ${row('stayT','العنوان','أسعار خاصة')}
+    ${row('stayD','التفصيل','فندقان قريبان…',1)}
+
+    <div class="txfoot">
+     <button class="act" onclick="txClear('${id}')">إعادة النصوص الأصلية</button>
+     <a class="act gold" href="index.html?vidPreview=${id}&vidSec=hall" target="_blank">معاينة على الموقع ↗</a>
+    </div>`)}
+
+  ${ctlCard('🕑 برنامج الحفل',
+   'اتركوه فارغًا ليبقى البرنامج الأصلي. أي سطر بلا عنوان يُتجاهل.',
+   `${rows.length?rows.map((r,i)=>`<div class="txprow">
+      <input class="tt" value="${escA(r.time||'')}" placeholder="19:00"
+       oninput="txProgEdit('${id}',${i},'time',this.value)">
+      <input value="${escA(r.title||'')}" placeholder="الفقرة"
+       oninput="txProgEdit('${id}',${i},'title',this.value)">
+      <input value="${escA(r.place||'')}" placeholder="المكان"
+       oninput="txProgEdit('${id}',${i},'place',this.value)">
+      <button class="txdel" onclick="txProgDel('${id}',${i})" title="حذف">×</button>
+     </div>`).join(''):'<p class="cmut">لا فقرات مخصّصة — يُعرض البرنامج الأصلي.</p>'}
+    <button class="act" onclick="txProgAdd('${id}')">+ أضيفوا فقرة</button>`)}
+ </div>`;}
+
 function mediaView(){
  const M=CFG.media;const cloud=window.__dbMode?'':`<p class="cmut" style="color:#A33">⚠️ لرفع الفيديوهات سجّلوا الدخول السحابي أولًا (الأزرار الأخرى تعمل).</p>`;
  return `<div class="cgrid">`+envView()+vidView()+readyView()+
@@ -281,7 +382,7 @@ function realOrdersHTML(){if(window.__dbOrdersHTML)return window.__dbOrdersHTML(
 function roStatus(ts,v){const a=lsGet(LSK.orders,[]);const o=a.find(x=>x.ts===ts);if(o){o.st=v;lsSet(LSK.orders,a);toast('حُدّثت حالة الطلب → '+v);renderContent();}}
 window.addEventListener('storage',function(e){if(e&&e.key&&(e.key===LSK.wishes||e.key===LSK.orders||e.key===LSK.meta)){try{renderContent()}catch(x){}}});
 
-const NAV=[['over','📊','نظرة عامة'],['ctl','🎛️','التحكم بالموقع'],['media','🎬','المحتوى والأفلام'],['orders','🛒','الطلبات'],['inv','💌','الدعوات'],['tpl','🖼️','القوالب والأفلام'],['guests','👥','الضيوف والردود'],['wish','💬','التهاني'],['ana','📈','التحليلات'],['set','⚙️','الإعدادات']];
+const NAV=[['over','📊','نظرة عامة'],['ctl','🎛️','التحكم بالموقع'],['media','🎬','المحتوى والأفلام'],['txt','✍️','نصوص الدعوات'],['orders','🛒','الطلبات'],['inv','💌','الدعوات'],['tpl','🖼️','القوالب والأفلام'],['guests','👥','الضيوف والردود'],['wish','💬','التهاني'],['ana','📈','التحليلات'],['set','⚙️','الإعدادات']];
 function newOrdersCount(){return ORDERS.filter(o=>o.d<1&&o.status==='جديد').length;}
 function shell(inner,title){
  return `<div class="layout">
