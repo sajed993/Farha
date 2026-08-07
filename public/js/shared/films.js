@@ -8,8 +8,8 @@
    readyCatalogue(), so both pages always see the same shelf.
 
    One song per film, and no song twice — sndN below is the record of which
-   is spoken for. Still unused from the songs we hold:
-     إليسا — عيشالك
+   is spoken for. Every song we hold is now on a film; the next one needs a
+   new track before it can ship.
    Each track in /media/snd is a 60-second Opus excerpt cut from the loudest
    part of the song and levelled to the same loudness as its neighbours. */
 
@@ -144,6 +144,18 @@ const FILMS_BUILTIN=[
    en:['Black tie optional','Dark suit · long dress']},
   sw:['#3E3C3C','#757273','#BAB7B8'],
   snd:'/media/snd/stair.webm',sndN:'إليسا — عروسة احلامي'},
+
+
+ {id:'blanc',cat:'wed',v:'/media/inv/blanc.mp4',p:'/media/inv/blanc.jpg',design:1,
+  name:{ar:'بياض',fr:'Blancheur',en:'Whiteness'},
+  blurb:{ar:'أبيض وأسود على بياض: يدها موضوعة في يده، ولا شيء آخر في الكادر',
+   fr:'Noir et blanc sur blanc : sa main posée dans la sienne, et rien d’autre dans le cadre',
+   en:'Black and white on white: her hand laid in his, and nothing else in the frame'},
+  dress:{ar:['أبيض وأسود','بلا ألوان — أبسط ما يكون'],
+   fr:['Noir et blanc','Sans couleurs — le plus simple possible'],
+   en:['Black and white','No colour — as plain as it gets']},
+  sw:['#121214','#79797B','#EDECF0'],
+  snd:'/media/snd/blanc.webm',sndN:'إليسا — عيشالك'},
 
  /* ── save the date ── */
  {id:'soon',cat:'save',v:'/media/inv/soon.mp4',p:'/media/inv/soon.jpg',design:3,
