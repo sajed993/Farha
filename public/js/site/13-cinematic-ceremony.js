@@ -326,7 +326,11 @@ function sendWish(){const el=document.getElementById('wishTxt');if(!el)return;
  S.wishes.unshift({txt:v.slice(0,240),who:S.c.guest||''});el.value='';
  const l=document.getElementById('wishList');if(l)l.innerHTML=wishesHTML();
  toast(t().congratsSent);burst(['💛','💌']);}
-function rsvp(y){toast(t().rsvpSent);if(y)burst(['🎉','💛']);
+/* This used to show a toast and keep nothing, so an owner never learned who
+   was coming. It opens a short form now and the reply is stored. */
+function rsvp(y){
+ if(typeof openRsvp==='function'){openRsvp(!!y);return;}
+ toast(t().rsvpSent);if(y)burst(['🎉','💛']);
  const r=veil&&veil.querySelector('.rsvp');if(r)r.style.opacity=.45;}
 function demoProgram(){return [
  {time:'19:00',title:{ar:'استقبال الضيوف',fr:'Accueil des invités',en:'Guest welcome'}[S.lang],place:{ar:'البهو الكبير',fr:'Grand hall',en:'Grand hall'}[S.lang],map:'https://maps.google.com',music:1,photos:[]},

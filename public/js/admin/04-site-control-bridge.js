@@ -453,6 +453,150 @@ function realWishesHTML(){if(window.__dbWishesHTML)return window.__dbWishesHTML(
    <button class="cmini del" onclick="rwDel(${w.ts})">حذف</button></span></div>`).join('')+`</div>`;}
 function rwOk(ts){const a=lsGet(LSK.wishes,[]);const w=a.find(x=>x.ts===ts);if(w){w.ok=!w.ok;lsSet(LSK.wishes,a);renderContent();toast(w.ok?'نُشرت على الموقع ✓':'أُخفيت عن الموقع');}}
 function rwDel(ts){lsSet(LSK.wishes,lsGet(LSK.wishes,[]).filter(x=>x.ts!==ts));renderContent();toast('حُذفت');}
+/* ======= طلبات الموقع وردود الضيوف =======
+   Whatever the two forms on the site collected. They sit at the top of the
+   الطلبات and الضيوف pages rather than in a page of their own, because
+   that is where someone looking for a new order already goes.
+   Export is CSV with a byte-order mark — the one shape Excel, Numbers and
+   Google Sheets all open with Arabic intact and no import dialogue. */
+const FRMK={ord:'farha_reqs',rv:'farha_rsvp'};
+function frmRows(k){try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return [];}}
+function frmWipe(k){
+ if(!confirm('مسح كل السجلّات؟ لا يمكن التراجع.'))return;
+ localStorage.setItem(k,'[]');renderContent();toast('مُسحت');}
+function frmWhen(iso){
+ if(!iso)return '';
+ const d=new Date(iso);if(isNaN(d))return String(iso);
+ const p=n=>('0'+n).slice(-2);
+ return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());}
+/* a wa.me link for the number they left; bare Tunisian numbers get the prefix */
+function frmWaTo(phone){
+ const p=String(phone||'').replace(/[^0-9]/g,'');
+ if(!p)return '';
+ return 'https://wa.me/'+(p.length===8?'216':'')+p;}
+
+function exportReqs(){
+ const R=frmRows(FRMK.ord);
+ if(!R.length){toast('لا طلبات بعد');return;}
+ dlCSV('farha-requests.csv',[['التاريخ','الاسم','الهاتف','الفيلم','الاختيار',
+   'الأسماء','تاريخ المناسبة','المكان','رسالة الدعوة','ما يتخيّلونه','السعر','اللغة','واتساب'],
+  ...R.map(r=>[frmWhen(r.at),r.name||'',r.phone||'',r.filmName||'',
+   {this:'هذا الفيلم',other:'فيلم آخر معروض',new:'فيلم جديد خاص'}[r.choice]||'',
+   r.names||'',r.when||'',r.place||'',r.msg||'',r.wish||'',r.price||'',r.lang||'',
+   r.viaWhatsApp?'نعم':''])]);}
+
+function exportRsvp(){
+ const R=frmRows(FRMK.rv);
+ if(!R.length){toast('لا ردود بعد');return;}
+ dlCSV('farha-guests.csv',[['التاريخ','الدعوة','اسم الضيف','الرد','العدد','الرسالة','اللغة'],
+  ...R.map(r=>[frmWhen(r.at),r.host||r.invite||'',r.name||'',
+   r.coming?'سيحضر':'معتذر',r.coming?(r.count||1):'',r.msg||'',r.lang||''])]);}
+
+/* the panel that opens the الطلبات page */
+function reqOrdersHTML(){
+ const R=frmRows(FRMK.ord).slice().reverse();
+ if(!R.length)return `<div class="ctlcard" style="margin-bottom:16px">
+   <h3>\u{1F4E5} طلبات من نموذج الموقع</h3>
+   <p class="cmut">لا طلبات بعد — كل من يملأ النموذج أو يتخطّاه إلى واتساب يظهر هنا.</p></div>`;
+ return `<div class="ctlcard" style="margin-bottom:16px">
+  <h3>\u{1F4E5} طلبات من نموذج الموقع <span class="sub">${R.length} طلب</span></h3>
+  <div class="frqlist">${R.map(r=>`<div class="frqrow">
+    <div class="frqh"><b>${escA(r.name||'—')}</b>
+     ${r.phone?`<a class="frqwa" href="${frmWaTo(r.phone)}" target="_blank" dir="ltr">${escA(r.phone)} ↗</a>`:''}
+     <span class="frqd">${frmWhen(r.at)}</span></div>
+    <div class="frqb">
+     ${r.filmName?`<span class="frqtag">${escA(r.filmName)}</span>`:''}
+     ${r.choice==='new'?'<span class="frqtag new">يريد فيلمًا جديدًا</span>':''}
+     ${r.choice==='other'?'<span class="frqtag">فيلم آخر من المعروضة</span>':''}
+     ${r.viaWhatsApp?'<span class="frqtag wa">تخطّى إلى واتساب</span>':''}
+     ${r.price?`<span class="frqtag">${r.price} د.ت</span>`:''}
+     <span class="frqtag lang">${escA(r.lang||'')}</span>
+     ${r.names?`<span>${escA(r.names)}</span>`:''}
+     ${r.when?`<span>\u{1F4C5} ${escA(r.when)}</span>`:''}
+     ${r.place?`<span>\u{1F4CD} ${escA(r.place)}</span>`:''}
+    </div>
+    ${r.wish?`<p class="frqmsg">${escA(r.wish)}</p>`:''}
+    ${r.msg?`<p class="frqmsg quiet">رسالة الدعوة: ${escA(r.msg)}</p>`:''}
+   </div>`).join('')}</div>
+  <div class="frqfoot">
+   <button class="act" onclick="exportReqs()">⬇️ تصدير CSV (يفتح في Excel)</button>
+   <button class="act" onclick="frmWipe('farha_reqs')">\u{1F5D1} مسح الكل</button>
+  </div></div>`;}
+
+/* the panel that opens the الضيوف page */
+function reqGuestsHTML(){
+ const R=frmRows(FRMK.rv).slice().reverse();
+ if(!R.length)return `<div class="ctlcard" style="margin-bottom:16px">
+   <h3>\u{1F4DD} ردود الضيوف من داخل الدعوة</h3>
+   <p class="cmut">لا ردود بعد — كل ضيف يضغط «سأحضر» يظهر هنا مع رسالته.</p></div>`;
+ const yes=R.filter(r=>r.coming);
+ const head=yes.reduce((n,r)=>n+(+r.count||1),0);
+ /* one list per invitation, so an owner can be handed only their own */
+ const byInv={};R.forEach(r=>{const k=r.host||r.invite||'—';(byInv[k]=byInv[k]||[]).push(r);});
+ return `<div class="ctlcard" style="margin-bottom:16px">
+  <h3>\u{1F4DD} ردود الضيوف من داخل الدعوة <span class="sub">${R.length} رد</span></h3>
+  <div class="mini-stat" style="margin-bottom:12px">
+   <span>سيحضر <b>${yes.length}</b></span>
+   <span>معتذر <b>${R.length-yes.length}</b></span>
+   <span>مجموع الحضور <b>${head}</b></span></div>
+  ${Object.keys(byInv).map(k=>`<div class="frqinv">
+    <h4>${escA(k)} <small>${byInv[k].length}</small></h4>
+    <div class="frqlist">${byInv[k].map(r=>`<div class="frqrow ${r.coming?'yes':'no'}">
+      <div class="frqh"><b>${escA(r.name)}</b>
+       <span class="frqtag ${r.coming?'yes':'no'}">${r.coming?'سيحضر':'معتذر'}</span>
+       ${r.coming&&(r.count||1)>1?`<span class="frqtag">${r.count} أشخاص</span>`:''}
+       <span class="frqd">${frmWhen(r.at)}</span></div>
+      ${r.msg?`<p class="frqmsg">${escA(r.msg)}</p>`:''}
+     </div>`).join('')}</div></div>`).join('')}
+  <div class="frqfoot">
+   <button class="act" onclick="exportRsvp()">⬇️ تصدير CSV (يفتح في Excel)</button>
+   <button class="act" onclick="frmWipe('farha_rsvp')">\u{1F5D1} مسح الكل</button>
+  </div>
+  <p class="cmut" style="margin-top:10px">لمشاركتها مع أصحاب الدعوة: ارفعوا الملف إلى Google Drive وافتحوه بـ Google Sheets، ثم شاركوا الرابط للقراءة فقط.</p></div>`;}
+
+/* ======= الرد الآلي على واتساب =======
+   A page cannot make WhatsApp answer on its own — the reply has to come from
+   WhatsApp Business, which sends a greeting to anyone who writes for the first
+   time. So the promise is written here ready to paste, and the site shows the
+   same words the moment a visitor leaves for WhatsApp, so nobody waits on a
+   setting that may not be switched on yet. */
+const WA_GREET={
+ all:'شكرًا لتواصلكم معنا \u{1F49B}\nوصلتنا رسالتكم، سنراجعها ونعود إليكم اليوم أو خلال 24 ساعة على الأكثر.\n—\nMerci de nous avoir écrit. Nous revenons vers vous aujourd\'hui, ou sous 24 heures au plus.\n—\nThank you for writing. We will get back to you today, or within 24 hours at the latest.',
+ ar:'شكرًا لتواصلكم معنا \u{1F49B} وصلتنا رسالتكم، سنراجعها ونعود إليكم اليوم أو خلال 24 ساعة على الأكثر.',
+ fr:'Merci de nous avoir écrit \u{1F49B} Nous avons bien reçu votre message et revenons vers vous aujourd\'hui, ou sous 24 heures au plus.',
+ en:'Thank you for writing \u{1F49B} We have received your message and will get back to you today, or within 24 hours at the latest.'};
+
+function waCopy(k){
+ const txt=WA_GREET[k]||'';
+ const done=()=>toast('نُسخ — الصقوه في واتساب');
+ try{
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,()=>waCopyFallback(txt,done));return;}
+ }catch(e){}
+ waCopyFallback(txt,done);}
+/* clipboard API needs a secure origin; a hidden textarea works anywhere */
+function waCopyFallback(txt,done){
+ const ta=document.createElement('textarea');
+ ta.value=txt;ta.style.cssText='position:fixed;opacity:0';
+ document.body.appendChild(ta);ta.select();
+ try{document.execCommand('copy');done();}catch(e){toast('انسخوه يدويًا من المربّع');}
+ ta.remove();}
+
+function waAutoHTML(){
+ return ctlCard('\u{1F7E2} الرد الآلي على واتساب',
+  'من يتخطّى النموذج ويكتب لكم يرى الوعد على الموقع فورًا. ليصله داخل واتساب أيضًا، فعّلوا رسالة الترحيب في تطبيق WhatsApp Business مرّة واحدة:',
+  `<ol class="wasteps">
+    <li>WhatsApp Business ← الإعدادات ← أدوات الأعمال</li>
+    <li>«رسالة الترحيب» ← فعّلوها ← الصقوا النصّ تحت</li>
+    <li>أرسلوها إلى «الجميع»</li>
+   </ol>
+   <div class="wabox">${escA(WA_GREET.all)}</div>
+   <div class="frqfoot">
+    <button class="act gold" onclick="waCopy('all')">\u{1F4CB} نسخ النصّ باللغات الثلاث</button>
+    <button class="act" onclick="waCopy('ar')">عربي فقط</button>
+    <button class="act" onclick="waCopy('fr')">Français</button>
+    <button class="act" onclick="waCopy('en')">English</button>
+   </div>`);}
+
 function realOrdersHTML(){if(window.__dbOrdersHTML)return window.__dbOrdersHTML();const a=lsGet(LSK.orders,[]);if(!a.length)return '';
  const sum=a.reduce((s,o)=>s+(+o.price||0),0);
  return `<div class="ctlcard" style="margin-bottom:16px"><h3>🛎️ طلبات واردة من الموقع (${a.length}) — ${sum} د.ت</h3>`+

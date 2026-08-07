@@ -262,3 +262,35 @@ label.cmini{cursor:pointer}
  border-top:1px dashed var(--line)}
 .filmup .act{cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
 .filmrow-g input[type=color]{padding:2px;height:34px;cursor:pointer}
+
+/* ── site requests and guest replies ── */
+.frqlist{display:grid;gap:9px;max-height:30rem;overflow-y:auto;padding-inline-end:4px}
+.frqrow{border:1px solid var(--line);border-radius:10px;padding:11px 13px;background:#fff}
+.frqrow.yes{border-inline-start:3px solid #2F6B3A}
+.frqrow.no{border-inline-start:3px solid #C08A8A;opacity:.82}
+.frqh{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:6px}
+.frqh b{font-size:.94rem;color:#3A2B10}
+.frqwa{font-size:.8rem;color:#2F6B3A;text-decoration:none;font-family:var(--num)}
+.frqwa:hover{text-decoration:underline}
+.frqd{margin-inline-start:auto;font-size:.72rem;color:#A3968A;font-family:var(--num)}
+.frqb{display:flex;flex-wrap:wrap;gap:7px;align-items:center;font-size:.8rem;color:#6A5A3E}
+.frqtag{border-radius:99px;padding:2px 9px;font-size:.72rem;background:#F3EEE3;color:#6A5A3E}
+.frqtag.new{background:#FFF1D9;color:#8A5A18}
+.frqtag.wa,.frqtag.yes{background:#E7F2E9;color:#2F6B3A}
+.frqtag.no{background:#F7E9E9;color:#9A4A4A}
+.frqtag.lang{text-transform:uppercase;letter-spacing:.06em;font-family:var(--num)}
+.frqmsg{margin-top:7px;padding-top:7px;font-size:.85rem;line-height:1.75;color:#5C4F3E;
+ border-top:1px dashed var(--line)}
+.frqmsg.quiet{color:#8A7A63;font-size:.8rem}
+.frqinv{margin-bottom:14px}
+.frqinv h4{font-family:var(--serif);font-size:.95rem;color:#3A2B10;margin-bottom:7px}
+.frqinv h4 small{color:#A3968A;font-family:var(--num);font-weight:400}
+.frqfoot{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px;padding-top:12px;
+ border-top:1px dashed var(--line)}
+
+/* ── whatsapp greeting ── */
+.wasteps{margin:0 0 12px;padding-inline-start:20px;display:grid;gap:5px;
+ font-size:.84rem;line-height:1.7;color:#6A5A3E}
+.wabox{white-space:pre-wrap;padding:13px 15px;border-radius:11px;font-size:.86rem;
+ line-height:1.85;color:#3A2B10;background:#E7F2E9;
+ border:1px solid rgba(47,107,58,.22)}

@@ -64,8 +64,8 @@ function orderRow(o,withAction){
   ${withAction?`<td><select class="act" onchange="setStatus('${o.id}',this.value)">
     ${STATUSES.map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}</select></td>`:''}</tr>`;}
 
-function ordersView(){if(window.__dbMode)return realOrdersHTML()+`<p class="cmut" style="margin-top:6px">☁️ هذه القائمة حيّة من قاعدة البيانات — كل طلب جديد من أي زبون يظهر هنا فورًا.</p>`;
- return realOrdersHTML()+_ordersView0();}
+function ordersView(){if(window.__dbMode)return reqOrdersHTML()+waAutoHTML()+realOrdersHTML()+`<p class="cmut" style="margin-top:6px">☁️ هذه القائمة حيّة من قاعدة البيانات — كل طلب جديد من أي زبون يظهر هنا فورًا.</p>`;
+ return reqOrdersHTML()+waAutoHTML()+realOrdersHTML()+_ordersView0();}
 function _ordersView0(){
  let list=ORDERS.filter(o=>S.ostatus==='الكل'||o.status===S.ostatus);
  if(S.q)list=list.filter(o=>(o.cust+o.id+o.tpl).includes(S.q));
@@ -119,7 +119,9 @@ function tplView(){
    </div>`).join('')}</div></div>`;}
 
 function guestsView(){
- if(window.__dbMode&&window.__dbRows){return guestsViewReal();}
+ if(window.__dbMode&&window.__dbRows){return reqGuestsHTML()+guestsViewReal();}
+ return reqGuestsHTML()+_guestsView0();}
+function _guestsView0(){
  let list=GUESTS;if(S.q)list=list.filter(g=>g.n.includes(S.q));
  const yes=list.filter(g=>g.st==='سيحضر').length,no=list.filter(g=>g.st==='معتذر').length,w=list.length-yes-no;
  return `<div class="card">

@@ -69,7 +69,7 @@ function filmShelfHTML(){
      <p>${esc(readyBlurb(f))}</p>
      <div class="rd-acts">
       <button class="rd-btn gold" onclick="openReady('${f.id}')">${t().rdOpen}</button>
-      <button class="rd-btn ghost" onclick="addToCart('${readyName(f).replace(/'/g,'')}',${readyPrice(f)})">
+      <button class="rd-btn ghost" onclick="openOrder('${f.id}')">
        ${t().rdOrder}
        <span class="rd-price">${readyWas(f)?`<s>${rdNum(readyWas(f))}</s>`:''}
         <b>${rdNum(readyPrice(f))} ${t().cur}</b></span>
