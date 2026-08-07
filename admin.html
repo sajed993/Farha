@@ -10,7 +10,16 @@
 <link rel="stylesheet" href="/css/admin.css">
 </head>
 <body>
-<div id="app"></div>
+<!-- The dashboard used to render in full and only then have a login laid over
+     it. Anything that stopped the auth module from running — a blocked CDN, a
+     script error — left the whole panel on screen. It starts hidden now and is
+     only revealed once a session is confirmed, so the failure mode is a blank
+     page rather than an open door. -->
+<style>#app[hidden]{display:none}
+#dbboot{position:fixed;inset:0;display:grid;place-items:center;font-family:system-ui;
+ background:linear-gradient(160deg,#FBF7EF,#F0E5CF);color:#8A7A63;font-size:.9rem}</style>
+<div id="dbboot">…</div>
+<div id="app" hidden></div>
 <script src="/js/shared/films.js"></script>
 <script src="/js/admin/00-seeded-demo-data.js"></script>
 <script src="/js/admin/01-state-helpers.js"></script>

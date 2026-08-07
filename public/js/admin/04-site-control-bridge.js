@@ -560,18 +560,16 @@ function reqGuestsHTML(){
   </div>
   <p class="cmut" style="margin-top:10px">«رابط للأصحاب» ينسخ صفحة للقراءة فقط تُحدّث نفسها — لا حساب ولا ملف يُرفع من جديد. ومن أراد جدولًا، التصدير فوقه.</p></div>`;}
 
-/* the link an owner is handed: the site itself, opened on their guest list */
+/* The link an owner is handed. The list has a key of its own now, held in the
+   database, so building the URL from the slug alone would produce something
+   that opens an empty page — the real one comes from the backend. */
 function glUrl(slug){
  const base=location.origin+location.pathname.replace(/[^/]*$/,'');
- return base+'?guests='+encodeURIComponent(slug);}
+ return base+'?guests='+encodeURIComponent(slug)+'&k=…';}
 function glCopy(slug){
- const u=glUrl(slug);
- const done=()=>toast('نُسخ الرابط — أرسلوه لأصحاب الدعوة');
- try{
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-   navigator.clipboard.writeText(u).then(done,()=>waCopyFallback(u,done));return;}
- }catch(e){}
- waCopyFallback(u,done);}
+ if(!slug){toast('اكتبوا معرّف الدعوة أولًا');return;}
+ if(window.dbGuestLink){window.dbGuestLink(slug);return;}
+ toast('سجّلوا الدخول أولًا — المفتاح محفوظ في قاعدة البيانات');}
 
 /* Any invitation, not only the ones this browser happens to have replies for.
    The real replies live in the database, so the slug is what matters here. */

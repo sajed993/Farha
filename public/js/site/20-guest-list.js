@@ -12,6 +12,13 @@ function glSlug() {
   try { return new URLSearchParams(location.search).get('guests') || ''; }
   catch (e) { return ''; }
 }
+/* The list has its own secret, separate from the invitation's slug. Without
+   it every guest who received an invitation could swap ?i= for ?guests= and
+   read the names and private messages of everyone else invited. */
+function glKey() {
+  try { return new URLSearchParams(location.search).get('k') || ''; }
+  catch (e) { return ''; }
+}
 let GL_ON = false, GL_ROWS = [], GL_LIVE = false, GL_STOP = null, GL_HOST = '';
 
 /* Two shapes reach this page: rows from the database and rows this device
@@ -34,12 +41,13 @@ function glWhen(iso) {
 }
 
 async function glFetch(slug) {
+  const key = glKey();
   if (window.__sbGuests) {
-    const rows = await window.__sbGuests(slug);
+    const rows = await window.__sbGuests(slug, key);
     if (rows) {
       GL_LIVE = true;
       if (!GL_HOST && window.__sbInviteName) {
-        try { GL_HOST = (await window.__sbInviteName(slug)) || ''; } catch (e) {}
+        try { GL_HOST = (await window.__sbInviteName(slug, key)) || ''; } catch (e) {}
       }
       return rows.map(glNorm);
     }

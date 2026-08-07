@@ -11,7 +11,14 @@ const E = (s) => (window.escA ? window.escA(s) : esc(s))
 const STS = ['جديد', 'مدفوع', 'مكتمل', 'ملغى']
 
 /* ---------- login gate ---------- */
+/* the only two ways the panel becomes visible: a confirmed session, or the
+   login form itself */
+function revealShell () {
+  const a = document.getElementById('app'); if (a) a.hidden = false
+  const b = document.getElementById('dbboot'); if (b) b.remove()
+}
 function showLogin() {
+  revealShell()
   if ($('dblogin')) return
   const d = document.createElement('form')
   d.id = 'dblogin'
@@ -207,6 +214,7 @@ function orderName (o) {
            <button class="cmini" onclick="dbSendLink(${o.id})">📲 إرسالها للزبون</button>
            <button class="cmini" onclick="dbGuestWa(${o.id})">📊 ملخص الردود له</button>
            <button class="cmini" onclick="dbGuestCsv('${E(o.inv_slug)}')">⬇️ CSV</button>
+           <button class="cmini" onclick="dbGuestLink('${E(o.inv_slug)}')">🔗 رابط الضيوف للأصحاب</button>
            <button class="cmini" onclick="dbEditNames(${o.id})">✏️ الأسماء</button>
            <button class="cmini" onclick="dbEditFull('${E(o.inv_slug)}')">🎨 فتح وتعديل كامل</button>`
         : `<select class="csel" id="dk${o.id}" style="margin:4px 6px 4px 0;font-size:.72rem">
@@ -271,6 +279,7 @@ function connectedBadge() {
 }
 
 function enterDb() {
+  revealShell()
   window.__dbMode = true
   try { if (window.Notification && Notification.permission === 'default') Notification.requestPermission() } catch (e) {}
   window.__dbOrdersHTML = ordersHTML
@@ -286,12 +295,60 @@ function enterDb() {
     const _em = { gift: String.fromCodePoint(0x1F381), spark: String.fromCodePoint(0x2728), heart: String.fromCodePoint(0x1F49B) }
     window.open('https://wa.me/' + n + '?text=' + encodeURIComponent(_em.gift + ' مبروك! دعوتكم من فرحة جاهزة:\n' + link + '\nافتحوها والمسوا الختم ' + _em.spark + ' ثم شاركوها مع ضيوفكم ' + _em.heart), '_blank')
   }
+  /* An invitation link is the only thing standing between a stranger and a
+     couple's names, date, venue and guest list, so it has to be unguessable.
+     The old slug was a timestamp plus three base-36 characters: the timestamp
+     is roughly when the order was delivered, which leaves 46,656 tries.
+     This is 20 characters from the OS random source — about 100 bits — using
+     an alphabet with no 0/O or 1/l/I, so it survives being read aloud. */
+  const SLUG_ABC = '23456789abcdefghjkmnpqrstuvwxyz'
+  function randomId (len) {
+    const a = new Uint8Array(len)
+    crypto.getRandomValues(a)
+    let out = ''
+    for (let i = 0; i < len; i++) out += SLUG_ABC[a[i] % SLUG_ABC.length]
+    return out
+  }
+
+  /* Turn a request-form order into a real invitation: the customer's own words
+     where they gave them, and the film they chose already dressed on it, so
+     delivering is a check rather than a retype. */
+  function configFromRequest (pl) {
+    const f = (typeof readyCatalogue === 'function' && pl.filmId)
+      ? readyCatalogue().find((x) => x.id === pl.filmId) : null
+    const c = {}
+    if (pl.names) c.n = String(pl.names).slice(0, 80)
+    if (pl.place) c.p = String(pl.place).slice(0, 80)
+    if (pl.msg) c.m = String(pl.msg).slice(0, 300)
+    if (pl.when) {
+      c.d = String(pl.when).slice(0, 40)          // shown as written
+      const t = Date.parse(pl.when)               // and drives the countdown
+      if (!isNaN(t) && t > Date.now()) c.when = new Date(t).toISOString().slice(0, 16)
+    }
+    const config = { kind: 'design', design: (f && f.design) || 1, c }
+    if (f) {
+      config.film = f.id
+      config.films = { hero: f.v, hall: f.v, detail: f.v, date: f.v, venue: f.p }
+      config.ediPal = f.id
+      config.ediSw = f.sw || null
+      config.trackUrl = f.snd || ''
+      config.trackName = f.sndN || ''
+      config.anim = 'edi'
+      config.music = 1
+    }
+    return config
+  }
+
   async function invCreate (o, config) {
     let slug = o.inv_slug
     if (!slug) {
-      slug = 'inv-' + Date.now().toString(36) + Math.floor(Math.random() * 46656).toString(36)
-      const { error } = await sb.from('invitations').insert({ slug, order_id: o.id, design_id: (config && config.design) || 1, config, published: true })
-      if (error) { toast('تعذّر إنشاء الدعوة — شغّلوا schema-3-delivery.sql أولًا'); return }
+      slug = 'i' + randomId(20)
+      /* the guest list gets a second secret of its own: without it, every
+         guest holding an invitation could swap ?i= for ?guests= and read the
+         names and private messages of everyone else invited */
+      const list_key = randomId(24)
+      const { error } = await sb.from('invitations').insert({ slug, list_key, order_id: o.id, design_id: (config && config.design) || 1, config, published: true })
+      if (error) { toast('تعذّر إنشاء الدعوة — شغّلوا schema-10-locks.sql أولًا'); return }
       await sb.from('orders').update({ inv_slug: slug, status: 'مدفوع' }).eq('id', o.id)
       o.inv_slug = slug
     }
@@ -300,6 +357,23 @@ function enterDb() {
     toast('🎁 أُنشئ التسليم ونُسخ الرابط ✓')
     if (o.phone) dbWaLink(o.phone, link)
     fetchAll()
+  }
+
+  /* the couple's own guest-list page — slug and key, and nothing else works */
+  window.dbGuestLink = async (slug) => {
+    if (!slug) return
+    try {
+      const { data } = await sb.from('invitations').select('list_key').eq('slug', slug).maybeSingle()
+      let key = data && data.list_key
+      if (!key) {                       /* an invitation made before the keys existed */
+        key = randomId(24)
+        await sb.from('invitations').update({ list_key: key }).eq('slug', slug)
+      }
+      const link = siteRoot() + '?guests=' + encodeURIComponent(slug) + '&k=' + encodeURIComponent(key)
+      try { await navigator.clipboard.writeText(link) } catch (e) {}
+      toast('🔗 نُسخ رابط قائمة الضيوف — للأصحاب فقط')
+      return link
+    } catch (e) { toast('تعذّر إنشاء الرابط') }
   }
   // The list fetch is light (no payload, to avoid DB timeouts). When we actually
   // need the full design — delivering or editing — fetch just that one row's payload.
@@ -326,6 +400,11 @@ function enterDb() {
     let config
     if (kind === 'ultra') config = { kind: 'ultra', uIdx: pl.uIdx || 0, c: pl.c || {}, design: pl.design || 1 }
     else if (kind === 'site') config = { kind: 'site', st: pl.st || {}, c: pl.c || {}, design: pl.design || 1 }
+    /* An order from the site's request form carries what the customer typed —
+       the names, the date, the place, the film they picked — but none of it in
+       the shape a design config wants. Left alone it delivered an invitation
+       with placeholder names, and everything had to be retyped by hand. */
+    else if (pl.tier || pl.filmId || pl.choice) config = configFromRequest(pl)
     else config = { kind: 'design', design: pl.design || 1, c: pl.c || {} }
     await invCreate(o, config)
   }
@@ -461,7 +540,15 @@ async function openSiteWindow(){
 }
 window.openSite=openSiteWindow;
 async function start() {
-  if (!sb) return // library failed → local demo mode, dashboard works as before
+  if (!sb) {
+    /* No library means no way to verify anyone. Previously this fell through
+       to "local demo mode" with the whole panel on screen; now it asks for a
+       sign-in it cannot complete, which is the safe direction to fail. */
+    showLogin()
+    const e = document.getElementById('dberr')
+    if (e) e.textContent = 'تعذّر الاتصال بالخادم — أعيدوا تحميل الصفحة'
+    return
+  }
   let session = null
   try { const r = await sb.auth.getSession(); session = r && r.data && r.data.session } catch (e) {}
   if (session) enterDb()

@@ -78,6 +78,9 @@ window.__loadForEdit=function(cfg,slug){try{
  if(cfg.design!=null)S.design=cfg.design;
  openEditor(S.design||1);
  if(cfg.c)S.c={...S.c,...cfg.c};
+ /* the same keys __applyInvite restores — opening an invitation to edit it
+    must not quietly drop the film, palette and song on the way in */
+ INV_KEYS.forEach(function(key){ if(cfg[key]!==undefined)S.c[key]=cfg[key]; });
  if(cfg.st)S.st=Object.assign({},S.st||{},cfg.st);
  S._editSlug=slug||null;S._editKind=cfg.kind||'design';S._editUidx=cfg.uIdx||0;
  render();
@@ -93,7 +96,14 @@ function showEditSaveBar(){
   </span>`;
  document.body.appendChild(bar);
 }
-function _editConfig(){return {kind:S._editKind||'design',design:S.design||1,c:JSON.parse(JSON.stringify(S.c)),st:_slimSt(S.st),uIdx:S._editUidx||0};}
+/* …and must not drop them on the way back out either. Saving used to write
+   only {kind, design, c, st}, so one edit stripped the film from an
+   invitation that had been delivered with it. */
+function _editConfig(){
+ const o={kind:S._editKind||'design',design:S.design||1,
+  c:JSON.parse(JSON.stringify(S.c)),st:_slimSt(S.st),uIdx:S._editUidx||0};
+ INV_KEYS.forEach(function(key){ if(S.c[key]!==undefined)o[key]=S.c[key]; });
+ return o;}
 window.saveEditToInvite=async function(){
  if(!window.__sbSaveInvite||!S._editSlug){toast(S.lang==='ar'?'لا يمكن الحفظ هنا':'Cannot save');return;}
  toast(S.lang==='ar'?'جارٍ الحفظ…':'Saving…');
@@ -131,9 +141,18 @@ window.saveEditAsTemplate=async function(){
  toast(ok?(S.lang==='ar'?'⭐ حُفظ كقالب جاهز':'Saved as template ✓'):(S.lang==='ar'?'تعذّر الحفظ':'Failed'));
  return ok;
 };
+/* The keys that decide what an invitation actually looks and sounds like.
+   Only cfg.c and cfg.design used to be copied, so a delivered invitation
+   opened with the couple's names on a bare design — no film behind it, no
+   palette from that film, no song. Everything the dashboard saved was there
+   in the config and being thrown away one line before it was used. */
+const INV_KEYS=['film','films','ediPal','ediSw','envStyle','vidStyle',
+ 'trackUrl','trackName','anim','music','musicStart','autoplay',
+ 'program','dress','dir','stay','story','maps','qr','font','pal'];
 window.__applyInvite=function(cfg,guest){try{
  cfg=cfg||{};const k=cfg.kind||'design';
  if(cfg.c)S.c={...S.c,...cfg.c};
+ INV_KEYS.forEach(function(key){ if(cfg[key]!==undefined)S.c[key]=cfg[key]; });
  if(guest)S.c.guest=String(guest).slice(0,40);
  if(k==='ultra'){window.__setUltraOvr&&window.__setUltraOvr({n:cfg.c&&cfg.c.n,d:cfg.c&&cfg.c.d});ultraOpen(Math.min(2,Math.max(0,(+cfg.uIdx)||0)));return;}
  if(k==='site'){if(cfg.st)S.st=Object.assign({},S.st,cfg.st);playShow();return;}

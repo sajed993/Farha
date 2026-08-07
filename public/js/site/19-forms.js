@@ -222,7 +222,12 @@ function submitRsvp(coming) {
   if (!name) { toast(t().rvNeed); return; }
   const row = {
     at: frmNow(), lang: S.lang,
-    invite: (S.c && (S.c.film || S.c.n)) || '',
+    /* The slug of the invitation this guest is standing in. It has to be the
+       slug and nothing else: the guest list is looked up by it, and falling
+       back to the couple's name filed every reply somewhere the list could
+       never find it. */
+    invite: (typeof window !== 'undefined' && window.__inviteSlug)
+            || (S.c && S.c.film) || (S.c && S.c.n) || '',
     host: (S.c && S.c.n) || '',
     name: name,
     coming: coming ? 1 : 0,

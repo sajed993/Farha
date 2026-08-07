@@ -102,7 +102,10 @@ async function loadInvite () {
     const q = new URLSearchParams(location.search)
     const slug = q.get('i')
     if (!slug) return
-    const { data, error } = await sb.from('invitations').select('*').eq('slug', slug).eq('published', true).maybeSingle()
+    /* through invite_get(), not the table: selecting invitations anonymously
+       used to return every couple's invitation in one request. */
+    const { data: rows, error } = await sb.rpc('invite_get', { p_slug: slug })
+    const data = rows && rows[0]
     if (error || !data) return
     window.__inviteSlug = slug
     track('open', { inv_slug: slug })
@@ -174,22 +177,25 @@ window.__lastUploadError = function () { return _uploadErr }
 // Through guest_list(), not the table: selecting rsvps anonymously would hand
 // over every wedding at once, while the function can only ever answer for the
 // one slug it was asked for. See supabase/schema-9-guest-list.sql.
-window.__sbGuests = async function (slug) {
+window.__sbGuests = async function (slug, key) {
   try {
     if (!sb || !slug) return null
-    const { data, error } = await sb.rpc('guest_list', { p_slug: slug })
-    if (!error) return data || []
-    // signed in as the owner, the table itself is readable
+    if (key) {
+      const { data, error } = await sb.rpc('guest_list', { p_slug: slug, p_key: key })
+      if (!error) return data || []
+    }
+    // no key, or the key was refused: the owner signed in can still read the
+    // table directly, which is how the dashboard's own view works
     const r = await sb.from('rsvps').select('name,attending,guests,message,created_at')
       .eq('inv_slug', slug).order('created_at', { ascending: false }).limit(500)
     return r.error ? null : (r.data || [])
   } catch (e) { return null }
 }
 // the couple's own names, so the page greets them instead of showing a slug
-window.__sbInviteName = async function (slug) {
+window.__sbInviteName = async function (slug, key) {
   try {
-    if (!sb || !slug) return ''
-    const { data, error } = await sb.rpc('invite_name', { p_slug: slug })
+    if (!sb || !slug || !key) return ''
+    const { data, error } = await sb.rpc('invite_name', { p_slug: slug, p_key: key })
     return (!error && data) ? String(data) : ''
   } catch (e) { return '' }
 }
