@@ -257,3 +257,8 @@ label.cmini{cursor:pointer}
 .txfoot .act{text-decoration:none;display:inline-flex;align-items:center}
 @media(max-width:720px){.txprow{grid-template-columns:1fr 1fr;grid-auto-rows:auto}
  .txprow .tt{grid-column:1/-1}}
+
+.filmup{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding-top:10px;
+ border-top:1px dashed var(--line)}
+.filmup .act{cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.filmrow-g input[type=color]{padding:2px;height:34px;cursor:pointer}

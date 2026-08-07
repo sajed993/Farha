@@ -26,7 +26,7 @@ const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,
   {id:'video',em:'🎥',name:{ar:'فيديو افتتاح مخصص',fr:'Vidéo d\'ouverture',en:'Custom video opening'},price:20},
   {id:'gallery',em:'🖼️',name:{ar:'معرض صور إضافي',fr:'Galerie photo',en:'Extra photo gallery'},price:10},
   {id:'musicup',em:'🎵',name:{ar:'رفع موسيقاكم الخاصة',fr:'Votre musique',en:'Upload your music'},price:10}
- ],wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:''},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[]}};
+ ],wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:''},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[],readyFilms:[]}};
 let CFG=JSON.parse(JSON.stringify(CFG_DEF));
 let T0=null;
 function loadCFG(){

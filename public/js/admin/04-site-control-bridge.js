@@ -2,7 +2,7 @@
 const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'farha_meta'};
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,cats:0,gallery:0,design:0,ready:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},vid:{site:'full',customer:'full'},price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[]}};
+const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,cats:0,gallery:0,design:0,ready:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},vid:{site:'full',customer:'full'},price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[],readyFilms:[]}};
 function loadCFG(){const cc=lsGet(LSK.cfg,{})||{};const o=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(o.sec,cc.sec||{});Object.assign(o.price,cc.price||{});o.wa=cc.wa||CFG_DEF.wa;o.d17=cc.d17||CFG_DEF.d17;
  Object.assign(o.banner,cc.banner||{});o.designs=cc.designs||{};
@@ -23,20 +23,14 @@ function ctlWa(v){CFG.wa=(v||'').trim();saveCFG();}
 function ctlD17(v){CFG.d17=(v||'').trim();saveCFG();}
 function ctlBan(k,v){CFG.banner[k]=(k==='on')?(v?1:0):v;saveCFG();}
 /* the four ready-made films, and the sections inside their invitation */
-/* every film on the shelf. This list had fallen four behind the site, so the
-   newer ones could not be switched off or priced at all. */
-const RDFILMS=[
- ['marble','قصر الرخام','أعراس'],
- ['oneday','يومًا ما','أعراس'],
- ['wisteria','ظلال الوستارية','أعراس'],
- ['rings','خواتم النور','أعراس'],
- ['henna','ليلة الحنّة','ليالي الحنّة'],
- ['bdaycake','شمعة العام','أعياد ميلاد'],
- ['bdayballoons','بالونات وردية','أعياد ميلاد'],
- ['babybasket','قدمان صغيرتان','مواليد'],
- ['babycake','أهلًا يا صغير','مواليد'],
- ['grad','قبّعة وورد','تخرّج'],
- ['soon','قريبًا','احفظوا التاريخ']];
+/* Derived from the shared catalogue rather than copied from it. The copy that
+   used to live here fell four films behind before anyone noticed, so there is
+   no copy any more — add a film anywhere and it appears in every panel. */
+const RDCATNAME={wed:'أعراس',henna:'ليالي الحنّة',bday:'أعياد ميلاد',
+ baby:'مواليد',grad:'تخرّج',save:'احفظوا التاريخ'};
+function rdFilms(){return readyCatalogue().map(f=>
+ [f.id, f.name.ar||f.id, RDCATNAME[f.cat]||f.cat, !!f._custom]);}
+Object.defineProperty(window,'RDFILMS',{get:rdFilms});
 const EDISECL=[['cd','ساعة العدّ التنازلي'],['prog','برنامج الحفل + مواقع الفقرات'],['dress','قواعد اللباس'],
  ['dir','الوصول وصفّ السيارات'],['stay','الإقامة'],['rsvp','تأكيد الحضور']];
 function ctlEdi(k,v){CFG.edi[k]=v?1:0;saveCFG();}
@@ -149,6 +143,86 @@ function mDelDesign(i){CFG.media.customDesigns.splice(i,1);saveCFG();renderConte
 function mShowTgl(i,on){const h=CFG.media.hideShows;const ix=h.indexOf(i);
  if(on&&ix>-1)h.splice(ix,1);if(!on&&ix===-1)h.push(i);saveCFG();}
 /* the ready-made films, and the sections inside their invitation */
+/* ── building a new ready invitation from the dashboard ── */
+function rdCustom(){CFG.media.readyFilms=CFG.media.readyFilms||[];return CFG.media.readyFilms;}
+function rdSlug(v){return String(v||'').trim().toLowerCase()
+ .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,24);}
+function rdNewSet(i,k,v){const L=rdCustom();if(!L[i])return;L[i][k]=v;saveCFG();}
+function rdNewAdd(){
+ const L=rdCustom();
+ let id='film-'+(L.length+1), n=2;
+ while(readyCatalogue().some(f=>f.id===id)){id='film-'+(L.length+n);n++;}
+ L.push({id:id,cat:'wed',v:'',p:'',nameAr:'دعوة جديدة',
+   sw0:'#3E3020',sw1:'#AE7E70',sw2:'#EFDFC2'});
+ saveCFG();renderContent();
+ toast('أُضيفت دعوة — ارفعوا فيديوها لتظهر على الموقع');}
+function rdNewDel(i){const L=rdCustom();const f=L[i];
+ if(f&&CFG.films&&CFG.films[f.id])delete CFG.films[f.id];
+ L.splice(i,1);saveCFG();renderContent();toast('حُذفت ✓');}
+function rdNewUp(ev,i,field){
+ mediaUp(ev.target,url=>{const L=rdCustom();if(L[i])L[i][field]=url;});}
+/* a poster grabbed from the film itself, so a new invitation is never blank */
+function rdGrabPoster(i){
+ const L=rdCustom(),f=L[i];
+ if(!f||!f.v){toast('ارفعوا الفيديو أولاً');return;}
+ const v=document.createElement('video');
+ v.src=f.v;v.muted=true;v.crossOrigin='anonymous';v.preload='auto';
+ v.onloadeddata=()=>{v.currentTime=Math.min(1.2,(v.duration||2)/2);};
+ v.onseeked=()=>{try{
+   const c=document.createElement('canvas');
+   c.width=v.videoWidth;c.height=v.videoHeight;
+   c.getContext('2d').drawImage(v,0,0);
+   f.p=c.toDataURL('image/jpeg',.82);saveCFG();renderContent();
+   toast('أُخذت صورة الغلاف ✓');
+  }catch(e){toast('تعذّر أخذ الصورة — ارفعوها يدويًا');}};
+ v.onerror=()=>toast('تعذّر قراءة الفيديو');}
+
+function newFilmsView(){
+ const L=rdCustom();
+ const cats=Object.keys(RDCATNAME);
+ return ctlCard('➕ دعوات جديدة من عندكم',
+  'ارفعوا فيديو واختاروا ألوانه — تظهر على الرفّ مع البقية، '
+  +'وتجدونها في كل اللوحات الأخرى فورًا.',
+  (L.length?L.map((f,i)=>`<div class="filmrow ${f.v?'':'off'}">
+    <div class="filmrow-h">
+     <b>${escA(f.nameAr||f.id)}</b>
+     <em>${RDCATNAME[f.cat]||f.cat}</em>
+     <span class="filmrow-st">${f.v?'جاهز':'بلا فيديو'}</span>
+     <button class="txdel" onclick="rdNewDel(${i})" title="حذف">×</button>
+    </div>
+    <div class="filmrow-g">
+     <label>الاسم (عربي)<input value="${escA(f.nameAr||'')}"
+      oninput="rdNewSet(${i},'nameAr',this.value)"></label>
+     <label>Nom (FR)<input value="${escA(f.nameFr||'')}"
+      oninput="rdNewSet(${i},'nameFr',this.value)"></label>
+     <label>Name (EN)<input value="${escA(f.nameEn||'')}"
+      oninput="rdNewSet(${i},'nameEn',this.value)"></label>
+     <label>المناسبة<select onchange="rdNewSet(${i},'cat',this.value);renderContent()">
+      ${cats.map(c=>`<option value="${c}" ${f.cat===c?'selected':''}>${RDCATNAME[c]}</option>`).join('')}
+     </select></label>
+     <label>الوصف<input value="${escA(f.blurbAr||'')}"
+      oninput="rdNewSet(${i},'blurbAr',this.value)"></label>
+     <label>رابط الموسيقى<input value="${escA(f.snd||'')}" placeholder="/media/snd/...webm"
+      oninput="rdNewSet(${i},'snd',this.value)"></label>
+     <label>لون الحبر<input type="color" value="${f.sw0||'#3E3020'}"
+      oninput="rdNewSet(${i},'sw0',this.value)"></label>
+     <label>لون اللمسة<input type="color" value="${f.sw1||'#AE7E70'}"
+      oninput="rdNewSet(${i},'sw1',this.value)"></label>
+     <label>لون الورق<input type="color" value="${f.sw2||'#EFDFC2'}"
+      oninput="rdNewSet(${i},'sw2',this.value)"></label>
+    </div>
+    <div class="filmup">
+     <label class="act">${f.v?'تغيير الفيديو':'↑ ارفعوا الفيديو'}
+      <input type="file" accept="video/*" hidden onchange="rdNewUp(event,${i},'v')"></label>
+     <label class="act">${f.p?'تغيير الغلاف':'↑ صورة الغلاف'}
+      <input type="file" accept="image/*" hidden onchange="rdNewUp(event,${i},'p')"></label>
+     <button class="act" onclick="rdGrabPoster(${i})">التقاط الغلاف من الفيديو</button>
+     ${f.v?`<a class="act gold" href="index.html?vidPreview=${f.id}&vidSec=hall" target="_blank">معاينة ↗</a>`:''}
+    </div>
+   </div>`).join('')
+   :'<p class="cmut">لا دعوات مضافة بعد.</p>')
+  +`<button class="act gold" onclick="rdNewAdd()">+ دعوة جديدة</button>`);}
+
 function ctlPriceReady(k,v){CFG.price[k]=Math.max(0,parseInt(v)||0);saveCFG();}
 function readyView(){
  const F=CFG.films||{},E=CFG.edi||{};
@@ -156,7 +230,8 @@ function readyView(){
    `<option value="${k}" ${cur===k?'selected':''}>${n}</option>`).join('');
  const vidOpt=(cur)=>VIDL.map(([k,n])=>
    `<option value="${k}" ${cur===k?'selected':''}>${n}</option>`).join('');
- return ctlCard('💰 سعر الدعوات الجاهزة',
+ return newFilmsView()
+ + ctlCard('💰 سعر الدعوات الجاهزة',
   'السعر المعروض والسعر المشطوب فوقه. اجعلوا المشطوب صفرًا لإخفاء الخصم.',
   `<div class="f-row"><label>السعر الحالي (د.ت)</label>
     <input type="number" value="${CFG.price.ready||99}"

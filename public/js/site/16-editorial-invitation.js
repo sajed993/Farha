@@ -482,6 +482,30 @@ function mountEditorial(stage){
   const m=root.scrollHeight-root.clientHeight;
   if(bar)bar.style.width=(m>0?(root.scrollTop/m*100):0)+'%';},{passive:true});}
 
+/* A built-in film has a .pal-<id> class written by hand. One added from the
+   dashboard has only three colours, so the rest of the palette is derived
+   from them and written inline — same variables, same result. */
+function ediMix(hex,amt){
+ const h=String(hex||'').trim().replace('#','');
+ if(h.length<6)return '#000000';
+ const n=parseInt(h.slice(0,6),16);
+ let r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+ const t=amt>0?255:0,k=Math.abs(amt);
+ r=Math.round(r+(t-r)*k);g=Math.round(g+(t-g)*k);b=Math.round(b+(t-b)*k);
+ return '#'+[r,g,b].map(v=>('0'+v.toString(16)).slice(-2)).join('');}
+function ediPaletteVars(sw){
+ if(!sw||sw.length<3)return '';
+ const ink=sw[0],acc=sw[1],paper=sw[2];
+ const V={
+  '--cream':ediMix(paper,.55),'--cream-hi':ediMix(paper,.8),
+  '--beige':ediMix(paper,.12),'--beige-dp':ediMix(paper,-.16),
+  '--gold':ediMix(acc,-.1),'--gold-hi':ediMix(acc,.5),
+  '--gold-lo':ediMix(acc,-.38),'--gold-pale':ediMix(acc,.72),
+  '--ink':ink,'--ink-soft':ediMix(ink,.18),'--ink-mute':ediMix(ink,.42),
+  '--blush':acc,'--plum':ediMix(acc,-.34),'--sage':ediMix(acc,-.05),
+  '--wax':ediMix(acc,-.24)};
+ return Object.keys(V).map(k=>k+':'+V[k]).join(';');}
+
 function editorialOpen(){
  closeVeil(true);
  /* the landing page is still behind the veil; give its decoders back before
@@ -489,6 +513,8 @@ function editorialOpen(){
  try{lazyvReleaseAll()}catch(e){}
  veil=document.createElement('div');
  veil.className='veil edi-veil-root'+(S.c.ediPal?' pal-'+S.c.ediPal:'');
+ /* a film added from the dashboard carries its colours rather than a class */
+ if(S.c.ediSw){const v=ediPaletteVars(S.c.ediSw);if(v)veil.setAttribute('style',v);}
  document.body.appendChild(veil);document.body.style.overflow='hidden';
  const stage=document.createElement('div');stage.className='cstage edi-stage';
  veil.appendChild(stage);
