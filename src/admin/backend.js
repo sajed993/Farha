@@ -322,8 +322,13 @@ function enterDb() {
     if (pl.msg) c.m = String(pl.msg).slice(0, 300)
     if (pl.when) {
       c.d = String(pl.when).slice(0, 40)          // shown as written
-      const t = Date.parse(pl.when)               // and drives the countdown
-      if (!isNaN(t) && t > Date.now()) c.when = new Date(t).toISOString().slice(0, 16)
+      /* The countdown wants a moment, not a day. It must NOT go through
+         Date.parse and toISOString: a bare "19:30" is read as local time and
+         written back as UTC, so a wedding at half past seven was stored as
+         half past six. Both halves are already in the shape S.c.when wants —
+         a local wall clock — so they are simply joined. */
+      const time = /^\d{2}:\d{2}$/.test(pl.time || '') ? pl.time : '19:00'
+      if (/^\d{4}-\d{2}-\d{2}$/.test(pl.when)) c.when = pl.when + 'T' + time
     }
     const config = { kind: 'design', design: (f && f.design) || 1, c }
     if (f) {

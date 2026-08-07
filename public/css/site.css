@@ -3278,3 +3278,34 @@ html[dir=rtl] .off-flour{transform:scaleX(-1)}
 .frm-sheet.is-sign::before{content:'';position:absolute;top:0;inset-inline:0;height:2px;
  border-start-start-radius:18px;border-start-end-radius:18px;
  background:var(--brandFoil);background-size:200% auto;animation:foilshift 7s ease-in-out infinite}
+
+/* ---- the order form, by occasion ---- */
+.frm-occs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.frm-occ{padding:7px 14px;border-radius:99px;font-size:.82rem;font-weight:600;
+ color:var(--ink2);background:#fff;cursor:pointer;transition:.18s;
+ box-shadow:inset 0 0 0 1px var(--line)}
+.frm-occ:hover{color:var(--brand-d)}
+.frm-occ.on{color:#FFF6F3;box-shadow:none;
+ background:linear-gradient(158deg,var(--brand-l),var(--brand) 42%,var(--brand-d))}
+/* a labelled field: type="date" shows no placeholder, so it needs a real label */
+.frm-f{display:block;margin-bottom:9px}
+.frm-f>span{display:block;font-size:.76rem;font-weight:600;color:var(--ink2);margin-bottom:5px}
+.frm-f>span i{font-style:normal;color:var(--brand)}
+.frm-f input,.frm-f textarea{margin-bottom:0}
+.frm-g2 .frm-f{margin-bottom:9px}
+/* the date and time pickers, which browsers style their own way */
+.frm-sheet input[type=date],.frm-sheet input[type=time]{
+ min-height:46px;font-family:var(--num);letter-spacing:.02em}
+.frm-sheet input[type=date]::-webkit-calendar-picker-indicator,
+.frm-sheet input[type=time]::-webkit-calendar-picker-indicator{
+ opacity:.55;cursor:pointer;filter:saturate(0)}
+/* ideas for anyone looking at an empty box */
+.frm-ideas{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 12px}
+.frm-ideas>span{flex:1 0 100%;font-size:.75rem;line-height:1.6;color:var(--taupe);margin-bottom:3px}
+.frm-idea{max-width:100%;padding:7px 12px;border-radius:10px;text-align:start;
+ font-size:.78rem;line-height:1.5;color:var(--brand-d);cursor:pointer;transition:.18s;
+ background:color-mix(in srgb,var(--brand-pale) 42%,transparent);
+ box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--brand) 16%,transparent)}
+.frm-idea:hover{background:color-mix(in srgb,var(--brand-pale) 72%,transparent)}
+.frm-idea.on{color:#FFF6F3;box-shadow:none;
+ background:linear-gradient(158deg,var(--brand-l),var(--brand) 42%,var(--brand-d))}

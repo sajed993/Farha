@@ -60,7 +60,7 @@ function frmWaText(o) {
              : (o.tier === 'sign' ? O.sName : O.rName);
     bits.push(lbl.offer + ': ' + nm); } catch (e) {}
   add('film', o.filmName); add('name', o.name); add('names', o.names);
-  add('when', o.when); add('place', o.place); add('wish', o.wish);
+  add('when', o.when + (o.time ? ' · ' + o.time : '')); add('place', o.place); add('wish', o.wish);
   return bits.join('\n');
 }
 function frmWaOpen(o) {
@@ -78,12 +78,192 @@ let FRM_FILM = null;
    leads with — asking a Signature buyer to pick from a shelf would be the
    wrong question. */
 let FRM_TIER = 'ready';
+/* Which occasion this is. One box labelled "names on the invitation" asked a
+   couple to type two names into one field and a new parent to type one, and
+   gave us a string nobody could split afterwards. The occasion decides which
+   boxes appear, so a wedding asks for the groom and the bride separately and
+   a birth asks for the baby. */
+let FRM_CAT = 'wed';
+
+/* Ideas live here rather than in the i18n file: they are the form's content,
+   they change with the occasion, and there are a lot of them. */
+const FRM_IDEAS = {
+  ar: {
+    msg: {
+      wed: ['يتشرّفان بدعوتكم لمشاركتهما فرحة العمر',
+            'بقلوب مفعمة بالسعادة ندعوكم لحضور حفل زفافنا',
+            'وجودكم معنا هو أجمل هديّة'],
+      henna: ['ندعوكم لليلة الحنّة — ليلة فرح وزغاريد',
+              'شاركونا أحلى ليلة قبل العرس',
+              'الحنّة على اليد، والفرح في القلب — كونوا معنا'],
+      bday: ['ندعوكم لمشاركتنا فرحة عيد الميلاد',
+             'شمعة جديدة، وفرحة نحبّ أن نعيشها معكم',
+             'يوم جميل يستحق أن نحتفل به سويًّا'],
+      baby: ['بفرحة كبيرة نبشّركم بقدوم مولودنا',
+             'وصل أجمل ضيف إلى بيتنا — تعالوا نفرحو',
+             'قلبنا امتلأ، وندعوكم لتشاركونا هذه الفرحة'],
+      grad: ['بعد سنوات من التعب، وصلنا — شاركونا الفرحة',
+             'ندعوكم لحفل التخرّج ومشاركتنا هذه اللحظة',
+             'حلمٌ تحقّق، ونحبّ أن نحتفل به معكم'],
+      save: ['احفظوا التاريخ — التفاصيل قريبًا',
+             'شيءٌ جميل قادم، ونريدكم معنا فيه',
+             'سجّلوا هذا اليوم عندكم من الآن']
+    },
+    wish: ['ألوان دافئة، ذهبي وكريمي، وموسيقى هادئة',
+           'شيء بسيط وأنيق — أبيض وأخضر، بلا زخرفة كثيرة',
+           'أجواء تونسية: زليج، ياسمين، وخطّ عربي',
+           'أبيض وأسود، سينمائي، وموسيقى بيانو',
+           'مرح وملوّن — نحبّ شيئًا يضحك القلب']
+  },
+  fr: {
+    msg: {
+      wed: ['Ont la joie de vous convier à leur mariage',
+            'Avec le cœur plein, nous vous invitons à partager notre bonheur',
+            'Votre présence est le plus beau des cadeaux'],
+      henna: ['Nous vous invitons à la nuit du henné',
+              'Partagez avec nous la plus belle nuit avant le mariage',
+              'Le henné sur les mains, la joie dans le cœur — venez'],
+      bday: ['Nous vous invitons à fêter cet anniversaire avec nous',
+             'Une bougie de plus, et une joie à partager',
+             'Une belle journée qui mérite d’être fêtée ensemble'],
+      baby: ['C’est avec une immense joie que nous vous annonçons sa naissance',
+             'Le plus beau des invités est arrivé — venez le rencontrer',
+             'Notre cœur est comblé, et nous voulons le partager avec vous'],
+      grad: ['Après des années de travail, nous y sommes — partagez notre joie',
+             'Nous vous invitons à la cérémonie de remise des diplômes',
+             'Un rêve réalisé, que nous aimerions fêter avec vous'],
+      save: ['Réservez la date — les détails suivront',
+             'Quelque chose de beau arrive, et nous vous y voulons',
+             'Notez ce jour dès maintenant']
+    },
+    wish: ['Tons chauds, doré et crème, une musique douce',
+           'Simple et élégant — blanc et vert, peu d’ornements',
+           'Ambiance tunisienne : zellige, jasmin et calligraphie',
+           'Noir et blanc, cinématographique, au piano',
+           'Joyeux et coloré — quelque chose qui fait sourire']
+  },
+  en: {
+    msg: {
+      wed: ['Joyfully invite you to celebrate their wedding',
+            'With full hearts, we invite you to share our day',
+            'Your presence is the greatest gift'],
+      henna: ['We invite you to our henna night',
+              'Share the loveliest night before the wedding with us',
+              'Henna on the hands, joy in the heart — be there'],
+      bday: ['We invite you to celebrate this birthday with us',
+             'One more candle, and a joy worth sharing',
+             'A lovely day that deserves to be spent together'],
+      baby: ['With great joy we announce the arrival of our baby',
+             'The loveliest guest has arrived — come and meet them',
+             'Our hearts are full, and we would like to share it'],
+      grad: ['After years of work, we made it — share the joy',
+             'We invite you to the graduation ceremony',
+             'A dream come true, and we would love to celebrate it with you'],
+      save: ['Save the date — details to follow',
+             'Something lovely is coming, and we want you there',
+             'Put this day in your calendar now']
+    },
+    wish: ['Warm tones, gold and cream, and quiet music',
+           'Simple and elegant — white and green, little ornament',
+           'A Tunisian feel: zellige, jasmine and Arabic calligraphy',
+           'Black and white, cinematic, with piano',
+           'Bright and colourful — something that makes you smile']
+  }
+};
+function frmIdeas() { return FRM_IDEAS[S.lang] || FRM_IDEAS.ar; }
+
+/* Which name boxes an occasion needs. [id, label, required] */
+function frmNameFields(cat) {
+  const N = t().ordN;
+  if (cat === 'baby') return [['ordNameA', N.baby, true], ['ordNameB', N.parents, false]];
+  if (cat === 'bday') return [['ordNameA', N.celebrant, true], ['ordNameB', N.age, false]];
+  if (cat === 'grad') return [['ordNameA', N.grad, true], ['ordNameB', N.degree, false]];
+  if (cat === 'henna') return [['ordNameA', N.bride, true], ['ordNameB', N.groomOpt, false]];
+  return [['ordNameA', N.groom, true], ['ordNameB', N.bride, true]];
+}
+/* the one string the invitation is titled with, built from the parts */
+function frmJoinNames(cat, a, b) {
+  a = (a || '').trim(); b = (b || '').trim();
+  if (!a) return b;
+  if (!b) return a;
+  if (cat === 'bday') return a;                   /* the second box is an age */
+  if (cat === 'baby' || cat === 'grad') return a; /* parents / degree are context */
+  return a + (S.lang === 'ar' ? ' و ' : ' & ') + b;
+}
+
+/* a row of ideas under a long box, for anyone staring at an empty field */
+function frmIdeaChips(target, list) {
+  if (!list || !list.length) return '';
+  return `<div class="frm-ideas"><span>${esc(t().ordIdeas)}</span>
+    ${list.map((s, i) => `<button type="button" class="frm-idea"
+      onclick="frmUseIdea('${target}',${i})">${esc(s)}</button>`).join('')}</div>`;
+}
+function frmUseIdea(target, i) {
+  const list = target === 'ordMsg' ? (frmIdeas().msg[FRM_CAT] || frmIdeas().msg.wed) : frmIdeas().wish;
+  const el = document.getElementById(target);
+  if (!el) return;
+  el.value = list[i] || '';
+  el.focus();
+  /* the chips stay so another can be tried; the chosen one is marked */
+  const wrap = el.parentElement.querySelector('.frm-ideas') ||
+               (el.nextElementSibling && el.nextElementSibling.classList.contains('frm-ideas') ? el.nextElementSibling : null);
+  if (wrap) [...wrap.querySelectorAll('.frm-idea')].forEach((b, j) => b.classList.toggle('on', j === i));
+}
+
+/* the block that changes with the occasion, rebuilt in place so nothing
+   already typed is lost when someone switches */
+function frmEventHTML(cat) {
+  const T = t();
+  const fields = frmNameFields(cat);
+  const msgIdeas = frmIdeas().msg[cat] || frmIdeas().msg.wed;
+  return `
+    <div class="frm-occs">${['wed','henna','bday','baby','grad','save'].map(k =>
+      `<button type="button" class="frm-occ ${cat === k ? 'on' : ''}"
+        onclick="frmSetOcc('${k}')">${esc(T.rdCats[k])}</button>`).join('')}</div>
+
+    <div class="frm-g2">${fields.map(([id, lbl, req]) =>
+      `<label class="frm-f"><span>${esc(lbl)}${req ? ' <i>*</i>' : ''}</span>
+        <input id="${id}" autocomplete="off"></label>`).join('')}</div>
+
+    <div class="frm-g2">
+      <label class="frm-f"><span>${esc(T.ordDateL)}</span>
+        <input id="ordWhen" type="date" dir="ltr" min="${new Date().toISOString().slice(0,10)}"></label>
+      <label class="frm-f"><span>${esc(T.ordTimeL)}</span>
+        <input id="ordTime" type="time" dir="ltr"></label>
+    </div>
+    <label class="frm-f"><span>${esc(T.ordPlaceL)}</span>
+      <input id="ordPlace" placeholder="${esc(T.ordPlaceEg)}"></label>
+
+    <label class="frm-f"><span>${esc(T.ordMsgL)}</span>
+      <textarea id="ordMsg" rows="2"></textarea></label>
+    ${frmIdeaChips('ordMsg', msgIdeas)}`;
+}
+function frmSetOcc(cat) {
+  const host = document.getElementById('ordEvent');
+  if (!host) return;
+  /* carry across whatever fits: the first name always, the second only when
+     the new occasion still has a second name box rather than an age */
+  const keep = { a: frmVal('ordNameA'), b: frmVal('ordNameB'), when: frmVal('ordWhen'),
+                 time: frmVal('ordTime'), place: frmVal('ordPlace'), msg: frmVal('ordMsg') };
+  const wasPaired = FRM_CAT === 'wed' || FRM_CAT === 'save' || FRM_CAT === 'henna';
+  FRM_CAT = cat;
+  const isPaired = cat === 'wed' || cat === 'save' || cat === 'henna';
+  host.innerHTML = frmEventHTML(cat);
+  const set = (id, v) => { const e = document.getElementById(id); if (e && v) e.value = v; };
+  set('ordNameA', keep.a);
+  if (wasPaired === isPaired) set('ordNameB', keep.b);
+  set('ordWhen', keep.when); set('ordTime', keep.time);
+  set('ordPlace', keep.place); set('ordMsg', keep.msg);
+}
 
 function openOrder(filmId, tier) {
   closeOrder();
   const f = (typeof readyFilm === 'function' && filmId) ? readyFilm(filmId) : null;
   FRM_FILM = f;
   FRM_TIER = (tier === 'sign') ? 'sign' : 'ready';
+  /* tapping a film already says what the occasion is; the chips still let it
+     be changed, for anyone who liked a wedding film for their engagement */
+  FRM_CAT = (f && f.cat) || 'wed';
   const sign = FRM_TIER === 'sign';
   const O = t().off;
   const nm = f ? (typeof readyName === 'function' ? readyName(f) : f.name[S.lang]) : '';
@@ -105,16 +285,11 @@ function openOrder(filmId, tier) {
     <label class="frm-l">${esc(t().ordWho)}</label>
     <div class="frm-g2">
       <input id="ordName" placeholder="${esc(t().ordName)}" autocomplete="name">
-      <input id="ordPhone" placeholder="${esc(t().ordPhone)}" inputmode="tel" autocomplete="tel">
+      <input id="ordPhone" placeholder="${esc(t().ordPhone)}" inputmode="tel" autocomplete="tel" dir="ltr">
     </div>
 
     <label class="frm-l">${esc(t().ordEv)}</label>
-    <input id="ordNames" placeholder="${esc(t().ordNames)}">
-    <div class="frm-g2">
-      <input id="ordWhen" placeholder="${esc(t().ordDate)}">
-      <input id="ordPlace" placeholder="${esc(t().ordPlace)}">
-    </div>
-    <input id="ordMsg" placeholder="${esc(t().ordMsg)}">
+    <div id="ordEvent">${frmEventHTML(FRM_CAT)}</div>
 
     ${sign ? '' : `<label class="frm-l">${esc(t().ordFilm)}</label>
     <div class="frm-radio">
@@ -125,6 +300,7 @@ function openOrder(filmId, tier) {
 
     <label class="frm-l">${esc(t().ordWish)}</label>
     <textarea id="ordWish" rows="${sign ? 5 : 3}" placeholder="${esc(t().ordWishPh)}"></textarea>
+    ${frmIdeaChips('ordWish', frmIdeas().wish)}
 
     <button class="frm-go" onclick="submitOrder()">${esc(t().ordSend)}</button>
     <button class="frm-alt" onclick="skipToWa()">${esc(t().ordSkip)}</button>
@@ -146,7 +322,10 @@ function frmCollect() {
   return {
     at: frmNow(), lang: S.lang,
     name: frmVal('ordName'), phone: frmVal('ordPhone'),
-    names: frmVal('ordNames'), when: frmVal('ordWhen'),
+    occ: FRM_CAT,
+    nameA: frmVal('ordNameA'), nameB: frmVal('ordNameB'),
+    names: frmJoinNames(FRM_CAT, frmVal('ordNameA'), frmVal('ordNameB')),
+    when: frmVal('ordWhen'), time: frmVal('ordTime'),
     place: frmVal('ordPlace'), msg: frmVal('ordMsg'),
     wish: frmVal('ordWish'),
     filmId: f ? f.id : '', filmName: f ? (typeof readyName === 'function' ? readyName(f) : f.name[S.lang]) : '',
@@ -172,7 +351,14 @@ function skipToWa() {
 }
 function submitOrder() {
   const o = frmCollect();
-  if (!o.name || !o.phone) { toast(t().ordNeed); return; }
+  if (!o.name || !o.phone) {
+    toast(t().ordNeed);
+    const e = document.getElementById(o.name ? 'ordPhone' : 'ordName'); if (e) e.focus();
+    return;
+  }
+  /* the names are what the invitation is titled with — an order without them
+     costs a round trip on WhatsApp to ask */
+  if (!o.nameA) { toast(t().ordNeedNames); const e = document.getElementById('ordNameA'); if (e) e.focus(); return; }
   frmPush(FRM_K.orders, o);
   closeOrder();
   orderThanks(o);
