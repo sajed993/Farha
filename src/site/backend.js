@@ -14,6 +14,7 @@ function rowFor(kind, d) {
   if (kind === 'rsvp')
     return {
       inv_slug: d.inv_slug ? String(d.inv_slug).slice(0, 64) : (window.__inviteSlug || null),
+      name: String(d.name || 'ضيف').slice(0, 60),
       attending: !!d.attending,
       guests: Math.min(50, Math.max(1, Math.floor(+d.guests) || 1)),
       allergies: Array.isArray(d.allergies) ? d.allergies.slice(0, 10) : [],
@@ -165,6 +166,46 @@ window.__uploadEventMedia = async function (st) {
 }
 window.__lastUploadError = function () { return _uploadErr }
 
+
+/* ═══ the guest list an owner can be handed: ?guests=slug ═══
+   Read-only and anonymous by design — the people opening it are the couple and
+   whoever they forward it to, not accounts we manage. It reads the same rsvps
+   the invitation writes, so it is the list itself rather than a copy of it. */
+// Through guest_list(), not the table: selecting rsvps anonymously would hand
+// over every wedding at once, while the function can only ever answer for the
+// one slug it was asked for. See supabase/schema-9-guest-list.sql.
+window.__sbGuests = async function (slug) {
+  try {
+    if (!sb || !slug) return null
+    const { data, error } = await sb.rpc('guest_list', { p_slug: slug })
+    if (!error) return data || []
+    // signed in as the owner, the table itself is readable
+    const r = await sb.from('rsvps').select('name,attending,guests,message,created_at')
+      .eq('inv_slug', slug).order('created_at', { ascending: false }).limit(500)
+    return r.error ? null : (r.data || [])
+  } catch (e) { return null }
+}
+// the couple's own names, so the page greets them instead of showing a slug
+window.__sbInviteName = async function (slug) {
+  try {
+    if (!sb || !slug) return ''
+    const { data, error } = await sb.rpc('invite_name', { p_slug: slug })
+    return (!error && data) ? String(data) : ''
+  } catch (e) { return '' }
+}
+// New replies arrive without anyone reloading. Realtime honours the same RLS
+// as a plain select, so this only delivers to the signed-in owner — the page
+// polls as well, which is what covers everyone else.
+window.__sbGuestsWatch = function (slug, onChange) {
+  try {
+    if (!sb || !slug) return null
+    const ch = sb.channel('guests-' + slug).on('postgres_changes',
+      { event: '*', schema: 'public', table: 'rsvps', filter: 'inv_slug=eq.' + slug },
+      () => { try { onChange() } catch (e) {} })
+    ch.subscribe()
+    return () => { try { sb.removeChannel(ch) } catch (e) {} }
+  } catch (e) { return null }
+}
 
 /* ═══ owner order-editing: load ?edit=slug into the editor, save back ═══ */
 async function loadForEdit () {

@@ -17,9 +17,20 @@ function frmPush(k, row) {
   const a = frmGet(k);
   a.push(row);
   try { localStorage.setItem(k, JSON.stringify(a)); } catch (e) {}
-  /* the backend takes it too when a customer is signed in; failing that the
-     row still exists locally and the dashboard can export it */
-  try { if (window.__sbSaveRow) window.__sbSaveRow(k, row); } catch (e) {}
+  /* Also to the database, which is what lets an owner open their guest list on
+     their own phone. localStorage only ever holds what this one device saw, so
+     without this the shared link would open empty for everybody else. */
+  try {
+    if (typeof dbHook === 'function') {
+      if (k === FRM_K.rsvp)
+        dbHook('rsvp', { inv_slug: row.invite, name: row.name, attending: !!row.coming,
+                         guests: row.count || 1, message: row.msg });
+      else
+        dbHook('order', { item: row.filmName || (row.choice === 'new' ? 'فيلم جديد خاص' : 'دعوة'),
+                          price: row.price || 0, phone: row.phone,
+                          customer_name: row.name, payload: row });
+    }
+  } catch (e) {}
   return a;
 }
 function frmNow() { const d = new Date(); return d.toISOString(); }

@@ -294,3 +294,12 @@ label.cmini{cursor:pointer}
 .wabox{white-space:pre-wrap;padding:13px 15px;border-radius:11px;font-size:.86rem;
  line-height:1.85;color:#3A2B10;background:#E7F2E9;
  border:1px solid rgba(47,107,58,.22)}
+
+/* ── guest-list link ── */
+.act.tiny{margin-inline-start:auto;padding:4px 10px;font-size:.72rem;font-weight:600}
+.frqinv h4{display:flex;align-items:center;gap:9px}
+.glbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.glbar input{flex:1 1 14rem;min-width:0;padding:10px 12px;border-radius:10px;
+ border:1px solid var(--line);background:#fff;font-family:inherit;font-size:.88rem}
+.glout{margin-top:10px;font-family:var(--num);font-size:.78rem;color:#2F6B3A;
+ word-break:break-all;direction:ltr;text-align:start}

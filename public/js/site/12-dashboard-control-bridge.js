@@ -312,7 +312,11 @@ function payProof(){const p=S._pay||{};
   if(hasMedia)toast(S.lang==='ar'?'📨 استلمنا طلبكم بصوركم — بعد تأكيد الدفع تصلكم دعوتكم 💛':'📨 Order received with your media ✓');
  })();}
 window.addEventListener('storage',function(e){if(e&&e.key&&(e.key===LSK.cfg||e.key===LSK.wishes)){try{loadCFG();render();}catch(x){}}});
-function render(){applyCFGdom._raf=requestAnimationFrame(function(){try{applyCFGdom()}catch(e){}});
+function render(){
+ /* the shared guest list owns the page once it opens — nothing else belongs
+    on it, and a stray render would put the whole site back */
+ if(typeof GL_ON!=='undefined'&&GL_ON)return;
+ applyCFGdom._raf=requestAnimationFrame(function(){try{applyCFGdom()}catch(e){}});
  const sameView=prevView===S.view;
  const keepY=sameView?window.scrollY:0;
  app.innerHTML=S.view==='land'?landView():editorView();

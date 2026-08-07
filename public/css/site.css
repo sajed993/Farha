@@ -2263,8 +2263,13 @@ html[dir=rtl] .df-yes{translate:50% -50%}
  --ink:#2C3742;--ink-soft:#4A5866;--ink-mute:#70808E;
  --blush:#5E88AA;--plum:#2E4256;--sage:#8298A0;--wax:#2E4256}
 
+/* No smooth scrolling here. It animates the container on every wheel tick and
+   swallows the deltas that arrive mid-animation, which is what made a scroll
+   down feel blocked until you went back up and tried again — measured at
+   2520px travelled against 2880px asked for. Nothing scrolls this element
+   programmatically, so there is nothing to smooth. */
 .edi{position:fixed;inset:0;z-index:70;overflow-y:auto;overflow-x:hidden;
- background:var(--cream);scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+ background:var(--cream);-webkit-overflow-scrolling:touch}
 .edi-stage{position:fixed;inset:0;display:block;padding:0}
 .edi-bar{position:fixed;top:0;left:0;right:0;height:2px;z-index:20;background:color-mix(in srgb,var(--gold) 16%,transparent)}
 .edi-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#B98A2F,#EBD9AE);transition:width .18s linear}
@@ -3113,3 +3118,40 @@ html.is-preview .edi::-webkit-scrollbar{display:none}
 /* the head-count carries a value from the start, so its placeholder never
    shows — it needs a caption of its own */
 .frm-l.tight{margin-top:4px}
+
+/* ============ SHARED GUEST LIST (?guests=) ============
+   Its own page, not a view of the site. Everything the site puts around the
+   content is hidden, because the couple opening this link came for one thing. */
+.is-guestlist .wa-float,.is-guestlist .cart-fab,.is-guestlist .topbar,
+.is-guestlist .nav,.is-guestlist footer:not(.gl-foot){display:none!important}
+.gl{max-width:34rem;margin:0 auto;padding:28px 18px 48px;min-height:100vh}
+.gl-head{text-align:center;padding-bottom:20px;border-bottom:1px dashed var(--line)}
+.gl-kick{display:inline-block;padding:4px 13px;border-radius:99px;font-size:.72rem;font-weight:700;
+ letter-spacing:.08em;color:var(--brand-d);background:var(--brand-pale)}
+.gl-head h1{margin:11px 0 5px;font-family:var(--disp);font-weight:700;font-size:1.6rem;color:var(--ink)}
+.gl-head p{font-size:.76rem;color:var(--taupe);font-family:var(--num)}
+.gl-nums{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:20px 0 22px}
+.gl-nums>div{padding:15px 12px;border-radius:13px;text-align:center;
+ background:color-mix(in srgb,var(--brand-pale) 48%,transparent)}
+.gl-nums>div.wide{grid-column:1/-1}
+.gl-nums b{display:block;font-family:var(--num);font-size:1.7rem;font-weight:700;color:var(--brand-d)}
+.gl-nums span{font-size:.78rem;color:var(--ink2)}
+.gl-list{list-style:none;display:grid;gap:10px}
+.gl-row{padding:13px 15px;border-radius:13px;background:var(--paper);
+ box-shadow:0 1px 0 var(--line),0 8px 20px -16px rgba(44,35,24,.5)}
+.gl-row.yes{border-inline-start:3px solid #2F6B3A}
+.gl-row.no{border-inline-start:3px solid var(--brand-l);opacity:.82}
+.gl-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.gl-top b{font-family:var(--disp);font-size:1.02rem;color:var(--ink)}
+.gl-tag{padding:2px 10px;border-radius:99px;font-size:.72rem;
+ background:color-mix(in srgb,var(--brand-pale) 70%,transparent);color:var(--brand-d)}
+.gl-row.yes .gl-tag{background:#E7F2E9;color:#2F6B3A}
+.gl-top time{margin-inline-start:auto;font-size:.7rem;color:var(--taupe);font-family:var(--num)}
+.gl-row p{margin-top:8px;padding-top:8px;font-size:.88rem;line-height:1.8;color:var(--ink2);
+ border-top:1px dashed var(--line)}
+.gl-empty{padding:38px 16px;text-align:center;font-size:.9rem;color:var(--taupe)}
+.gl-foot{margin-top:26px;padding-top:18px;border-top:1px dashed var(--line);text-align:center}
+.gl-btn{padding:13px 22px;border-radius:12px;font-weight:700;font-size:.92rem;cursor:pointer;
+ color:#FFF6F3;background:linear-gradient(158deg,var(--brand-l),var(--brand) 38%,var(--brand-d));
+ box-shadow:0 10px 24px -12px color-mix(in srgb,var(--brand-d) 72%,transparent)}
+.gl-foot p{margin-top:12px;font-size:.76rem;line-height:1.7;color:var(--taupe)}

@@ -531,8 +531,11 @@ function reqGuestsHTML(){
    <p class="cmut">لا ردود بعد — كل ضيف يضغط «سأحضر» يظهر هنا مع رسالته.</p></div>`;
  const yes=R.filter(r=>r.coming);
  const head=yes.reduce((n,r)=>n+(+r.count||1),0);
- /* one list per invitation, so an owner can be handed only their own */
- const byInv={};R.forEach(r=>{const k=r.host||r.invite||'—';(byInv[k]=byInv[k]||[]).push(r);});
+ /* One list per invitation, keyed on the slug rather than the couple's name:
+    the slug is what the shared link needs, and two couples can share a name. */
+ const byInv={};
+ R.forEach(r=>{const k=r.invite||r.host||'—';
+  (byInv[k]=byInv[k]||{nm:r.host||r.invite||'—',rows:[]}).rows.push(r);});
  return `<div class="ctlcard" style="margin-bottom:16px">
   <h3>\u{1F4DD} ردود الضيوف من داخل الدعوة <span class="sub">${R.length} رد</span></h3>
   <div class="mini-stat" style="margin-bottom:12px">
@@ -540,8 +543,9 @@ function reqGuestsHTML(){
    <span>معتذر <b>${R.length-yes.length}</b></span>
    <span>مجموع الحضور <b>${head}</b></span></div>
   ${Object.keys(byInv).map(k=>`<div class="frqinv">
-    <h4>${escA(k)} <small>${byInv[k].length}</small></h4>
-    <div class="frqlist">${byInv[k].map(r=>`<div class="frqrow ${r.coming?'yes':'no'}">
+    <h4>${escA(byInv[k].nm)} <small>${byInv[k].rows.length}</small>
+     <button class="act tiny" onclick="glCopy('${escA(k)}')">\u{1F517} رابط للأصحاب</button></h4>
+    <div class="frqlist">${byInv[k].rows.map(r=>`<div class="frqrow ${r.coming?'yes':'no'}">
       <div class="frqh"><b>${escA(r.name)}</b>
        <span class="frqtag ${r.coming?'yes':'no'}">${r.coming?'سيحضر':'معتذر'}</span>
        ${r.coming&&(r.count||1)>1?`<span class="frqtag">${r.count} أشخاص</span>`:''}
@@ -552,7 +556,37 @@ function reqGuestsHTML(){
    <button class="act" onclick="exportRsvp()">⬇️ تصدير CSV (يفتح في Excel)</button>
    <button class="act" onclick="frmWipe('farha_rsvp')">\u{1F5D1} مسح الكل</button>
   </div>
-  <p class="cmut" style="margin-top:10px">لمشاركتها مع أصحاب الدعوة: ارفعوا الملف إلى Google Drive وافتحوه بـ Google Sheets، ثم شاركوا الرابط للقراءة فقط.</p></div>`;}
+  <p class="cmut" style="margin-top:10px">«رابط للأصحاب» ينسخ صفحة للقراءة فقط تُحدّث نفسها — لا حساب ولا ملف يُرفع من جديد. ومن أراد جدولًا، التصدير فوقه.</p></div>`;}
+
+/* the link an owner is handed: the site itself, opened on their guest list */
+function glUrl(slug){
+ const base=location.origin+location.pathname.replace(/[^/]*$/,'');
+ return base+'?guests='+encodeURIComponent(slug);}
+function glCopy(slug){
+ const u=glUrl(slug);
+ const done=()=>toast('نُسخ الرابط — أرسلوه لأصحاب الدعوة');
+ try{
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+   navigator.clipboard.writeText(u).then(done,()=>waCopyFallback(u,done));return;}
+ }catch(e){}
+ waCopyFallback(u,done);}
+
+/* Any invitation, not only the ones this browser happens to have replies for.
+   The real replies live in the database, so the slug is what matters here. */
+function glLinkHTML(){
+ let slugs=[];
+ try{slugs=frmRows(FRMK.rv).map(r=>r.invite).filter(Boolean);}catch(e){}
+ try{const R=window.__dbRows;if(R&&R.invitations)slugs=slugs.concat(R.invitations.map(i=>i.slug));}catch(e){}
+ slugs=slugs.filter((v,i,a)=>v&&a.indexOf(v)===i).slice(0,40);
+ return ctlCard('\u{1F517} رابط قائمة الضيوف',
+  'صفحة للقراءة فقط تُظهر لأصحاب الدعوة من ردّ عليهم، وتُحدّث نفسها مع كل رد جديد. لا دخول ولا تعديل — من يفتح الرابط يقرأ القائمة فقط.',
+  `<div class="glbar">
+    <input id="glSlug" placeholder="معرّف الدعوة (slug)" list="glSlugs"
+     oninput="const e=document.getElementById('glOut');if(e)e.textContent=this.value?glUrl(this.value):'';">
+    <datalist id="glSlugs">${slugs.map(x=>`<option value="${escA(x)}">`).join('')}</datalist>
+    <button class="act gold" onclick="glCopy(document.getElementById('glSlug').value.trim())">نسخ الرابط</button>
+   </div>
+   <div class="glout" id="glOut"></div>`);}
 
 /* ======= الرد الآلي على واتساب =======
    A page cannot make WhatsApp answer on its own — the reply has to come from

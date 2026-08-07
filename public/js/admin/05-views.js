@@ -119,8 +119,8 @@ function tplView(){
    </div>`).join('')}</div></div>`;}
 
 function guestsView(){
- if(window.__dbMode&&window.__dbRows){return reqGuestsHTML()+guestsViewReal();}
- return reqGuestsHTML()+_guestsView0();}
+ if(window.__dbMode&&window.__dbRows){return reqGuestsHTML()+glLinkHTML()+guestsViewReal();}
+ return reqGuestsHTML()+glLinkHTML()+_guestsView0();}
 function _guestsView0(){
  let list=GUESTS;if(S.q)list=list.filter(g=>g.n.includes(S.q));
  const yes=list.filter(g=>g.st==='سيحضر').length,no=list.filter(g=>g.st==='معتذر').length,w=list.length-yes-no;
