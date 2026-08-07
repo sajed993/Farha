@@ -5,15 +5,17 @@ const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'far
    so a phone that had ever stored a config kept showing old sections and
    old prices while a fresh browser showed the new ones. Bumping this drops
    the stored sec/price once; everything the owner typed is kept. */
-const CFG_VER=4;
+const CFG_VER=5;
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 /* Everything except the newest section is off for now; each is one switch
    away in the dashboard. */
 const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,
-  cats:0,gallery:0,design:0,ready:1},
+  cats:0,gallery:0,design:0,ready:1,offers:1},
  price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},
  edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},
+ offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,
+         signPrice:249,signWas:0,signRevs:5,signDays:7},
  envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},
  vid:{site:'full',customer:'full'},
  tiers:[
@@ -45,6 +47,7 @@ function loadCFG(){
   designs:Object.assign({},fc.designs||{},lc.designs||{}),
   edi:Object.assign({},fc.edi||{},lc.edi||{}),
   films:Object.assign({},fc.films||{},lc.films||{}),
+  offers:Object.assign({},fc.offers||{},lc.offers||{}),
   envStyle:lc.envStyle||fc.envStyle||'',
   env:Object.assign({},fc.env||{},lc.env||{}),
   vid:Object.assign({},fc.vid||{},lc.vid||{})};
@@ -52,6 +55,7 @@ function loadCFG(){
  Object.assign(CFG.sec,cc.sec||{});Object.assign(CFG.price,cc.price||{});
  CFG.wa=cc.wa||CFG_DEF.wa;CFG.d17=cc.d17||CFG_DEF.d17;Object.assign(CFG.banner,cc.banner||{});CFG.designs=cc.designs||{};
  Object.assign(CFG.edi,cc.edi||{});CFG.films=cc.films||{};
+ Object.assign(CFG.offers,cc.offers||{});
  if(cc.envStyle)CFG.envStyle=cc.envStyle;Object.assign(CFG.env,cc.env||{});
  Object.assign(CFG.vid,cc.vid||{});
  CFG.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),(fc.media||{}),(lc.media||{}));

@@ -30,6 +30,10 @@
  --shadowSm:0 10px 26px -12px rgba(44,35,24,.4);
  --dispA:'Aref Ruqaa','Amiri','Times New Roman',serif;--serifA:'Amiri','Aref Ruqaa',serif;--bodyA:'IBM Plex Sans Arabic','Segoe UI',system-ui,sans-serif;
  --dispL:'Fraunces','Georgia',serif;--bodyL:'Karla','Segoe UI',system-ui,sans-serif;--script:'Great Vibes','Snell Roundhand',cursive;
+ /* Numerals are Latin in every language here, so they get one face of their
+    own rather than following the Arabic body font. Several rules already ask
+    for --num; until now it resolved to nothing and they inherited. */
+ --num:'Fraunces','Georgia',serif;
  --disp:var(--dispA);--body:var(--bodyA);--serif:var(--serifA);
 }
 html[dir=ltr]{--disp:var(--dispL);--body:var(--bodyL);--serif:var(--dispL)}
@@ -3155,3 +3159,122 @@ html.is-preview .edi::-webkit-scrollbar{display:none}
  color:#FFF6F3;background:linear-gradient(158deg,var(--brand-l),var(--brand) 38%,var(--brand-d));
  box-shadow:0 10px 24px -12px color-mix(in srgb,var(--brand-d) 72%,transparent)}
 .gl-foot p{margin-top:12px;font-size:.76rem;line-height:1.7;color:var(--taupe)}
+
+/* ============ THE TWO OFFERS ============
+   The hierarchy is carried by the material, not by a badge. The Collection is
+   printed on the same paper as the rest of the site; the Signature is struck
+   on ink with a foil rule and its own flourish. You can tell which is the
+   dearer one across a room, with the text too small to read. */
+#offers{padding-block:clamp(56px,9vw,110px)}
+.off-grid{display:grid;gap:22px;max-width:60rem;margin:0 auto;
+ grid-template-columns:repeat(auto-fit,minmax(19rem,1fr));align-items:stretch}
+
+.off-card{position:relative;display:flex;flex-direction:column;overflow:hidden;
+ border-radius:24px;padding:34px 28px 28px;
+ transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s}
+.off-card:hover{transform:translateY(-4px)}
+
+/* ── the Collection: paper ── */
+.off-ready{background:var(--paper);color:var(--ink);
+ box-shadow:var(--shadowSm),inset 0 0 0 1px var(--line2)}
+.off-ready:hover{box-shadow:var(--shadow),inset 0 0 0 1px color-mix(in srgb,var(--brand) 30%,transparent)}
+/* a whisper of the brand in the top corner, like a watermark in the stock */
+.off-ready::before{content:'';position:absolute;inset-inline-end:-70px;top:-70px;
+ width:220px;height:220px;border-radius:50%;pointer-events:none;
+ background:radial-gradient(circle,color-mix(in srgb,var(--brand-pale) 82%,transparent),transparent 68%)}
+
+/* ── the Signature: ink and foil ── */
+.off-sign{color:#F6E9E6;isolation:isolate;
+ background:
+  radial-gradient(120% 90% at 88% 0%,rgba(214,149,156,.30),transparent 58%),
+  linear-gradient(168deg,#3A2129 0%,#2A1820 52%,#1E1118 100%);
+ box-shadow:0 30px 70px -30px rgba(30,17,24,.75),
+  inset 0 0 0 1px color-mix(in srgb,var(--brand-l) 34%,transparent)}
+.off-sign:hover{box-shadow:0 38px 84px -30px rgba(30,17,24,.8),
+ inset 0 0 0 1px color-mix(in srgb,var(--brand-l) 52%,transparent)}
+/* the foil rule along the top edge */
+.off-sign::before{content:'';position:absolute;top:0;inset-inline:0;height:2px;
+ background:var(--brandFoil);background-size:200% auto;animation:foilshift 7s ease-in-out infinite}
+.off-flour{position:absolute;top:0;inset-inline-end:0;width:150px;height:150px;
+ color:var(--brand-l);pointer-events:none;opacity:.55}
+html[dir=rtl] .off-flour{transform:scaleX(-1)}
+
+/* ── the ribbon ── */
+.off-ribbon{position:absolute;top:20px;inset-inline-end:0;z-index:2;
+ padding:5px 16px 5px 13px;border-start-start-radius:99px;border-end-start-radius:99px;
+ font-size:.7rem;font-weight:700;letter-spacing:.06em;color:#FFF6F3;
+ background:linear-gradient(120deg,var(--brand-l),var(--brand) 55%,var(--brand-d))}
+
+/* ── head ── */
+.off-mark{width:46px;height:46px;margin-bottom:14px;color:var(--brand)}
+.off-sign .off-mark{color:var(--brand-l)}
+.off-mark svg{width:100%;height:100%}
+.off-card h3{font-family:var(--disp);font-weight:700;font-size:clamp(1.6rem,3.4vw,2.1rem);
+ line-height:1.3;margin-bottom:8px}
+/* The page foil is mixed for cream paper and goes muddy on ink, so the dark
+   card gets its own — same hues, lifted to read against #2A1820. */
+.off-sign h3{background:linear-gradient(105deg,#E7B4BC,#FBEBED 26%,#DFA3AC 48%,#FFF4F5 72%,#E3AEB6);
+ background-size:200% auto;-webkit-background-clip:text;
+ background-clip:text;color:transparent;animation:foilshift 6s ease-in-out infinite}
+.off-for{font-size:.9rem;line-height:1.75;color:var(--ink2);min-height:3.1em}
+.off-sign .off-for{color:#D9BFC3}
+
+/* ── price ── */
+.off-price{display:flex;align-items:baseline;gap:9px;margin:18px 0 4px;
+ padding-bottom:18px;border-bottom:1px dashed var(--line)}
+.off-sign .off-price{border-bottom-color:rgba(214,149,156,.28)}
+.off-price b{font-family:var(--num);font-size:2.9rem;font-weight:700;line-height:1;color:var(--brand-d)}
+.off-sign .off-price b{color:#F2D9DC}
+.off-price i{font-style:normal;font-size:.94rem;font-weight:700;color:var(--ink2)}
+.off-sign .off-price i{color:#D9BFC3}
+.off-price s{font-family:var(--num);font-size:1.06rem;color:var(--taupe);text-decoration-thickness:1.5px}
+
+/* ── what is in it ── */
+.off-list{list-style:none;display:grid;gap:11px;margin:20px 0 26px;flex:1}
+.off-list li{position:relative;padding-inline-start:26px;font-size:.9rem;line-height:1.7;color:var(--ink2)}
+.off-sign .off-list li{color:#E4D0D3}
+/* A drawn tick rather than a bullet or an emoji. The borders are physical on
+   purpose: inset-inline-start flips the two arms in RTL and the tick becomes
+   a chevron pointing the wrong way. Only its position should mirror. */
+.off-list li::before{content:'';position:absolute;inset-inline-start:0;top:.45em;
+ width:13px;height:8px;border-left:2px solid;border-bottom:2px solid;
+ border-color:var(--brand);transform:rotate(-45deg)}
+.off-sign .off-list li::before{border-color:var(--brand-l)}
+/* the hinge line on the Signature card reads as a heading, not an item */
+.off-sign .off-list li:first-child{font-weight:700;color:#F6E9E6;padding-inline-start:0}
+.off-sign .off-list li:first-child::before{display:none}
+
+/* ── buttons ── */
+.off-go{width:100%;padding:15px;border-radius:13px;font-weight:700;font-size:1rem;
+ transition:transform .2s,box-shadow .3s}
+/* the Collection carries a second button, so its list stops one line short;
+   pushing the actions to the bottom keeps both cards ending on the same line */
+.off-card>.off-go{margin-top:auto}
+.off-ready .off-go{color:#FFF6F3;
+ background:linear-gradient(158deg,var(--brand-l),var(--brand) 38%,var(--brand-d));
+ box-shadow:0 12px 26px -12px color-mix(in srgb,var(--brand-d) 76%,transparent),
+  inset 0 1px 0 rgba(255,225,218,.4)}
+.off-sign .off-go{color:#241319;background:var(--foilD);
+ box-shadow:0 12px 30px -12px rgba(216,179,104,.5),inset 0 1px 0 rgba(255,247,226,.5)}
+.off-go:hover{transform:translateY(-2px)}
+.off-see{width:100%;margin-top:10px;padding:12px;border-radius:12px;font-weight:600;font-size:.88rem;
+ color:var(--brand-d);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--brand) 32%,transparent)}
+.off-see:hover{background:color-mix(in srgb,var(--brand) 8%,transparent)}
+.off-note{margin-top:12px;text-align:center;font-size:.78rem;line-height:1.7;color:#C9A9AE}
+
+@media(max-width:520px){
+ .off-card{padding:28px 22px 24px;border-radius:20px}
+ .off-for{min-height:0}
+ .off-price b{font-size:2.4rem}
+ .off-flour{width:112px;height:112px}
+}
+
+/* the tier chip on a form opened from an offer card rather than a film */
+.frm-pick.tier{justify-content:space-between;padding:13px 15px}
+.frm-tiern{font-family:var(--disp);font-weight:700;font-size:1.1rem;color:var(--ink)}
+.frm-pick.tier em{font-family:var(--num);font-size:1.05rem}
+/* a Signature form carries the same foil rule as its card, so the click and
+   what it opened are visibly the same thing */
+.frm-sheet.is-sign::before{content:'';position:absolute;top:0;inset-inline:0;height:2px;
+ border-start-start-radius:18px;border-start-end-radius:18px;
+ background:var(--brandFoil);background-size:200% auto;animation:foilshift 7s ease-in-out infinite}

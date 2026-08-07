@@ -153,6 +153,7 @@ function landView(){
   </div>
  </header>
  ${filmShelfHTML()}
+ ${CFG.sec.offers?offersHTML():''}
  <section id="cats">
   <div class="sec-head"><span class="kicker">${t().catsKick}</span><h2>${t().catsTitle}</h2></div>
   <div class="cats">

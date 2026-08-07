@@ -47,13 +47,15 @@ function frmWaText(o) {
                  fr: 'Bonjour, je souhaite commander une invitation numérique.',
                  en: 'Hello, I would like to order a digital invitation.' }[L];
   const lbl = { ar: { film: 'الفيلم', name: 'الاسم', when: 'التاريخ', place: 'المكان',
-                      names: 'الأسماء', wish: 'ما نتخيّله' },
+                      names: 'الأسماء', wish: 'ما نتخيّله', offer: 'الباقة' },
                 fr: { film: 'Film', name: 'Nom', when: 'Date', place: 'Lieu',
-                      names: 'Prénoms', wish: 'Souhaits' },
+                      names: 'Prénoms', wish: 'Souhaits', offer: 'Formule' },
                 en: { film: 'Film', name: 'Name', when: 'Date', place: 'Venue',
-                      names: 'Names', wish: 'Wishes' } }[L];
+                      names: 'Names', wish: 'Wishes', offer: 'Offer' } }[L];
   const bits = [head, ''];
   const add = (k, v) => { if (v && String(v).trim()) bits.push(lbl[k] + ': ' + v); };
+  /* say which offer, so the conversation starts where the page left off */
+  try { const O = t().off; bits.push(lbl.offer + ': ' + (o.tier === 'sign' ? O.sName : O.rName)); } catch (e) {}
   add('film', o.filmName); add('name', o.name); add('names', o.names);
   add('when', o.when); add('place', o.place); add('wish', o.wish);
   return bits.join('\n');
@@ -68,23 +70,34 @@ function frmWaOpen(o) {
 
 /* ---- the order form -------------------------------------------------- */
 let FRM_FILM = null;
+/* 'ready' picks from the shelf, 'sign' is one made from nothing. It changes
+   the price shown, which film choice starts selected, and what the form
+   leads with — asking a Signature buyer to pick from a shelf would be the
+   wrong question. */
+let FRM_TIER = 'ready';
 
-function openOrder(filmId) {
+function openOrder(filmId, tier) {
   closeOrder();
   const f = (typeof readyFilm === 'function' && filmId) ? readyFilm(filmId) : null;
   FRM_FILM = f;
+  FRM_TIER = (tier === 'sign') ? 'sign' : 'ready';
+  const sign = FRM_TIER === 'sign';
+  const O = t().off;
   const nm = f ? (typeof readyName === 'function' ? readyName(f) : f.name[S.lang]) : '';
-  const price = f && typeof readyPrice === 'function' ? readyPrice(f) : 0;
+  const price = f && typeof readyPrice === 'function' ? readyPrice(f)
+              : (typeof offTier === 'function' ? offTier()[FRM_TIER].price : 0);
 
   const d = document.createElement('div');
   d.className = 'frm-veil'; d.id = 'ordveil';
   d.onclick = e => { if (e.target === d) closeOrder(); };
-  d.innerHTML = `<div class="frm-sheet" role="dialog" aria-modal="true">
+  d.innerHTML = `<div class="frm-sheet ${sign ? 'is-sign' : ''}" role="dialog" aria-modal="true">
     <button class="frm-x" onclick="closeOrder()" aria-label="${esc(t().ordClose)}">✕</button>
-    <h3 class="frm-t">${esc(t().ordT)}</h3>
-    <p class="frm-sub">${esc(t().ordSub)}</p>
+    <h3 class="frm-t">${esc(sign ? O.sCta : t().ordT)}</h3>
+    <p class="frm-sub">${esc(sign ? O.sFor : t().ordSub)}</p>
     ${f ? `<div class="frm-pick"><img src="${f.p}" alt="" loading="lazy">
-      <span><b>${esc(nm)}</b><em>${price} ${esc(t().cur)}</em></span></div>` : ''}
+      <span><b>${esc(nm)}</b><em>${price} ${esc(t().cur)}</em></span></div>`
+      : `<div class="frm-pick tier"><span class="frm-tiern">${esc(sign ? O.sName : O.rName)}</span>
+      <span><em>${price} ${esc(t().cur)}</em></span></div>`}
 
     <label class="frm-l">${esc(t().ordWho)}</label>
     <div class="frm-g2">
@@ -100,15 +113,15 @@ function openOrder(filmId) {
     </div>
     <input id="ordMsg" placeholder="${esc(t().ordMsg)}">
 
-    <label class="frm-l">${esc(t().ordFilm)}</label>
+    ${sign ? '' : `<label class="frm-l">${esc(t().ordFilm)}</label>
     <div class="frm-radio">
       ${f ? `<label><input type="radio" name="ordf" value="this" checked><span>${esc(t().ordFilmThis)}</span></label>` : ''}
       <label><input type="radio" name="ordf" value="other" ${f ? '' : 'checked'}><span>${esc(t().ordFilmOther)}</span></label>
       <label><input type="radio" name="ordf" value="new"><span>${esc(t().ordFilmNew)}</span></label>
-    </div>
+    </div>`}
 
     <label class="frm-l">${esc(t().ordWish)}</label>
-    <textarea id="ordWish" rows="3" placeholder="${esc(t().ordWishPh)}"></textarea>
+    <textarea id="ordWish" rows="${sign ? 5 : 3}" placeholder="${esc(t().ordWishPh)}"></textarea>
 
     <button class="frm-go" onclick="submitOrder()">${esc(t().ordSend)}</button>
     <button class="frm-alt" onclick="skipToWa()">${esc(t().ordSkip)}</button>
@@ -134,8 +147,11 @@ function frmCollect() {
     place: frmVal('ordPlace'), msg: frmVal('ordMsg'),
     wish: frmVal('ordWish'),
     filmId: f ? f.id : '', filmName: f ? (typeof readyName === 'function' ? readyName(f) : f.name[S.lang]) : '',
-    choice: pickEl ? pickEl.value : 'other',
-    price: f && typeof readyPrice === 'function' ? readyPrice(f) : 0
+    tier: FRM_TIER,
+    /* no radio on a Signature form — it can only ever be a new film */
+    choice: (FRM_TIER === 'sign') ? 'new' : (pickEl ? pickEl.value : 'other'),
+    price: f && typeof readyPrice === 'function' ? readyPrice(f)
+         : (typeof offTier === 'function' ? offTier()[FRM_TIER].price : 0)
   };
 }
 function skipToWa() {

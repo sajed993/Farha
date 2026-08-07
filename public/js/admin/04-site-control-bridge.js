@@ -2,11 +2,12 @@
 const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'farha_meta'};
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,cats:0,gallery:0,design:0,ready:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},vid:{site:'full',customer:'full'},price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[],readyFilms:[]}};
+const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,cats:0,gallery:0,design:0,ready:1,offers:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,signPrice:249,signWas:0,signRevs:5,signDays:7},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},vid:{site:'full',customer:'full'},price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[],readyFilms:[]}};
 function loadCFG(){const cc=lsGet(LSK.cfg,{})||{};const o=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(o.sec,cc.sec||{});Object.assign(o.price,cc.price||{});o.wa=cc.wa||CFG_DEF.wa;o.d17=cc.d17||CFG_DEF.d17;
  Object.assign(o.banner,cc.banner||{});o.designs=cc.designs||{};
  Object.assign(o.edi,cc.edi||{});o.films=cc.films||{};
+ Object.assign(o.offers,cc.offers||{});
  if(cc.envStyle)o.envStyle=cc.envStyle;Object.assign(o.env,cc.env||{});
  Object.assign(o.vid,cc.vid||{});
  o.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),cc.media||{});return o;}
@@ -107,6 +108,7 @@ function ctlVis(id,v){CFG.designs[id]=CFG.designs[id]||{};CFG.designs[id].vis=!!
 function ctlBadge(id,v){CFG.designs[id]=CFG.designs[id]||{};CFG.designs[id].badge=v;saveCFG();}
 function escA(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 const SECL=[['ready','✦ قسم «دعوات جاهزة» (الأفلام)'],
+ ['offers','✦ قسم الباقتين (المجموعة / التوقيع)'],
  ['cats','المناسبات'],['gallery','معرض القوالب'],
  ['design','محرّر «صمّم دعوتك» وأزراره'],['ultra','✦ قسم «واقعي جدًا»'],['premium','قسم بريميوم'],['ai','سينما AI (داخل بريميوم)'],['sites','مواقع المناسبات'],['datef','دعوة أول موعد التفاعلية'],['open','عروض لحظة الفتح'],['wishes','صندوق التهاني داخل الدعوات']];
 function ctlCard(tt,ss,inner){return `<div class="ctlcard"><h3>${tt}</h3>${ss?`<p class="cmut">${ss}</p>`:''}${inner}</div>`;}
@@ -631,6 +633,32 @@ function waAutoHTML(){
     <button class="act" onclick="waCopy('en')">English</button>
    </div>`);}
 
+/* ======= الباقتان =======
+   The offer section reads its numbers from here. The count of films is not
+   among them: it counts the shelf, so hiding a film changes what the offer
+   claims without anyone remembering to come back and edit it. */
+function ctlOff(k,v){CFG.offers[k]=Math.max(0,parseInt(v)||0);saveCFG();}
+const OFFL=[
+ ['المجموعة','readyPrice','readyWas','readyRevs','readyDays',
+  'الزبون يختار فيلمًا ممّا نعرضه. أزرار الأسعار تحت كل فيلم تؤدّي إلى هذه الباقة.'],
+ ['التوقيع','signPrice','signWas','signRevs','signDays',
+  'دعوة تُصنع من الصفر. نموذج الطلب يفتح على «فيلم جديد» مباشرة.']];
+function offView(){
+ let n=0;try{n=readyCatalogue().filter(f=>!(CFG.films[f.id]&&CFG.films[f.id].vis===false)).length;}catch(e){}
+ const row=(lbl,k,suf)=>`<div class="ctlrow"><span>${lbl}</span>
+   <span style="display:flex;align-items:center;gap:6px">
+    <input class="cnum" type="number" min="0" value="${CFG.offers[k]|0}" onchange="ctlOff('${k}',this.value)">
+    <small style="color:#8A7A63">${suf}</small></span></div>`;
+ return OFFL.map(([nm,pk,wk,rk,dk,ds])=>ctlCard('\u{1F48E} باقة «'+nm+'»',ds,
+   row('السعر',pk,'د.ت')
+  +row('السعر المشطوب (0 = بلا)',wk,'د.ت')
+  +row('جولات التعديل',rk,'جولة')
+  +row('مدة التسليم',dk,'يوم')
+  )).join('')
+ +ctlCard('\u{1F522} عدد الأفلام المعروض في الباقة',
+   'لا يُكتب يدويًا — القسم يعدّ الرفّ بنفسه. أطفئوا فيلمًا من «المحتوى والأفلام» وينقص الرقم وحده.',
+   `<div class="ctlrow"><span>الظاهر الآن على الموقع</span><b style="font-size:1.4rem;color:#8A6210">${n}</b></div>`);}
+
 function realOrdersHTML(){if(window.__dbOrdersHTML)return window.__dbOrdersHTML();const a=lsGet(LSK.orders,[]);if(!a.length)return '';
  const sum=a.reduce((s,o)=>s+(+o.price||0),0);
  return `<div class="ctlcard" style="margin-bottom:16px"><h3>🛎️ طلبات واردة من الموقع (${a.length}) — ${sum} د.ت</h3>`+
@@ -639,7 +667,7 @@ function realOrdersHTML(){if(window.__dbOrdersHTML)return window.__dbOrdersHTML(
 function roStatus(ts,v){const a=lsGet(LSK.orders,[]);const o=a.find(x=>x.ts===ts);if(o){o.st=v;lsSet(LSK.orders,a);toast('حُدّثت حالة الطلب → '+v);renderContent();}}
 window.addEventListener('storage',function(e){if(e&&e.key&&(e.key===LSK.wishes||e.key===LSK.orders||e.key===LSK.meta)){try{renderContent()}catch(x){}}});
 
-const NAV=[['over','📊','نظرة عامة'],['ctl','🎛️','التحكم بالموقع'],['media','🎬','المحتوى والأفلام'],['txt','✍️','نصوص الدعوات'],['orders','🛒','الطلبات'],['inv','💌','الدعوات'],['tpl','🖼️','القوالب والأفلام'],['guests','👥','الضيوف والردود'],['wish','💬','التهاني'],['ana','📈','التحليلات'],['set','⚙️','الإعدادات']];
+const NAV=[['over','📊','نظرة عامة'],['ctl','🎛️','التحكم بالموقع'],['media','🎬','المحتوى والأفلام'],['txt','✍️','نصوص الدعوات'],['off','\u{1F48E}','الباقتان'],['orders','🛒','الطلبات'],['inv','💌','الدعوات'],['tpl','🖼️','القوالب والأفلام'],['guests','👥','الضيوف والردود'],['wish','💬','التهاني'],['ana','📈','التحليلات'],['set','⚙️','الإعدادات']];
 function newOrdersCount(){return ORDERS.filter(o=>o.d<1&&o.status==='جديد').length;}
 function shell(inner,title){
  return `<div class="layout">
