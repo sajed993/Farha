@@ -191,12 +191,18 @@ function frmJoinNames(cat, a, b) {
   return a + (S.lang === 'ar' ? ' و ' : ' & ') + b;
 }
 
-/* a row of ideas under a long box, for anyone staring at an empty field */
+/* Ideas for anyone staring at an empty field — folded away by default.
+   Eight suggestions, each a full sentence, took about four hundred pixels of
+   a phone screen from people who already knew what they wanted to write. One
+   line now, and one tap to open. A <details> does this without script, keeps
+   its own open state, and is reachable from a keyboard. */
 function frmIdeaChips(target, list) {
   if (!list || !list.length) return '';
-  return `<div class="frm-ideas"><span>${esc(t().ordIdeas)}</span>
-    ${list.map((s, i) => `<button type="button" class="frm-idea"
-      onclick="frmUseIdea('${target}',${i})">${esc(s)}</button>`).join('')}</div>`;
+  return `<details class="frm-ideas" data-for="${target}">
+    <summary>${esc(t().ordIdeas)}</summary>
+    <div class="frm-idealist">${list.map((s, i) => `<button type="button" class="frm-idea"
+      onclick="frmUseIdea('${target}',${i})">${esc(s)}</button>`).join('')}</div>
+  </details>`;
 }
 function frmUseIdea(target, i) {
   const list = target === 'ordMsg' ? (frmIdeas().msg[FRM_CAT] || frmIdeas().msg.wed) : frmIdeas().wish;
@@ -204,9 +210,8 @@ function frmUseIdea(target, i) {
   if (!el) return;
   el.value = list[i] || '';
   el.focus();
-  /* the chips stay so another can be tried; the chosen one is marked */
-  const wrap = el.parentElement.querySelector('.frm-ideas') ||
-               (el.nextElementSibling && el.nextElementSibling.classList.contains('frm-ideas') ? el.nextElementSibling : null);
+  /* the chosen one stays marked, so a second tap is clearly a change of mind */
+  const wrap = document.querySelector('.frm-ideas[data-for="' + target + '"]');
   if (wrap) [...wrap.querySelectorAll('.frm-idea')].forEach((b, j) => b.classList.toggle('on', j === i));
 }
 
@@ -302,9 +307,11 @@ function openOrder(filmId, tier) {
     <textarea id="ordWish" rows="${sign ? 5 : 3}" placeholder="${esc(t().ordWishPh)}"></textarea>
     ${frmIdeaChips('ordWish', frmIdeas().wish)}
 
-    <button class="frm-go" onclick="submitOrder()">${esc(t().ordSend)}</button>
-    <button class="frm-alt" onclick="skipToWa()">${esc(t().ordSkip)}</button>
-    <p class="frm-note">${esc(t().ordSkipNote)}</p>
+    <div class="frm-act">
+      <button class="frm-go" onclick="submitOrder()">${esc(t().ordSend)}</button>
+      <button class="frm-alt" onclick="skipToWa()">${esc(t().ordSkip)}</button>
+      <p class="frm-note">${esc(t().ordSkipNote)}</p>
+    </div>
   </div>`;
   document.body.appendChild(d);
   scrollSync();
@@ -376,8 +383,10 @@ function orderThanks(o) {
     <div class="frm-tick">✓</div>
     <h3 class="frm-t">${esc(t().ordOk)}</h3>
     <p class="frm-sub">${esc(t().ordOkNote)}</p>
-    <button class="frm-go" onclick="frmWaLast()">${esc(t().ordWa)}</button>
-    <button class="frm-alt" onclick="closeOrder()">${esc(t().ordClose)}</button>
+    <div class="frm-act">
+      <button class="frm-go" onclick="frmWaLast()">${esc(t().ordWa)}</button>
+      <button class="frm-alt" onclick="closeOrder()">${esc(t().ordClose)}</button>
+    </div>
   </div>`;
   document.body.appendChild(d);
   scrollSync();
@@ -396,7 +405,9 @@ function openRsvp(coming) {
     ${coming ? `<label class="frm-l tight">${esc(t().rvCount)}</label>
     <input id="rvCount" inputmode="numeric" value="1">` : ''}
     <textarea id="rvMsg" rows="3" placeholder="${esc(t().rvMsg)}"></textarea>
-    <button class="frm-go" onclick="submitRsvp(${coming ? 1 : 0})">${esc(t().rvSend)}</button>
+    <div class="frm-act">
+      <button class="frm-go" onclick="submitRsvp(${coming ? 1 : 0})">${esc(t().rvSend)}</button>
+    </div>
   </div>`;
   document.body.appendChild(d);
   scrollSync();

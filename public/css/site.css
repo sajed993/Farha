@@ -3091,7 +3091,10 @@ html.is-preview .edi::-webkit-scrollbar{display:none}
  box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 16%,transparent)}
 .frm-g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .frm-g2 input{margin-bottom:9px}
-@media(max-width:420px){.frm-g2{grid-template-columns:1fr;gap:0}}
+/* This used to stack every pair below 420px, which is what made the form
+   1893px tall — nearly three screens — on a 360px phone. Two short boxes fit
+   side by side at 360 with room to spare; only genuinely long labels wrap,
+   and they do that on their own. */
 .frm-pick{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;
  background:color-mix(in srgb,var(--brand-pale) 46%,transparent);margin-bottom:4px}
 .frm-pick img{width:44px;height:60px;object-fit:cover;border-radius:7px;flex:0 0 auto}
@@ -3299,9 +3302,21 @@ html[dir=rtl] .off-flour{transform:scaleX(-1)}
 .frm-sheet input[type=date]::-webkit-calendar-picker-indicator,
 .frm-sheet input[type=time]::-webkit-calendar-picker-indicator{
  opacity:.55;cursor:pointer;filter:saturate(0)}
-/* ideas for anyone looking at an empty box */
-.frm-ideas{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 12px}
-.frm-ideas>span{flex:1 0 100%;font-size:.75rem;line-height:1.6;color:var(--taupe);margin-bottom:3px}
+/* ideas for anyone looking at an empty box, folded until asked for */
+.frm-ideas{margin:2px 0 12px}
+.frm-ideas>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:7px;
+ padding:7px 2px;font-size:.78rem;line-height:1.5;color:var(--brand-d)}
+.frm-ideas>summary::-webkit-details-marker{display:none}
+.frm-ideas>summary::before{content:"✨";font-size:.9em}
+/* physical borders on purpose: border-inline-end flips the two arms in RTL
+   and the chevron ends up pointing sideways. Only its position should mirror,
+   which margin-inline-start already does. */
+.frm-ideas>summary::after{content:"";width:7px;height:7px;margin-inline-start:auto;
+ border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;
+ transform:rotate(45deg);opacity:.6;transition:transform .2s}
+.frm-ideas[open]>summary::after{transform:rotate(-135deg)}
+.frm-ideas>summary:hover{color:var(--brand)}
+.frm-idealist{display:flex;flex-wrap:wrap;gap:6px;padding-top:4px}
 .frm-idea{max-width:100%;padding:7px 12px;border-radius:10px;text-align:start;
  font-size:.78rem;line-height:1.5;color:var(--brand-d);cursor:pointer;transition:.18s;
  background:color-mix(in srgb,var(--brand-pale) 42%,transparent);
@@ -3309,3 +3324,52 @@ html[dir=rtl] .off-flour{transform:scaleX(-1)}
 .frm-idea:hover{background:color-mix(in srgb,var(--brand-pale) 72%,transparent)}
 .frm-idea.on{color:#FFF6F3;box-shadow:none;
  background:linear-gradient(158deg,var(--brand-l),var(--brand) 42%,var(--brand-d))}
+
+/* ============ THE FORMS ON A PHONE ============
+   Measured at 360px before touching anything: the sheet was 1893px tall
+   against a 681px window — 2.8 screens, with the send button at the bottom of
+   all of it. Three things caused that, and each is undone below.
+
+   It also stops being a dialog floating in the middle of a small screen and
+   becomes what a phone expects: a sheet rising from the bottom edge, using
+   the full width instead of losing 36px to a margin. */
+@media(max-width:560px){
+ .frm-veil{padding:0;align-items:end;place-items:end stretch}
+ .frm-sheet{width:100%;max-width:none;max-height:94dvh;
+  padding:20px 15px 0;border-radius:24px 24px 0 0;
+  animation:frmSheetUp .3s cubic-bezier(.2,.8,.3,1)}
+ @keyframes frmSheetUp{from{transform:translateY(26px);opacity:.6}to{transform:none;opacity:1}}
+
+ /* pairs stay pairs */
+ .frm-g2{grid-template-columns:1fr 1fr;gap:8px}
+ .frm-g2 input{margin-bottom:8px}
+
+ /* the same rhythm, one notch tighter */
+ .frm-t{font-size:1.22rem}
+ .frm-sub{font-size:.84rem;line-height:1.65;margin-bottom:13px}
+ .frm-l{margin:13px 0 6px;font-size:.72rem}
+ .frm-sheet input,.frm-sheet textarea{padding:11px 12px;margin-bottom:8px;font-size:16px}
+ .frm-f{margin-bottom:7px}
+ .frm-f>span{font-size:.72rem;margin-bottom:4px}
+ .frm-occ{padding:6px 12px;font-size:.78rem}
+ .frm-occs{gap:6px;margin-bottom:11px}
+ .frm-radio{gap:6px}
+ .frm-radio label{padding:9px 11px;font-size:.85rem}
+ .frm-pick{padding:9px}
+ .frm-pick img{width:38px;height:52px}
+ .frm-idea{padding:6px 11px;font-size:.76rem}
+ .frm-ideas{margin:0 0 10px}
+
+ /* The send button was three screens down. It sits on the bottom edge now,
+    over a fade so the text scrolling beneath it stays legible. */
+ .frm-act{position:sticky;bottom:0;z-index:2;
+  margin:6px -15px 0;padding:10px 15px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,var(--paper) 68%,transparent)}
+ .frm-act .frm-go{margin-top:0;padding:14px}
+ .frm-act .frm-alt{margin-top:7px;padding:11px}
+ .frm-note{margin-top:6px;font-size:.74rem}
+}
+/* a very small phone: the pairs give up, but only here */
+@media(max-width:330px){
+ .frm-g2{grid-template-columns:1fr;gap:0}
+}
