@@ -5,7 +5,13 @@
 
    FILMS_BUILTIN ships with the code. Anything the owner adds from the
    dashboard lives in CFG.media.readyFilms and is merged on top by
-   readyCatalogue(), so both pages always see the same shelf. */
+   readyCatalogue(), so both pages always see the same shelf.
+
+   One song per film, and no song twice — sndN below is the record of which
+   is spoken for. Still unused from the songs we hold:
+     إليسا — عيشالك
+   Each track in /media/snd is a 60-second Opus excerpt cut from the loudest
+   part of the song and levelled to the same loudness as its neighbours. */
 
 const FILMS_BUILTIN=[
  /* ── weddings ── */
@@ -92,6 +98,52 @@ const FILMS_BUILTIN=[
    en:['Caftan or jebba','Red and gold, as the night asks']},
   sw:['#3A211C','#8E221C','#EBDCC6'],
   snd:'/media/snd/henna.webm',sndN:'جيبوا الحنّة'},
+
+
+ /* ── four more weddings ── */
+ {id:'zellij',cat:'wed',v:'/media/inv/zellij.mp4',p:'/media/inv/zellij.jpg',design:2,
+  name:{ar:'الزليج',fr:'Zellige',en:'The Mosaic Floor'},
+  blurb:{ar:'من فوق الدرج: عروسان على أرضٍ من فسيفساء، ودرابزين حديد يحيط بهما',
+   fr:"Vu du haut de l'escalier : deux mariés sur une mosaïque, une rampe de fer forgé autour d'eux",
+   en:'Seen from the top of the stairs: two of them on a mosaic floor, wrought iron all around'},
+  dress:{ar:['أنيق كلاسيكي','بدلة داكنة · فستان طويل'],
+   fr:['Élégance classique','Costume sombre · robe longue'],
+   en:['Classic elegance','Dark suit · long dress']},
+  sw:['#251E1C','#837C79','#CBC7C4'],
+  snd:'/media/snd/zellij.webm',sndN:'عمرو دياب — الليلة'},
+
+ {id:'ray',cat:'wed',v:'/media/inv/ray.mp4',p:'/media/inv/ray.jpg',design:4,
+  name:{ar:'شعاع',fr:'Rai de lumière',en:'Shaft of Light'},
+  blurb:{ar:'أبيض وأسود: طرحة تلتقط النور النازل من نوافذ عالية، ولا شيء غيره',
+   fr:'Noir et blanc : un voile qui attrape la lumière tombant de hautes fenêtres, et rien d’autre',
+   en:'Black and white: a veil catching the light falling from high windows, and nothing else'},
+  dress:{ar:['أبيض وأسود','بلا ألوان — هكذا نحبّها'],
+   fr:['Noir et blanc','Sans couleurs — c’est ainsi qu’on l’aime'],
+   en:['Black and white','No colour — that is the whole idea']},
+  sw:['#1D1A1D','#757275','#DFDDDF'],
+  snd:'/media/snd/ray.webm',sndN:'حسين الجسمي — إدخلي عمري'},
+
+ {id:'vow',cat:'wed',v:'/media/inv/vow.mp4',p:'/media/inv/vow.jpg',design:1,
+  name:{ar:'يد في يد',fr:'Main dans la main',en:'Hand in Hand'},
+  blurb:{ar:'يدان متشابكتان، ساعة وخاتم، وقماشٌ لا يُرى منه إلّا طيّاته',
+   fr:'Deux mains nouées, une montre et une bague, et du tissu dont on ne voit que les plis',
+   en:'Two hands held, a watch and a ring, and cloth you only see the folds of'},
+  dress:{ar:['رسمي هادئ','بدلة رمادية · فستان بسيط'],
+   fr:['Formel et sobre','Costume gris · robe simple'],
+   en:['Quietly formal','Grey suit · simple dress']},
+  sw:['#403E40','#6E6C6E','#B0AEB0'],
+  snd:'/media/snd/vow.webm',sndN:'Ed Sheeran — Perfect'},
+
+ {id:'dawn',cat:'wed',v:'/media/inv/dawn.mp4',p:'/media/inv/dawn.jpg',design:3,
+  name:{ar:'صباح العرس',fr:'Le matin des noces',en:'The Wedding Morning'},
+  blurb:{ar:'كتّان كريمي وضوءٌ أوّل، وحذاء العروس على طرف السرير قبل أن يبدأ اليوم',
+   fr:'Lin crème et première lumière, et les chaussures de la mariée au bord du lit avant que le jour commence',
+   en:'Cream linen and first light, and her shoes at the edge of the bed before the day begins'},
+  dress:{ar:['نهاري أنيق','ألوان فاتحة · كتّان وحرير'],
+   fr:['Élégance de jour','Tons clairs · lin et soie'],
+   en:['Daytime elegance','Light tones · linen and silk']},
+  sw:['#352C26','#836F5D','#DDCCB3'],
+  snd:'/media/snd/dawn.webm',sndN:'إليسا — عروسة احلامي'},
 
  /* ── save the date ── */
  {id:'soon',cat:'save',v:'/media/inv/soon.mp4',p:'/media/inv/soon.jpg',design:3,
