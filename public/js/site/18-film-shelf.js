@@ -168,6 +168,8 @@ function openReady(id){
   qr:false,maps:'https://maps.google.com',story:[],guest:'',
   when:when.toISOString().slice(0,16),
   film:f.id,films:{hero:f.v,hall:f.v,detail:f.v,date:f.v,venue:f.p},ediPal:f.id,
+  /* whatever the dashboard set for this film, else the scope default */
+  envStyle:readyCfg(f.id).env||'',vidStyle:readyCfg(f.id).vid||'',
   dress:f.dress?{t:(f.dress[S.lang]||[])[0]||'',d:(f.dress[S.lang]||[])[1]||'',sw:f.sw||null}:null,
   trackUrl:f.snd||'',trackName:f.sndN||'',
   dir:f.cat==='wed'?ediDemoNote('dir'):null,

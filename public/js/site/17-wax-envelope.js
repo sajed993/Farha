@@ -8,7 +8,12 @@ const ENV_STYLES=['classic','full','macro','silk','press'];
    guest never lands on a blank screen. */
 function envStyleActive(){
  const C=(typeof CFG!=='undefined'&&CFG)||{};
- const want=C.envStyle||'classic';
+ /* a URL override wins (dashboard preview), then the film's own choice,
+    then whatever the site default is */
+ let q='';try{q=new URLSearchParams(location.search).get('envStyle')||'';}catch(e){}
+ const want=(ENV_STYLES.indexOf(q)>=0&&q)
+   ||(S.c&&S.c.envStyle&&ENV_STYLES.indexOf(S.c.envStyle)>=0&&S.c.envStyle)
+   ||C.envStyle||'classic';
  if(ENV_STYLES.indexOf(want)<0)return 'classic';
  if(C.env&&C.env[want]===0)return 'classic';
  return want;}

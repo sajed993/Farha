@@ -23,7 +23,20 @@ function ctlWa(v){CFG.wa=(v||'').trim();saveCFG();}
 function ctlD17(v){CFG.d17=(v||'').trim();saveCFG();}
 function ctlBan(k,v){CFG.banner[k]=(k==='on')?(v?1:0):v;saveCFG();}
 /* the four ready-made films, and the sections inside their invitation */
-const RDFILMS=[['marble','قصر الرخام'],['oneday','يومًا ما'],['wisteria','ظلال الوستارية'],['rings','خواتم النور']];
+/* every film on the shelf. This list had fallen four behind the site, so the
+   newer ones could not be switched off or priced at all. */
+const RDFILMS=[
+ ['marble','قصر الرخام','أعراس'],
+ ['oneday','يومًا ما','أعراس'],
+ ['wisteria','ظلال الوستارية','أعراس'],
+ ['rings','خواتم النور','أعراس'],
+ ['henna','ليلة الحنّة','ليالي الحنّة'],
+ ['bdaycake','شمعة العام','أعياد ميلاد'],
+ ['bdayballoons','بالونات وردية','أعياد ميلاد'],
+ ['babybasket','قدمان صغيرتان','مواليد'],
+ ['babycake','أهلًا يا صغير','مواليد'],
+ ['grad','قبّعة وورد','تخرّج'],
+ ['soon','قريبًا','احفظوا التاريخ']];
 const EDISECL=[['cd','ساعة العدّ التنازلي'],['prog','برنامج الحفل + مواقع الفقرات'],['dress','قواعد اللباس'],
  ['dir','الوصول وصفّ السيارات'],['stay','الإقامة'],['rsvp','تأكيد الحضور']];
 function ctlEdi(k,v){CFG.edi[k]=v?1:0;saveCFG();}
@@ -136,18 +149,42 @@ function mDelDesign(i){CFG.media.customDesigns.splice(i,1);saveCFG();renderConte
 function mShowTgl(i,on){const h=CFG.media.hideShows;const ix=h.indexOf(i);
  if(on&&ix>-1)h.splice(ix,1);if(!on&&ix===-1)h.push(i);saveCFG();}
 /* the ready-made films, and the sections inside their invitation */
+function ctlPriceReady(k,v){CFG.price[k]=Math.max(0,parseInt(v)||0);saveCFG();}
 function readyView(){
  const F=CFG.films||{},E=CFG.edi||{};
- return ctlCard('🎞️ الدعوات الجاهزة — الأفلام',
-  'أخفوا فيلمًا، أو غيّروا اسمه وسعره. الألوان تُستخرج من الفيديو تلقائيًا.',
-  RDFILMS.map(([id,nm])=>{const o=F[id]||{};
-   return `<div class="ctlrow" style="flex-wrap:wrap;gap:8px">
-    <span style="min-width:9rem">${nm}</span>
-    <span class="sw-toggle ${o.vis===false?'':'on'}" onclick="ctlFilm('${id}','vis',${o.vis===false});renderContent()"></span>
-    <input style="flex:1;min-width:7rem" placeholder="${escA(nm)}" value="${escA(o.nm||'')}"
-     onchange="ctlFilm('${id}','nm',this.value)">
-    <input type="number" style="width:5.5rem" placeholder="${CFG.price.ultra}" value="${o.price||''}"
-     onchange="ctlFilm('${id}','price',this.value)">
+ const envOpt=(cur)=>ENVL.map(([k,n])=>
+   `<option value="${k}" ${cur===k?'selected':''}>${n}</option>`).join('');
+ const vidOpt=(cur)=>VIDL.map(([k,n])=>
+   `<option value="${k}" ${cur===k?'selected':''}>${n}</option>`).join('');
+ return ctlCard('💰 سعر الدعوات الجاهزة',
+  'السعر المعروض والسعر المشطوب فوقه. اجعلوا المشطوب صفرًا لإخفاء الخصم.',
+  `<div class="f-row"><label>السعر الحالي (د.ت)</label>
+    <input type="number" value="${CFG.price.ready||99}"
+     onchange="ctlPriceReady('ready',this.value);renderContent()"></div>
+   <div class="f-row"><label>السعر قبل الخصم (د.ت)</label>
+    <input type="number" value="${CFG.price.readyWas||0}"
+     onchange="ctlPriceReady('readyWas',this.value);renderContent()"></div>`)
+ + ctlCard('🎞️ الدعوات الجاهزة — كل فيلم على حدة',
+  'لكل فيلم: إظهاره أو إخفاؤه، اسمه، سعره الخاص، شكل ظرفه، وطريقة عرض فيلمه. '
+  +'اتركوا «الافتراضي» ليتبع الإعداد العام.',
+  RDFILMS.map(([id,nm,cat])=>{const o=F[id]||{};
+   return `<div class="filmrow ${o.vis===false?'off':''}">
+    <div class="filmrow-h">
+     <span class="sw-toggle ${o.vis===false?'':'on'}"
+      onclick="ctlFilm('${id}','vis',${o.vis===false});renderContent()"></span>
+     <b>${nm}</b><em>${cat}</em>
+     <span class="filmrow-st">${o.vis===false?'مخفي':'ظاهر'}</span>
+    </div>
+    <div class="filmrow-g">
+     <label>الاسم<input placeholder="${escA(nm)}" value="${escA(o.nm||'')}"
+      onchange="ctlFilm('${id}','nm',this.value)"></label>
+     <label>السعر<input type="number" placeholder="${CFG.price.ready||99}"
+      value="${o.price||''}" onchange="ctlFilm('${id}','price',this.value)"></label>
+     <label>شكل الظرف<select onchange="ctlFilm('${id}','env',this.value)">
+      <option value="">الافتراضي</option>${envOpt(o.env||'')}</select></label>
+     <label>عرض الفيلم<select onchange="ctlFilm('${id}','vid',this.value)">
+      <option value="">الافتراضي</option>${vidOpt(o.vid||'')}</select></label>
+    </div>
    </div>`;}).join(''))
  + ctlCard('🧩 أقسام الدعوة','ما يظهر داخل الدعوة نفسها — بلا أي شيء عن الطعام أو الحساسية.',
    EDISECL.map(([k,l])=>`<div class="ctlrow"><span>${l}</span>

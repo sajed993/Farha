@@ -207,3 +207,17 @@ label.cmini{cursor:pointer}
 @media(max-width:640px){
  .vidphone iframe{width:340px;height:700px;transform:scale(.52);margin-bottom:-336px}
 }
+
+/* ── per-film controls ── */
+.filmrow{border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:10px;background:#fff}
+.filmrow.off{opacity:.62;background:#FAF7F1}
+.filmrow-h{display:flex;align-items:center;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+.filmrow-h b{font-size:.92rem;color:#3A2B10}
+.filmrow-h em{font-style:normal;font-size:.72rem;color:#8A7E6A;
+ border:1px solid var(--line);border-radius:99px;padding:2px 8px}
+.filmrow-st{margin-inline-start:auto;font-size:.72rem;color:#8A7E6A}
+.filmrow.off .filmrow-st{color:#A3968A}
+.filmrow-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.filmrow-g label{display:grid;gap:4px;font-size:.72rem;color:#8A7E6A}
+.filmrow-g input,.filmrow-g select{padding:7px 9px;border-radius:7px;border:1px solid var(--line);
+ background:#fff;font-family:inherit;font-size:.82rem;color:#3A2B10;width:100%}
