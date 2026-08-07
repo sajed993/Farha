@@ -3091,6 +3091,13 @@ html.is-preview .edi::-webkit-scrollbar{display:none}
  box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 16%,transparent)}
 .frm-g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .frm-g2 input{margin-bottom:9px}
+/* A grid item's min-width is auto, which means a track can never be narrower
+   than its content's intrinsic minimum. iOS gives date and time inputs a
+   fixed intrinsic width that ignores width:100%, so the 1fr tracks were being
+   forced wider than the sheet and the whole thing slid sideways off the
+   screen. Everything in this grid must be allowed to shrink. */
+.frm-g2>*{min-width:0}
+.frm-g2 input,.frm-g2 textarea,.frm-g2 .frm-f{min-width:0;max-width:100%}
 /* This used to stack every pair below 420px, which is what made the form
    1893px tall — nearly three screens — on a 360px phone. Two short boxes fit
    side by side at 360 with room to spare; only genuinely long labels wrap,
@@ -3297,8 +3304,19 @@ html[dir=rtl] .off-flour{transform:scaleX(-1)}
 .frm-f input,.frm-f textarea{margin-bottom:0}
 .frm-g2 .frm-f{margin-bottom:9px}
 /* the date and time pickers, which browsers style their own way */
+/* Safari on iOS sizes these from its own native control and centres the
+   value; appearance:none hands the box back to the page, and the value is
+   pinned to the reading edge so it does not drift in Arabic. */
 .frm-sheet input[type=date],.frm-sheet input[type=time]{
+ -webkit-appearance:none;appearance:none;
+ width:100%;min-width:0;max-width:100%;
  min-height:46px;font-family:var(--num);letter-spacing:.02em}
+.frm-sheet input[type=date]::-webkit-date-and-time-value,
+.frm-sheet input[type=time]::-webkit-date-and-time-value{
+ text-align:start;margin:0}
+/* the empty state on iOS is blank; give it the same grey a placeholder has */
+.frm-sheet input[type=date]:invalid::-webkit-datetime-edit,
+.frm-sheet input[type=time]:invalid::-webkit-datetime-edit{color:var(--taupe)}
 .frm-sheet input[type=date]::-webkit-calendar-picker-indicator,
 .frm-sheet input[type=time]::-webkit-calendar-picker-indicator{
  opacity:.55;cursor:pointer;filter:saturate(0)}
@@ -3369,7 +3387,16 @@ html[dir=rtl] .off-flour{transform:scaleX(-1)}
  .frm-act .frm-alt{margin-top:7px;padding:11px}
  .frm-note{margin-top:6px;font-size:.74rem}
 }
-/* a very small phone: the pairs give up, but only here */
+/* The name boxes stay paired down to 330px. The date and time pickers do not:
+   they are native controls, and iOS renders them at a width of its own
+   choosing that no amount of width:100% will reduce. Half of a phone screen
+   is not reliably enough for one, and when it is not, the grid track grows
+   and takes the whole sheet sideways with it. They get a row each on every
+   phone — one extra row against a layout that cannot break. */
+@media(max-width:560px){
+ .frm-g2.frm-when{grid-template-columns:1fr;gap:0}
+}
+/* a very small phone: the rest give up too */
 @media(max-width:330px){
  .frm-g2{grid-template-columns:1fr;gap:0}
 }

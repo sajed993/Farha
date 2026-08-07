@@ -230,7 +230,7 @@ function frmEventHTML(cat) {
       `<label class="frm-f"><span>${esc(lbl)}${req ? ' <i>*</i>' : ''}</span>
         <input id="${id}" autocomplete="off"></label>`).join('')}</div>
 
-    <div class="frm-g2">
+    <div class="frm-g2 frm-when">
       <label class="frm-f"><span>${esc(T.ordDateL)}</span>
         <input id="ordWhen" type="date" dir="ltr" min="${new Date().toISOString().slice(0,10)}"></label>
       <label class="frm-f"><span>${esc(T.ordTimeL)}</span>
