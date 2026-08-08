@@ -8,10 +8,14 @@
    readyCatalogue(), so both pages always see the same shelf.
 
    One song per film, and no song twice — sndN below is the record of which
-   is spoken for. Every song we hold is now on a film; the next one needs a
-   new track before it can ship.
-   Each track in /media/snd is a 60-second Opus excerpt cut from the loudest
-   part of the song and levelled to the same loudness as its neighbours. */
+   is spoken for. Still unused from the songs we hold:
+     إليسا — عيشالك
+   Most tracks in /media/snd are 60-second Opus excerpts cut from the loudest
+   part of a song. بياض is the exception: it carries the sound that came with
+   its own footage, so it is fifteen seconds and loops. All of them are
+   levelled to the same loudness, and none of them is allowed past the
+   ceiling — the gain is whichever is smaller, the one that matches or the
+   one that keeps the loudest sample under full scale. */
 
 const FILMS_BUILTIN=[
  /* ── weddings ── */
@@ -155,7 +159,7 @@ const FILMS_BUILTIN=[
    fr:['Noir et blanc','Sans couleurs — le plus simple possible'],
    en:['Black and white','No colour — as plain as it gets']},
   sw:['#121214','#79797B','#EDECF0'],
-  snd:'/media/snd/blanc.webm',sndN:'إليسا — عيشالك'},
+  snd:'/media/snd/blanc.webm',sndN:'صوت الفيلم نفسه'},
 
  /* ── save the date ── */
  {id:'soon',cat:'save',v:'/media/inv/soon.mp4',p:'/media/inv/soon.jpg',design:3,
