@@ -2521,7 +2521,7 @@ html[dir=rtl] .wenv-to{font-family:var(--bodyA);letter-spacing:.1em;text-transfo
  /* The flap folds in .55s, not 1.15s. With the opening retimed so the song
     arrives with it, a fold that took longer than the whole opening was still
     halfway back when the envelope faded — the flap never appeared to open. */
- transition:transform .55s cubic-bezier(.55,0,.25,1)}
+ transition:transform .5s cubic-bezier(.55,0,.25,1)}
 .wenv-env.open .wenv-f.t{transform:rotateX(-172deg)}
 /* the card inside, rising once the flap is clear */
 .wenv-note{position:absolute;left:7%;right:7%;top:9%;bottom:14%;z-index:3;
@@ -2529,7 +2529,9 @@ html[dir=rtl] .wenv-to{font-family:var(--bodyA);letter-spacing:.1em;text-transfo
  background:linear-gradient(180deg,var(--cream-hi),var(--cream));
  box-shadow:0 2px 10px rgba(60,44,20,.18),inset 0 0 0 1px color-mix(in srgb,var(--gold) 26%,transparent);
  transform:translateY(6%) scale(.97);opacity:0;
- transition:transform .62s cubic-bezier(.2,.8,.2,1),opacity .45s ease}
+ /* opacity leads the movement, so the names are readable while the card is
+    still settling rather than only once it has stopped */
+ transition:transform .55s cubic-bezier(.2,.8,.2,1),opacity .3s ease}
 .wenv-env.lift .wenv-note{transform:translateY(-16%) scale(1);opacity:1}
 .wenv-note span{font-family:'Cormorant Garamond',serif;font-size:clamp(.6rem,2.1vw,.72rem);
  letter-spacing:.3em;text-transform:uppercase;color:var(--ink-mute)}

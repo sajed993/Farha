@@ -193,11 +193,16 @@ function waxEnvelope(host,after){
      which is why it felt like the music arrived late rather than with the
      opening. The beats are the same, closer together, and the invitation
      arrives as the envelope clears rather than a beat afterwards. */
-  setTimeout(()=>env.classList.add('open'),280);      /* flap folds back */
-  setTimeout(()=>env.classList.add('lift'),700);      /* note rises out */
+  /* The note carries the couple's names and what the invitation is for, and
+     it is the only moment a guest gets to read them on the envelope. It used
+     to be whisked away while it was still rising — never once fully legible,
+     before or after the retiming. It now settles and then HOLDS, a full
+     second at full opacity, before the envelope fades. */
+  setTimeout(()=>env.classList.add('open'),200);      /* flap folds back */
+  setTimeout(()=>env.classList.add('lift'),450);      /* note rises out */
   setTimeout(()=>{const w=host.querySelector('#wenv');
-   if(w){w.classList.add('gone');}},1180);
-  setTimeout(()=>{if(after)after();},1280);};
+   if(w){w.classList.add('gone');}},1750);            /* after a beat to read */
+  setTimeout(()=>{if(after)after();},1850);};
 
  envWax(cv,ini);}
 ;
