@@ -332,12 +332,22 @@ function enterDb() {
     }
     const config = { kind: 'design', design: (f && f.design) || 1, c }
     if (f) {
+      /* Whatever the dashboard set for this film wins over what shipped with
+         it — the same order the shelf uses when the customer previews it.
+         Without this, delivery read the catalogue alone: a song uploaded here
+         was ignored, the stretch it was trimmed to was ignored, and the
+         customer received a different invitation from the one they chose. */
+      const o = (typeof readyCfg === 'function') ? readyCfg(f.id) : {}
       config.film = f.id
       config.films = { hero: f.v, hall: f.v, detail: f.v, date: f.v, venue: f.p }
       config.ediPal = f.id
       config.ediSw = f.sw || null
-      config.trackUrl = f.snd || ''
-      config.trackName = f.sndN || ''
+      config.envStyle = o.env || ''
+      config.vidStyle = o.vid || ''
+      config.trackUrl = o.snd || f.snd || ''
+      config.trackName = o.sndN || f.sndN || ''
+      config.trackFrom = +o.snd0 || 0
+      config.trackTo = +o.snd1 || 0
       config.anim = 'edi'
       config.music = 1
     }

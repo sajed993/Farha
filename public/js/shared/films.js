@@ -192,3 +192,13 @@ function readyCustom(){
 
 /* The whole shelf: what ships, plus what was added, in that order. */
 function readyCatalogue(){return FILMS_BUILTIN.concat(readyCustom());}
+
+/* Whatever the dashboard set for one film — its uploaded song, the stretch
+   that song was trimmed to, its envelope and framing — which always wins over
+   what shipped with the film.
+
+   This lived in the shelf alone, so the dashboard could not see it, and
+   delivery quietly handed over the shipped song at full length instead of the
+   one that had been uploaded and cut. It sits beside the catalogue now
+   because both pages load this file first, and the two paths must agree. */
+function readyCfg(id){return (typeof CFG!=='undefined'&&CFG&&CFG.films&&CFG.films[id])||{};}

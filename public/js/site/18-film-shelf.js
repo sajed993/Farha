@@ -25,7 +25,8 @@ function readyProg(f){
 
 function readyFilm(id){const L=FR();return L.find(f=>f.id===id)||L[0];}
 /* Dashboard overrides: hide a film, rename it, or reprice it. */
-function readyCfg(id){return (typeof CFG!=='undefined'&&CFG&&CFG.films&&CFG.films[id])||{};}
+/* readyCfg now lives in shared/films.js, beside readyCatalogue — the dashboard
+   needs it too, and one definition is what keeps preview and delivery in step. */
 function readyShown(){return FR().filter(f=>readyCfg(f.id).vis!==false);}
 function readyName(f){const o=readyCfg(f.id);return (o.nm&&o.nm.trim())||f.name[S.lang];}
 function readyPrice(f){const o=readyCfg(f.id);return o.price||CFG.price.ready||CFG.price.ultra;}
