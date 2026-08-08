@@ -326,13 +326,59 @@ async function ctlFilmSnd(id, ev){
   toast('تعذّر الرفع — شغّلوا schema-2-storage.sql');
  }
 }
+
+/* ======= أين تبدأ الأغنية وأين تنتهي =======
+   An uploaded song is rarely the right length for a film, and the part that
+   fits is rarely at the front. These set where it starts and stops. The film
+   loops underneath either way; what is being chosen is which stretch of the
+   song plays over it.
+
+   The important part is that the choice is made by ear rather than by
+   arithmetic: the preview plays the trimmed stretch on a loop, so what you
+   hear here is exactly what a guest hears, and «الآن» takes the point you
+   are standing at rather than asking for a number. */
+function ctlFilmTrim(id, k, v){
+ CFG.films[id] = CFG.films[id] || {};
+ const n = Math.max(0, Math.round((parseFloat(v)||0) * 10) / 10);
+ if(!n) delete CFG.films[id][k]; else CFG.films[id][k] = n;
+ /* a start past the end is not a segment; drop the end rather than keep a
+    pair that can only produce silence */
+ const a = +CFG.films[id].snd0 || 0, b = +CFG.films[id].snd1 || 0;
+ if(b && b <= a + 0.5) delete CFG.films[id].snd1;
+ saveCFG();
+ sndTrimLabel(id);
+}
+/* the moment the preview is standing at */
+function ctlFilmMark(id, k){
+ if(!_sndPrev){ toast('شغّلوا المقطع أوّلًا ثم اضغطوا «الآن»'); return; }
+ ctlFilmTrim(id, k, _sndPrev.currentTime);
+ const e = document.getElementById(k === 'snd0' ? 'snd0-'+id : 'snd1-'+id);
+ if(e) e.value = (CFG.films[id][k] || '');
+ toast(k === 'snd0' ? 'تبدأ من هنا' : 'تنتهي هنا');
+}
+/* the readout under the row, written straight into the DOM so that dragging a
+   number does not rebuild sixteen film rows */
+function sndTrimLabel(id){
+ const el = document.getElementById('sndlab-'+id);
+ if(!el) return;
+ const o = (CFG.films||{})[id] || {};
+ const a = +o.snd0 || 0, b = +o.snd1 || 0;
+ const pos = _sndPrev && _sndPrevId === id ? '  ·  الآن ' + _sndPrev.currentTime.toFixed(1) + 'ث' : '';
+ el.textContent = (b > a
+   ? 'المقطع: ' + a.toFixed(1) + 'ث ← ' + b.toFixed(1) + 'ث  (' + (b-a).toFixed(1) + 'ث)'
+   : (a ? 'يبدأ من ' + a.toFixed(1) + 'ث حتّى آخر الأغنية' : 'الأغنية كاملة')) + pos;
+}
 /* hear what is actually set before anyone else does */
-let _sndPrev = null;
+let _sndPrev = null, _sndPrevId = null, _sndTick = null;
 function sndStop(){
- if(_sndPrev){ try{ _sndPrev.pause(); }catch(e){} _sndPrev = null; }
+ clearInterval(_sndTick); _sndTick = null;
+ if(_sndPrev){ try{ _sndPrev.pause(); }catch(e){} }
+ const was = _sndPrevId;
+ _sndPrev = null; _sndPrevId = null;
+ if(was) sndTrimLabel(was);
 }
 function ctlFilmPlay(id){
- if(_sndPrev){ sndStop(); renderContent(); return; }
+ if(_sndPrev){ const same = _sndPrevId === id; sndStop(); renderContent(); if(same) return; }
  /* a running viewer is playing its own music — it has to stop first, or
     there is no hearing the song you asked for */
  if(VIDLIVE!==null){ VIDLIVE=null; renderContent(); }
@@ -340,10 +386,33 @@ function ctlFilmPlay(id){
  let url = o.snd;
  if(!url){ try{ url = (readyCatalogue().find(f=>f.id===id)||{}).snd; }catch(e){} }
  if(!url){ toast('لا موسيقى لهذا الفيلم بعد'); return; }
- const a = new Audio(url); a.volume = .9; _sndPrev = a;
+
+ /* the same stretch a guest would hear, on the same loop */
+ const st = +o.snd0 || 0, en = +o.snd1 || 0;
+ const a = new Audio(url); a.volume = .9;
+ _sndPrev = a; _sndPrevId = id;
+ /* A seek asked for before the file is ready is simply dropped, so it is asked
+    for again each tick until it lands — the same as the site player does. */
+ let tries = 0, landed = st <= 0;
+ const seek = () => { if(_sndPrev!==a) return; try{ a.currentTime = st; }catch(e){} };
+ if(st){ if(a.readyState>0) seek(); else a.addEventListener('loadedmetadata', seek, {once:true}); }
+ a.ontimeupdate = () => {
+  if(_sndPrev!==a) return;
+  if(!landed){
+   if(a.currentTime >= st - 0.3) landed = true;
+   else if(++tries < 40){ seek(); return; }
+   else landed = true;
+  }
+  const stop = en > st + 0.5 ? en : (a.duration||0);
+  if(stop && a.currentTime >= stop - 0.05){ landed = st<=0; tries = 0; seek(); a.play().catch(()=>{}); }
+ };
+ a.onended = () => { if(_sndPrev!==a) return; landed = st<=0; tries = 0; seek(); a.play().catch(()=>{}); };
+ /* the running position, written straight into the label — re-rendering the
+    page ten times a second to show a clock would be absurd */
+ clearInterval(_sndTick);
+ _sndTick = setInterval(()=>{ sndTrimLabel(id); }, 100);
  a.play().then(function(){ toast('تشغيل — اضغطوا مرّة أخرى للإيقاف'); },
-                 function(){ toast('تعذّر التشغيل — تأكّدوا من الرابط'); _sndPrev = null; });
- a.onended = function(){ _sndPrev = null; };
+                 function(){ toast('تعذّر التشغيل'); sndStop(); });
 }
 
 function readyView(){
@@ -393,8 +462,22 @@ function readyView(){
       <label class="sndup">↑ ارفعوا أغنية
        <input type="file" accept="audio/*" onchange="ctlFilmSnd('${id}',event)"></label>
       <button class="act" onclick="ctlFilmPlay('${id}')">▶ اسمعوها</button>
-      ${o.snd?`<button class="act" onclick="ctlFilm('${id}','snd','');ctlFilm('${id}','sndN','');renderContent()">↺ الأصلية</button>`:''}
+      ${o.snd?`<button class="act" onclick="ctlFilm('${id}','snd','');ctlFilm('${id}','sndN','');ctlFilm('${id}','snd0','');ctlFilm('${id}','snd1','');renderContent()">↺ الأصلية</button>`:''}
      </div>
+     <div class="sndtrim">
+      <span>تبدأ</span>
+      <input id="snd0-${id}" type="number" min="0" step="0.1" dir="ltr" placeholder="0"
+       value="${o.snd0||''}" onchange="ctlFilmTrim('${id}','snd0',this.value)">
+      <button class="act" onclick="ctlFilmMark('${id}','snd0')">الآن</button>
+      <span>تنتهي</span>
+      <input id="snd1-${id}" type="number" min="0" step="0.1" dir="ltr" placeholder="آخر الأغنية"
+       value="${o.snd1||''}" onchange="ctlFilmTrim('${id}','snd1',this.value)">
+      <button class="act" onclick="ctlFilmMark('${id}','snd1')">الآن</button>
+     </div>
+     <div class="sndlab" id="sndlab-${id}">${
+       (+o.snd1||0) > (+o.snd0||0)
+        ? 'المقطع: '+(+o.snd0||0).toFixed(1)+'ث ← '+(+o.snd1).toFixed(1)+'ث  ('+((+o.snd1)-(+o.snd0||0)).toFixed(1)+'ث)'
+        : (o.snd0 ? 'يبدأ من '+(+o.snd0).toFixed(1)+'ث حتّى آخر الأغنية' : 'الأغنية كاملة')}</div>
     </div>
    </div>`;}).join(''))
  + ctlCard('🧩 أقسام الدعوة','ما يظهر داخل الدعوة نفسها — بلا أي شيء عن الطعام أو الحساسية.',

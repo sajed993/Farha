@@ -96,6 +96,9 @@ function openReady(id){
   dress:f.dress?{t:(f.dress[S.lang]||[])[0]||'',d:(f.dress[S.lang]||[])[1]||'',sw:f.sw||null}:null,
   trackUrl:readyCfg(f.id).snd||f.snd||'',
   trackName:readyCfg(f.id).sndN||f.sndN||'',
+  /* where the song should start and stop for this film, if it was trimmed */
+  trackFrom:+readyCfg(f.id).snd0||0,
+  trackTo:+readyCfg(f.id).snd1||0,
   dir:f.cat==='wed'?ediDemoNote('dir'):null,
   stay:f.cat==='wed'?ediDemoNote('stay'):null,
   program:ediDemoProgram(f.cat)};

@@ -26,14 +26,45 @@ function fadeTo(v,ms,cb){if(!AUD){if(cb)cb();return;}
   AUD.volume=Math.min(1,Math.max(0,from+dv*k));
   if(k>=steps){clearInterval(fadeI);if(AUD)AUD.volume=Math.min(1,Math.max(0,v));if(cb)cb();}},40);}
 /* Loop a real audio file. Used by the built-in tracks and by each ready film. */
-function playTrack(url,vol){
+/* A track can now be given a start and an end, so a song can be trimmed to
+   sit against its film rather than the film being stuck with whatever the
+   file happens to open on.
+
+   The browser's own loop always returns to zero, which is no use once there
+   is a start offset, so any trimmed track is looped by hand: seek back when
+   it reaches the end, and again if it runs off the tail. */
+function playTrack(url,vol,from,to){
  if(!url)return;
- AUD=new Audio(url);AUD.loop=true;AUD.volume=0;
+ const st=Math.max(0,+from||0);
+ const en=+to||0;
+ const trimmed = st>0 || en>st+0.5;
+ AUD=new Audio(url);AUD.volume=0;AUD.loop=!trimmed;
+ if(trimmed){
+  /* A seek asked for too early is dropped on the floor — the metadata may not
+     have arrived, or the host may not answer byte ranges yet. So the seek is
+     never trusted on the first try: it is asked for again on every tick until
+     it lands, and given up on after a few seconds so a host that cannot seek
+     at all plays the whole song rather than stuttering at the front. */
+  const me=AUD; let tries=0, landed=st<=0;
+  const seek=()=>{ if(AUD!==me)return; try{ me.currentTime=st; }catch(e){} };
+  if(me.readyState>0)seek(); else me.addEventListener('loadedmetadata',seek,{once:true});
+  me.ontimeupdate=()=>{
+   if(AUD!==me)return;
+   if(!landed){
+    if(me.currentTime>=st-0.3){ landed=true; }
+    else if(++tries<40){ seek(); return; }
+    else { landed=true; }      /* it will not seek — let it run */
+   }
+   const stop = en>st+0.5 ? en : (me.duration||0);
+   if(stop && me.currentTime >= stop-0.05){ landed=st<=0; tries=0; seek(); me.play().catch(()=>{}); }
+  };
+  me.onended=()=>{ if(AUD!==me)return; landed=st<=0; tries=0; seek(); me.play().catch(()=>{}); };
+ }
  AUD.play().catch(()=>{});
  fadeTo(vol===undefined?trackVol(url):vol,1400);}
 function playMusic(i){stopMusic();
  if(!i)return;
- if(S.c.trackUrl){playTrack(S.c.trackUrl);return;}
+ if(S.c.trackUrl){playTrack(S.c.trackUrl,undefined,S.c.trackFrom,S.c.trackTo);return;}
  if(TRACKS[i]){playTrack(TRACKS[i]);return;}
  if(i===4&&S.c.track){
   AUD=new Audio(S.c.track.url);

@@ -376,3 +376,17 @@ html[dir=rtl] .txl input,html[dir=rtl] .txl textarea{padding:9px 34px 9px 11px}
 .vidoff:hover{background:rgba(30,17,24,.9)}
 /* what a film's music currently is, now that the url box is gone */
 .sndnow{font-size:.76rem;color:#6A5A3E;margin:2px 0 4px}
+
+/* -- where a song starts and ends -- */
+/* Three columns, two rows: each of «تبدأ» and «تنتهي» keeps its own box and
+   its own «الآن» on one line. Left to wrap, the labels drifted a line away
+   from the boxes they name. */
+.sndtrim{display:grid;grid-template-columns:max-content minmax(0,7rem) max-content;
+ gap:6px 8px;align-items:center;justify-content:start;margin-top:7px}
+.sndtrim>span{font-size:.76rem;font-weight:600;color:#6A5A3E}
+.sndtrim input{width:100%;padding:7px 9px;border-radius:9px;border:1px solid var(--line);
+ background:#fff;font-family:var(--num);font-size:.82rem;color:#3A2B10;text-align:center}
+.sndtrim input::placeholder{font-family:inherit;font-size:.72rem}
+.sndtrim input:focus{outline:none;border-color:#B98A2F;box-shadow:0 0 0 3px rgba(185,138,47,.16)}
+.sndtrim .act{padding:7px 11px;font-size:.74rem}
+.sndlab{margin-top:6px;font-size:.74rem;color:#8A7A63;font-family:var(--num);direction:rtl}

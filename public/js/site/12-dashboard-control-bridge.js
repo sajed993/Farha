@@ -147,7 +147,7 @@ window.saveEditAsTemplate=async function(){
    palette from that film, no song. Everything the dashboard saved was there
    in the config and being thrown away one line before it was used. */
 const INV_KEYS=['film','films','ediPal','ediSw','envStyle','vidStyle',
- 'trackUrl','trackName','anim','music','musicStart','autoplay',
+ 'trackUrl','trackName','trackFrom','trackTo','anim','music','musicStart','autoplay',
  'program','dress','dir','stay','story','maps','qr','font','pal'];
 window.__applyInvite=function(cfg,guest){try{
  cfg=cfg||{};const k=cfg.kind||'design';
