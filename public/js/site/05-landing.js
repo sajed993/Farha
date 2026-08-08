@@ -82,13 +82,12 @@ function lazyvWatch(hosts){
 
 function navHTML(){return `<div class="nav">
  <div class="logo" onclick="go('land')"><b>${S.lang==='ar'?'فرحة':'Far7a'}</b><small>${t().brandS}</small></div>
+ <!-- Five of these pointed at sections deleted with the old designs —
+      القوالب, المناسبات, لحظة الفتح, واقعي جدًا, بريميوم. They stayed visible
+      and scrolled to nothing. Only what exists is listed. -->
  <nav class="menu">
-  <a onclick="scrollSec('gallery')" href="javascript:void(0)">${t().navTpl}</a>
-  <a onclick="scrollSec('cats')" href="javascript:void(0)">${t().navCats}</a>
-  <a onclick="scrollSec('open')" href="javascript:void(0)">${t().navOpen}</a>
   <a class="prem" onclick="scrollSec('ready')" href="javascript:void(0)" style="color:var(--gold2)">✦ ${t().rdNav}</a>
-  <a class="prem" onclick="scrollSec('ultra')" href="javascript:void(0)" style="color:var(--gold3)">✦ ${t().uBadge}</a>
-  <a class="prem" onclick="scrollSec('premium')" href="javascript:void(0)">${t().navPrem}</a>
+  <a class="prem" onclick="scrollSec('offers')" href="javascript:void(0)">${t().off.rName}</a>
   <a class="prem" onclick="scrollSec('sites')" href="javascript:void(0)">${t().navSites}</a>
   <a class="prem" onclick="scrollSec('datef')" href="javascript:void(0)" style="color:var(--acc-grad)">${t().dfKick.split(' ')[0]} ❤️</a>
  </nav>
