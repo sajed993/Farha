@@ -422,18 +422,114 @@ function txClear(id){
  saveCFG(true);   /* structural: write at once */renderContent();
  toast('أُعيدت النصوص الأصلية ✓');}
 
+/* ======= نصوص الدعوة، صفحة بصفحة =======
+   The editor used to be one flat list behind a language tab: you filled it in
+   Arabic, then switched and filled it again, with no way to see whether the
+   French had been done and no clue which box belonged to which screen.
+
+   It is ordered by the invitation itself now — the pages a guest scrolls
+   through, numbered in that order — and every text carries its three
+   languages side by side, so a missing translation is visible rather than
+   discovered by a French visitor. */
+function txSetL(id, lang, k, v){
+ CFG.films[id] = CFG.films[id] || {};
+ CFG.films[id].txt = CFG.films[id].txt || {};
+ CFG.films[id].txt[lang] = CFG.films[id].txt[lang] || {};
+ CFG.films[id].txt[lang][k] = v;
+ saveCFG();
+}
+function txGetL(id, lang){ return (((CFG.films[id]||{}).txt)||{})[lang] || {}; }
+
+/* A moment in time reads the same in every language, so it is written to all
+   three rather than asking for it three times. */
+function txSetAll(id, k, v){ ['ar','fr','en'].forEach(function(l){ txSetL(id, l, k, v); }); }
+
+/* Names, dates and venues are usually the same in all three. This copies the
+   Arabic across, but only into boxes that are still empty — it will never
+   overwrite a translation somebody wrote. */
+function txSpread(id, k){
+ const src = (txGetL(id,'ar')[k]||'').trim();
+ if(!src){ toast('اكتبوا العربية أوّلًا'); return; }
+ let n = 0;
+ ['fr','en'].forEach(function(l){
+  if(!(txGetL(id,l)[k]||'').trim()){ txSetL(id,l,k,src); n++; }
+ });
+ renderContent();
+ toast(n ? ('نُسخت إلى '+n+' لغة') : 'اللغتان مكتوبتان بالفعل');
+}
+
+/* the pages of the invitation, in the order a guest meets them.
+   [key, label, hint, isTextarea, oneLanguageOnly] */
+const TXPAGES = [
+ { n:'٠', t:'على الرفّ', s:'ما يُقرأ على البطاقة في الموقع، قبل أن تُفتح الدعوة',
+   f:[['blurb','الوصف تحت الاسم','سطر قصير يظهر على البطاقة',1]] },
+ { n:'١', t:'الغلاف', s:'أوّل ما يراه الضيف بعد كسر الختم',
+   f:[['t','السطر الصغير فوق الأسماء','دعوة زفاف'],
+      ['n','الأسماء','مريم و يوسف']] },
+ { n:'٢', t:'الدعوة', s:'الصفحة التي تحمل نصّ الدعوة نفسه — والأسماء تتكرّر فيها',
+   f:[['m','نصّ الدعوة','يتشرفان بدعوتكم لمشاركتهما فرحة العمر',1]] },
+ { n:'٣', t:'الموعد', s:'التاريخ كما يُكتب على الصفحة',
+   f:[['d','التاريخ','14 سبتمبر 2026']] },
+ { n:'٤', t:'المكان',
+   f:[['p','اسم المكان','رياض الأندلس']] },
+ { n:'٥', t:'العدّ التنازلي', s:'رقمٌ واحد لكلّ اللغات — منه تُحسب الأيام والساعات',
+   f:[['when','لحظة المناسبة','2026-09-14T19:00',0,1]] },
+ { n:'٦', t:'برنامج الحفل', s:'يُحرَّر في البطاقة أسفل الصفحة، سطرًا سطرًا', f:[] },
+ { n:'٧', t:'قواعد اللباس',
+   f:[['dressT','العنوان','أنيق رسمي'],
+      ['dressD','التفصيل','بدلة داكنة · فستان طويل']] },
+ { n:'٨', t:'الوصول وصفّ السيارات',
+   f:[['dirT','العنوان','موقف مجاني'],
+      ['dirD','التفصيل','خدمة صفّ السيارات من الساعة 3:30',1]] },
+ { n:'٩', t:'الإقامة',
+   f:[['stayT','العنوان','أسعار خاصة'],
+      ['stayD','التفصيل','فندقان على بعد دقائق',1]] }
+];
+
 function txtView(){
- const id=TXF, x=txGet(id), rows=txProgRows(id);
- const row=(k,label,hint,area)=>`<div class="txf">
-   <label>${label}${hint?`<em>${hint}</em>`:''}</label>
-   ${area?`<textarea rows="3" placeholder="${escA(hint||'')}"
-      oninput="txSet('${id}','${k}',this.value)">${escA(x[k]||'')}</textarea>`
-        :`<input value="${escA(x[k]||'')}" placeholder="${escA(hint||'')}"
-      oninput="txSet('${id}','${k}',this.value)">`}
-  </div>`;
+ const id = TXF, rows = txProgRows(id);
+ const nameOf = (RDFILMS.find(r=>r[0]===id)||['','',''])[1];
+
+ /* one text, three languages, and a note when one of them is still empty */
+ const field = ([k,label,hint,area,one]) => {
+  const box = (l) => {
+   const v = txGetL(id,l)[k] || '';
+   const on = 'oninput="txSetL(\''+id+'\',\''+l+'\',\''+k+'\',this.value)"';
+   return `<div class="txl ${v?'has':''}">
+     <span>${l}</span>
+     ${area?`<textarea rows="2" placeholder="${escA(l==='ar'?hint:'')}" ${on}>${escA(v)}</textarea>`
+           :`<input value="${escA(v)}" placeholder="${escA(l==='ar'?hint:'')}" ${on}>`}
+    </div>`;
+  };
+  if(one){
+   const v = txGetL(id,'ar')[k] || '';
+   return `<div class="txf">
+     <label>${label}<em>${escA(hint||'')}</em></label>
+     <div class="txl has one"><span>الكل</span>
+      <input value="${escA(v)}" placeholder="${escA(hint||'')}"
+       oninput="txSetAll('${id}','${k}',this.value)"></div>
+    </div>`;
+  }
+  const missing = ['ar','fr','en'].filter(l=>!(txGetL(id,l)[k]||'').trim()).length;
+  return `<div class="txf">
+    <label>${label}
+     ${missing===3?'<i class="txwarn empty">فارغ — يظهر النصّ الأصلي</i>'
+       :missing?`<i class="txwarn">ينقص ${missing===1?'لغة':'لغتان'}</i>`
+       :'<i class="txok">مكتمل</i>'}
+     <button class="txcopy" onclick="txSpread('${id}','${k}')" title="انسخوا العربية إلى الفارغ">⇥</button>
+    </label>
+    <div class="txl3">${['ar','fr','en'].map(box).join('')}</div>
+   </div>`;
+ };
+
+ const page = (p) => ctlCard(
+   `<span class="txnum">${p.n}</span> ${p.t}`, p.s||'',
+   p.f.length ? p.f.map(field).join('')
+     : `<p class="cmut">لا نصّ هنا — انظروا بطاقة البرنامج أسفل الصفحة.</p>`);
+
  return `<div class="cgrid">
   ${ctlCard('🎞️ اختاروا الدعوة',
-   'كل دعوة نصوصها الخاصة وبكل لغة على حدة.',
+   'كل دعوة نصوصها الخاصة. النقطة تعني أنّ فيها تعديلًا.',
    `<div class="txpick">${RDFILMS.map(([fid,nm,cat])=>{
      const has=((CFG.films[fid]||{}).txt)||((CFG.films[fid]||{}).prog);
      const off=(CFG.films[fid]||{}).vis===false;
@@ -441,53 +537,33 @@ function txtView(){
        ${nm}<em>${cat}</em>${has?'<i class="txdot" title="معدّل"></i>':''}
        ${off?'<s>مخفي</s>':''}</button>`;}).join('')}</div>`)}
 
-  ${ctlCard('✒️ نصوص «'+ (RDFILMS.find(r=>r[0]===id)||['','',''])[1] +'»',
-   'اتركوا أي حقل فارغًا ليبقى النص الأصلي. الحفظ فوري.',
-   `<div class="txlangs">${TXLANGS.map(([l,n])=>
-     `<button class="txlang ${TXL===l?'on':''}" onclick="txLang('${l}')">${n}</button>`).join('')}</div>
-
-    <h4 class="txh">في الرفّ</h4>
-    ${row('blurb','الوصف تحت الاسم','سطر قصير يظهر على البطاقة',1)}
-
-    <h4 class="txh">داخل الدعوة</h4>
-    ${row('t','العنوان الصغير','دعوة زفاف')}
-    ${row('n','الأسماء','مريم و يوسف')}
-    ${row('d','التاريخ كما يُكتب','14 سبتمبر 2026')}
-    ${row('when','تاريخ العدّ التنازلي','2026-09-14T19:00')}
-    ${row('p','المكان','رياض الأندلس')}
-    ${row('m','الرسالة','يتشرفان بدعوتكم…',1)}
-
-    <h4 class="txh">قواعد اللباس</h4>
-    ${row('dressT','العنوان','أنيق رسمي')}
-    ${row('dressD','التفصيل','بدلة داكنة · فستان طويل')}
-
-    <h4 class="txh">الوصول</h4>
-    ${row('dirT','العنوان','موقف مجاني')}
-    ${row('dirD','التفصيل','خدمة صفّ السيارات…',1)}
-
-    <h4 class="txh">الإقامة</h4>
-    ${row('stayT','العنوان','أسعار خاصة')}
-    ${row('stayD','التفصيل','فندقان قريبان…',1)}
-
-    <div class="txfoot">
-     <button class="act" onclick="txClear('${id}')">إعادة النصوص الأصلية</button>
-     <a class="act gold" href="index.html?vidPreview=${id}&vidSec=hall" target="_blank">معاينة على الموقع ↗</a>
+  ${ctlCard('✒️ «'+nameOf+'» — الصفحات بالترتيب',
+   'الصفحات كما يمرّ بها الضيف. كل نصّ بلغاته الثلاث، واتركوا أي خانة فارغة '
+   +'ليبقى النصّ الأصلي. ⇥ ينسخ العربية إلى الخانات الفارغة وحدها.',
+   `<div class="txfoot">
+     <button class="act" onclick="txClear('${id}')">إعادة كل النصوص إلى الأصل</button>
+     <a class="act gold" href="index.html?vidPreview=${id}&vidSec=hall" target="_blank">معاينة ↗</a>
     </div>`)}
 
-  ${ctlCard('🕑 برنامج الحفل',
-   'اتركوه فارغًا ليبقى البرنامج الأصلي. أي سطر بلا عنوان يُتجاهل.',
-   `${rows.length?rows.map((r,i)=>`<div class="txprow">
+  ${TXPAGES.map(page).join('')}
+
+  ${ctlCard('<span class="txnum">٦</span> برنامج الحفل',
+   'اتركوه فارغًا ليبقى البرنامج الأصلي. أي سطر بلا عنوان يُتجاهل. '
+   +'الأوقات واحدة لكل اللغات؛ العناوين تُكتب لكل لغة على حدة.',
+   `<div class="txlangs">${TXLANGS.map(([l,n])=>
+      `<button class="txlang ${TXL===l?'on':''}" onclick="txLang('${l}')">${n}</button>`).join('')}</div>
+    ${rows.length?rows.map((r,i)=>`<div class="txprow">
       <input class="tt" value="${escA(r.time||'')}" placeholder="19:00"
        oninput="txProgEdit('${id}',${i},'time',this.value)">
       <input value="${escA(r.title||'')}" placeholder="الفقرة"
        oninput="txProgEdit('${id}',${i},'title',this.value)">
       <input value="${escA(r.place||'')}" placeholder="المكان"
        oninput="txProgEdit('${id}',${i},'place',this.value)">
-      <button class="txdel" onclick="txProgDel('${id}',${i})" title="حذف">×</button>
-     </div>`).join(''):'<p class="cmut">لا فقرات مخصّصة — يُعرض البرنامج الأصلي.</p>'}
-    <button class="act" onclick="txProgAdd('${id}')">+ أضيفوا فقرة</button>`)}
- </div>`;}
-
+      <button class="act" onclick="txProgDel('${id}',${i})">حذف</button>
+     </div>`).join(''):'<p class="cmut">لا فقرات بعد.</p>'}
+    <div class="txfoot"><button class="act gold" onclick="txProgAdd('${id}')">+ فقرة</button></div>`)}
+ </div>`;
+}
 function mediaView(){
  const M=CFG.media;const cloud=window.__dbMode?'':`<p class="cmut" style="color:#A33">⚠️ لرفع الفيديوهات سجّلوا الدخول السحابي أولًا (الأزرار الأخرى تعمل).</p>`;
  return `<div class="cgrid">`+envView()+vidView()+readyView()+

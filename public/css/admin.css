@@ -322,3 +322,36 @@ label.cmini{cursor:pointer}
 .sndup:hover{background:#EDE4D2}
 .sndup input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .sndrow .act{padding:8px 13px;font-size:.8rem}
+
+/* -- invitation text, page by page, three languages at a time -- */
+.txnum{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;
+ margin-inline-end:8px;font-size:.8rem;font-weight:700;color:#FFF6F3;font-family:var(--num);
+ background:linear-gradient(158deg,#C68E96,#AA606A 45%,#813F49);vertical-align:middle}
+.txf{margin-bottom:16px}
+.txf>label{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+ font-size:.82rem;font-weight:700;color:#3A2B10;margin-bottom:7px}
+.txf>label em{font-style:normal;font-weight:400;font-size:.75rem;color:#A3968A}
+.txwarn{font-style:normal;font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:99px;
+ background:#FFF1D9;color:#8A5A18}
+.txwarn.empty{background:#F3EEE3;color:#8A7A63}
+.txok{font-style:normal;font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:99px;
+ background:#E7F2E9;color:#2F6B3A}
+.txcopy{margin-inline-start:auto;width:26px;height:26px;border-radius:8px;cursor:pointer;
+ font-size:.85rem;color:#6A5A3E;background:#F3EEE3;box-shadow:inset 0 0 0 1px var(--line)}
+.txcopy:hover{background:#EDE4D2;color:#813F49}
+/* the three languages, side by side on a desktop and stacked on a laptop */
+.txl3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:1100px){.txl3{grid-template-columns:1fr}}
+.txl{position:relative}
+.txl>span{position:absolute;top:8px;inset-inline-start:9px;z-index:1;
+ font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+ color:#A3968A;font-family:var(--num);pointer-events:none}
+.txl.has>span{color:#2F6B3A}
+.txl input,.txl textarea{width:100%;padding:9px 11px 9px 34px;border-radius:10px;
+ border:1px solid var(--line);background:#fff;font-family:inherit;font-size:.86rem;
+ line-height:1.7;color:#3A2B10;resize:vertical}
+html[dir=rtl] .txl input,html[dir=rtl] .txl textarea{padding:9px 34px 9px 11px}
+.txl input:focus,.txl textarea:focus{outline:none;border-color:#B98A2F;
+ box-shadow:0 0 0 3px rgba(185,138,47,.16)}
+.txl.has input,.txl.has textarea{border-color:rgba(47,107,58,.3)}
+.txl.one{max-width:22rem}
