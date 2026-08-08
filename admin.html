@@ -16,9 +16,16 @@
      only revealed once a session is confirmed, so the failure mode is a blank
      page rather than an open door. -->
 <style>#app[hidden]{display:none}
-#dbboot{position:fixed;inset:0;display:grid;place-items:center;font-family:system-ui;
- background:linear-gradient(160deg,#FBF7EF,#F0E5CF);color:#8A7A63;font-size:.9rem}</style>
-<div id="dbboot">…</div>
+#dbboot{position:fixed;inset:0;z-index:998;display:grid;place-items:center;font-family:system-ui;
+ background:linear-gradient(160deg,#FBF7EF,#F0E5CF);color:#8A7A63;font-size:.9rem}
+#dbboot .bootbox{display:grid;justify-items:center;gap:16px}
+#dbboot .bootring{width:38px;height:38px;border-radius:50%;
+ border:3px solid rgba(185,138,47,.22);border-top-color:#B98A2F;
+ animation:bootspin .9s linear infinite}
+#dbboot p{margin:0;font-size:.84rem;letter-spacing:.01em}
+@keyframes bootspin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#dbboot .bootring{animation-duration:2.4s}}</style>
+<div id="dbboot"><div class="bootbox"><div class="bootring"></div><p>جارٍ الاتصال…</p></div></div>
 <div id="app" hidden></div>
 <script src="/js/shared/films.js"></script>
 <script src="/js/admin/00-seeded-demo-data.js"></script>

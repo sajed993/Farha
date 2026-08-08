@@ -40,17 +40,26 @@ function loadCFG(){
   delete keep.sec;delete keep.price;      /* these are ours to set */
   keep.v=CFG_VER;lc=keep;lsSet(LSK.cfg,lc);
  }
- const cc={sec:Object.assign({},fc.sec||{},lc.sec||{}),price:Object.assign({},fc.price||{},lc.price||{}),
-  wa:(lc.wa!==undefined&&lc.wa!=='')?lc.wa:(fc.wa||''),
-  d17:(lc.d17!==undefined&&lc.d17!=='')?lc.d17:(fc.d17||''),
-  banner:Object.assign({},fc.banner||{},lc.banner||{}),
-  designs:Object.assign({},fc.designs||{},lc.designs||{}),
-  edi:Object.assign({},fc.edi||{},lc.edi||{}),
-  films:Object.assign({},fc.films||{},lc.films||{}),
-  offers:Object.assign({},fc.offers||{},lc.offers||{}),
-  envStyle:lc.envStyle||fc.envStyle||'',
-  env:Object.assign({},fc.env||{},lc.env||{}),
-  vid:Object.assign({},fc.vid||{},lc.vid||{})};
+ /* Which copy wins, when a visitor's browser and the dashboard disagree.
+    Everything here is the shop's to decide — prices, which films are on the
+    shelf, the song each one carries, the envelope, the offers. It was being
+    merged the other way round, so a visitor who had loaded the site once kept
+    seeing last week's prices and last week's films for as long as that
+    localStorage survived, and no change published from the dashboard could
+    reach them. The published copy wins now, whenever there is one. */
+ const pub = fc && Object.keys(fc).length;
+ const own = (k) => pub ? (fc[k] || {}) : Object.assign({}, fc[k] || {}, lc[k] || {});
+ const cc={sec:own('sec'),price:own('price'),
+  wa:(pub?fc.wa:0)||((lc.wa!==undefined&&lc.wa!=='')?lc.wa:(fc.wa||'')),
+  d17:(pub?fc.d17:0)||((lc.d17!==undefined&&lc.d17!=='')?lc.d17:(fc.d17||'')),
+  banner:own('banner'),
+  designs:own('designs'),
+  edi:own('edi'),
+  films:own('films'),
+  offers:own('offers'),
+  envStyle:(pub?fc.envStyle:0)||lc.envStyle||fc.envStyle||'',
+  env:own('env'),
+  vid:own('vid')};
  CFG=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(CFG.sec,cc.sec||{});Object.assign(CFG.price,cc.price||{});
  CFG.wa=cc.wa||CFG_DEF.wa;CFG.d17=cc.d17||CFG_DEF.d17;Object.assign(CFG.banner,cc.banner||{});CFG.designs=cc.designs||{};
@@ -58,7 +67,7 @@ function loadCFG(){
  Object.assign(CFG.offers,cc.offers||{});
  if(cc.envStyle)CFG.envStyle=cc.envStyle;Object.assign(CFG.env,cc.env||{});
  Object.assign(CFG.vid,cc.vid||{});
- CFG.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),(fc.media||{}),(lc.media||{}));
+ CFG.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),(fc.media||{}),(pub?{}:(lc.media||{})));
  for(let i=DESIGNS.length-1;i>=0;i--)if(DESIGNS[i]._custom)DESIGNS.splice(i,1);
  (CFG.media.customDesigns||[]).forEach((cd,ix)=>{const nm=cd.nm||('قالب '+(ix+1));
   DESIGNS.push({_custom:true,id:200+ix,cat:cd.cat||'wed',badge:cd.badge||'',

@@ -3,7 +3,8 @@ const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'far
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,cats:0,gallery:0,design:0,ready:1,offers:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,signPrice:249,signWas:0,signRevs:5,signDays:7,ribbonOn:1,noteOn:1,txt:{}},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},vid:{site:'full',customer:'full'},price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[],readyFilms:[]}};
-function loadCFG(){const cc=lsGet(LSK.cfg,{})||{};const o=JSON.parse(JSON.stringify(CFG_DEF));
+/* Fill out a stored config into a whole one, whatever it came from. */
+function cfgFrom(cc){cc=cc||{};const o=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(o.sec,cc.sec||{});Object.assign(o.price,cc.price||{});o.wa=cc.wa||CFG_DEF.wa;o.d17=cc.d17||CFG_DEF.d17;
  Object.assign(o.banner,cc.banner||{});o.designs=cc.designs||{};
  Object.assign(o.edi,cc.edi||{});o.films=cc.films||{};
@@ -11,7 +12,35 @@ function loadCFG(){const cc=lsGet(LSK.cfg,{})||{};const o=JSON.parse(JSON.string
  if(cc.envStyle)o.envStyle=cc.envStyle;Object.assign(o.env,cc.env||{});
  Object.assign(o.vid,cc.vid||{});
  o.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),cc.media||{});return o;}
+function loadCFG(){return cfgFrom(lsGet(LSK.cfg,{}));}
 let CFG=loadCFG();
+
+/* ============ one settings drawer, not one per device ============
+   The dashboard used to write site_config and never read it back, so each
+   phone and each laptop booted from its own localStorage. Two consequences,
+   the second much worse than the first: settings made on the phone were
+   invisible on the laptop, and the moment anything was changed on the laptop
+   its stale copy was published over the phone's work.
+
+   The database holds the truth now. localStorage is only a cache for the next
+   reload. And nothing is ever published from a device that did not manage to
+   read first — an unread config cannot be allowed to overwrite a read one. */
+let CFG_LOADED = false;
+function adoptCFG(remote){
+ CFG = cfgFrom(remote);
+ CFG_LOADED = true;
+ try{ lsSet(LSK.cfg, CFG); }catch(e){}
+ try{ if(typeof renderContent==='function') renderContent(); }catch(e){}
+ return CFG;
+}
+/* the local copy is still worth keeping when there is no network, but it must
+   not be mistaken for the published one */
+function adoptLocalCFG(){ CFG = loadCFG(); CFG_LOADED = false; return CFG; }
+/* `let CFG` is a global lexical binding, which is not a property of window —
+   the module that talks to the database needs a way in. */
+window.getCFG = function(){ return CFG; };
+window.adoptCFG = adoptCFG;
+window.adoptLocalCFG = adoptLocalCFG;
 /* ============ saving the config ============
    Thirty-four places call saveCFG, and thirteen of them are wired to
    oninput. Every keystroke in the text editors was therefore a full-row
@@ -39,6 +68,12 @@ function _cfgWriteRemote(){
  _cfgRemoteT = null;
  if(!_cfgPending) return;
  _cfgPending = false;
+ /* Publishing a config this device never managed to read would overwrite
+    whatever another device has already set. Refuse, and say so. */
+ if(window.__dbSaveCfg && !CFG_LOADED){
+  toast('⚠️ لم تُقرأ الإعدادات من الخادم — لم يُنشر شيء');
+  return;
+ }
  if(window.__dbSaveCfg) window.__dbSaveCfg(CFG);      /* toasts on success */
  else toast('حُفظ ✓');
 }

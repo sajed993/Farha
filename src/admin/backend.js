@@ -11,14 +11,31 @@ const E = (s) => (window.escA ? window.escA(s) : esc(s))
 const STS = ['جديد', 'مدفوع', 'مكتمل', 'ملغى']
 
 /* ---------- login gate ---------- */
-/* the only two ways the panel becomes visible: a confirmed session, or the
-   login form itself */
+/* the only two ways the panel becomes visible: real data, or the login form */
 function revealShell () {
   const a = document.getElementById('app'); if (a) a.hidden = false
   const b = document.getElementById('dbboot'); if (b) b.remove()
 }
+/* The waiting screen. It says what it is waiting for rather than spinning
+   silently, and it recreates itself after a login has taken the first one
+   away, so there is never a gap where the seeded demo shows through. */
+function bootMsg (text) {
+  let b = document.getElementById('dbboot')
+  if (!b) {
+    b = document.createElement('div')
+    b.id = 'dbboot'
+    document.body.appendChild(b)
+  }
+  b.innerHTML = '<div class="bootbox"><div class="bootring"></div><p id="bootmsg"></p></div>'
+  b.querySelector('#bootmsg').textContent = text || '…'
+  const a = document.getElementById('app'); if (a) a.hidden = true
+}
 function showLogin() {
-  revealShell()
+  /* The boot screen goes, but the panel stays hidden behind the form. It was
+     being revealed here too, so the seeded demo sat underneath the login —
+     and one tap on «متابعة محليًا» dropped you straight onto invented orders
+     and invented revenue. That is now an explicit choice, not a side effect. */
+  const b = document.getElementById('dbboot'); if (b) b.remove()
   if ($('dblogin')) return
   const d = document.createElement('form')
   d.id = 'dblogin'
@@ -45,7 +62,10 @@ function showLogin() {
   d.onsubmit = (e)=>{e.preventDefault();doLogin();}
   $('dbgo').onclick = doLogin
   $('dbpw').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin() })
-  $('dbloc').onclick = () => d.remove()
+  $('dbloc').onclick = () => {
+    if (!confirm('الوضع التجريبي يعرض أرقامًا وطلبات مُختلَقة للعرض فقط — لا علاقة لها بمتجركم. هل تريدون المتابعة؟')) return
+    d.remove(); revealShell()
+  }
 }
 
 async function doLogin() {
@@ -279,7 +299,7 @@ function connectedBadge() {
 }
 
 function enterDb() {
-  revealShell()
+  bootMsg('جارٍ الاتصال…')
   window.__dbMode = true
   try { if (window.Notification && Notification.permission === 'default') Notification.requestPermission() } catch (e) {}
   window.__dbOrdersHTML = ordersHTML
@@ -511,14 +531,75 @@ function enterDb() {
     const { data } = sb.storage.from(bucket || 'videos').getPublicUrl(path)
     return data.publicUrl
   }
+  /* Our own writes come back to us over realtime a moment later. Adopting one
+     would rebuild the panel under the hands of whoever is typing, so a write
+     is remembered just long enough to recognise its own echo. */
+  let __cfgEchoUntil = 0
   window.__dbSaveCfg = async (cfg) => {
     try {
+      __cfgEchoUntil = Date.now() + 4000
       const { error } = await sb.from('site_config').update({ cfg, updated_at: new Date().toISOString() }).eq('id', 1)
-      if (!error && typeof window.toast === 'function') window.toast('☁️ نُشر لكل الزوّار مباشرة')
+      if (error) { if (window.toast) window.toast('تعذّر النشر — لم تُحفظ على الخادم'); return }
+      if (typeof window.toast === 'function') window.toast('☁️ نُشر لكل الزوّار مباشرة')
+    } catch (e) { if (window.toast) window.toast('تعذّر النشر — لم تُحفظ على الخادم') }
+  }
+
+  /* The settings live in the database, not on this device. Read them before
+     anything is drawn, so a phone and a laptop are looking at one thing. */
+  window.__dbLoadCfg = async () => {
+    const { data, error } = await sb.from('site_config').select('cfg').eq('id', 1).maybeSingle()
+    if (error) throw error
+    return (data && data.cfg) || null
+  }
+
+  async function bootConfig () {
+    try {
+      const cfg = await window.__dbLoadCfg()
+      if (cfg && Object.keys(cfg).length) { window.adoptCFG(cfg); return true }
+      /* nothing published yet — this device's settings become the first copy
+         rather than being silently discarded */
+      window.adoptCFG(window.getCFG ? window.getCFG() : {})
+      await window.__dbSaveCfg(window.getCFG ? window.getCFG() : {})
+      return true
+    } catch (e) {
+      console.warn('[farha] config read failed', e && e.message)
+      return false
+    }
+  }
+
+  /* a change made on another device lands here */
+  function watchConfig () {
+    try {
+      sb.channel('farha-config')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'site_config' }, (p) => {
+          if (Date.now() < __cfgEchoUntil) return              /* our own write */
+          const cfg = p && p.new && p.new.cfg
+          if (!cfg || !Object.keys(cfg).length) return
+          window.adoptCFG(cfg)
+          if (window.toast) window.toast('🔄 حُدّثت الإعدادات من جهاز آخر')
+        })
+        .subscribe()
     } catch (e) {}
   }
+
   connectedBadge()
-  fetchAll()
+  /* Nothing is shown until there is something real to show. The panel used to
+     appear the instant the session was confirmed, so the first thing on screen
+     was the seeded demo — invented orders, invented revenue — which is worse
+     than a blank page because it reads as real. */
+  ;(async () => {
+    bootMsg('جارٍ تحميل الإعدادات…')
+    const ok = await bootConfig()
+    if (!ok) {
+      window.adoptLocalCFG()
+      if (window.toast) window.toast('⚠️ تعذّرت قراءة الإعدادات — لن يُنشر أي تغيير')
+    }
+    bootMsg('جارٍ تحميل الطلبات والردود…')
+    await fetchAll()
+    revealShell()
+    try { window.renderContent && window.renderContent() } catch (e) {}
+    watchConfig()
+  })()
   // realtime: new orders/wishes pop in live; harmless if the socket fails
   try {
     sb.channel('farha-inbox')
