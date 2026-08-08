@@ -2,11 +2,11 @@
 const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'farha_meta'};
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,cats:0,gallery:0,design:0,ready:1,offers:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,signPrice:249,signWas:0,signRevs:5,signDays:7,ribbonOn:1,noteOn:1,txt:{}},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},vid:{site:'full',customer:'full'},price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},designs:{},media:{films:{},customFilms:[],vopens:[],customDesigns:[],hideShows:[],readyFilms:[]}};
+const CFG_DEF={sec:{sites:0,datef:0,wishes:0,ready:1,offers:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,signPrice:249,signWas:0,signRevs:5,signDays:7,ribbonOn:1,noteOn:1,txt:{}},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},vid:{site:'full',customer:'full'},price:{site:149,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},media:{films:{},customFilms:[],hideShows:[],readyFilms:[]}};
 /* Fill out a stored config into a whole one, whatever it came from. */
 function cfgFrom(cc){cc=cc||{};const o=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(o.sec,cc.sec||{});Object.assign(o.price,cc.price||{});o.wa=cc.wa||CFG_DEF.wa;o.d17=cc.d17||CFG_DEF.d17;
- Object.assign(o.banner,cc.banner||{});o.designs=cc.designs||{};
+ Object.assign(o.banner,cc.banner||{});
  Object.assign(o.edi,cc.edi||{});o.films=cc.films||{};
  Object.assign(o.offers,cc.offers||{});
  if(cc.envStyle)o.envStyle=cc.envStyle;Object.assign(o.env,cc.env||{});
@@ -209,13 +209,15 @@ function ctlFilm(id,k,v){CFG.films[id]=CFG.films[id]||{};
  else if(k==='price')CFG.films[id].price=Math.max(0,parseInt(v)||0);
  else CFG.films[id][k]=v;
  saveCFG();}
-function ctlVis(id,v){CFG.designs[id]=CFG.designs[id]||{};CFG.designs[id].vis=!!v;saveCFG();}
-function ctlBadge(id,v){CFG.designs[id]=CFG.designs[id]||{};CFG.designs[id].badge=v;saveCFG();}
 function escA(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+/* What is left on the site. The card designs, «واقعي جدًا», بريميوم, سينما AI,
+   معرض القوالب, المناسبات and عروض لحظة الفتح were deleted — a switch for a
+   section that no longer exists is worse than no switch. */
 const SECL=[['ready','✦ قسم «دعوات جاهزة» (الأفلام)'],
  ['offers','✦ قسم الباقتين (المجموعة / التوقيع)'],
- ['cats','المناسبات'],['gallery','معرض القوالب'],
- ['design','محرّر «صمّم دعوتك» وأزراره'],['ultra','✦ قسم «واقعي جدًا»'],['premium','قسم بريميوم'],['ai','سينما AI (داخل بريميوم)'],['sites','مواقع المناسبات'],['datef','دعوة أول موعد التفاعلية'],['open','عروض لحظة الفتح'],['wishes','صندوق التهاني داخل الدعوات']];
+ ['sites','مواقع المناسبات (ألبوم الصور)'],
+ ['datef','دعوة أول موعد التفاعلية'],
+ ['wishes','صندوق التهاني داخل الدعوات']];
 function ctlCard(tt,ss,inner){return `<div class="ctlcard"><h3>${tt}</h3>${ss?`<p class="cmut">${ss}</p>`:''}${inner}</div>`;}
 
 /* ===== dynamic content manager ===== */
@@ -237,16 +239,6 @@ function mAddFilm(ev){const nm=(document.getElementById('mfNm')||{}).value||'',d
  if(!nm.trim()){toast('أدخلوا اسم الفيلم أولًا');ev.target.value='';return;}
  mediaUp(ev.target,url=>{CFG.media.customFilms.push({nm:nm.trim().slice(0,40),ds:ds.trim().slice(0,120),em:em.trim().slice(0,4)||'🎬',url:url});});}
 function mDelFilm(j){CFG.media.customFilms.splice(j,1);saveCFG();renderContent();}
-function mAddVopen(ev){const nm=(document.getElementById('mvNm')||{}).value||'';
- if(!nm.trim()){toast('أدخلوا اسم المقدمة أولًا');ev.target.value='';return;}
- mediaUp(ev.target,url=>{CFG.media.vopens.push({nm:nm.trim().slice(0,30),url:url});});}
-function mDelVopen(i){CFG.media.vopens.splice(i,1);saveCFG();renderContent();}
-function mAddDesign(){const g=id=>(document.getElementById(id)||{}).value||'';
- const nm=g('mdNm').trim();if(!nm){toast('أدخلوا اسم القالب');return;}
- CFG.media.customDesigns.push({nm:nm.slice(0,40),em:(g('mdEm')||'✨').slice(0,4),cat:g('mdCat')||'wed',
-  bg:g('mdBg')||'#FFF9EC',ac:g('mdAc')||'#B98A2F',ink:g('mdInk')||'#3A2B10',badge:g('mdBadge')||''});
- saveCFG();renderContent();toast('أُضيف القالب ونُشر ✓');}
-function mDelDesign(i){CFG.media.customDesigns.splice(i,1);saveCFG();renderContent();}
 function mShowTgl(i,on){const h=CFG.media.hideShows;const ix=h.indexOf(i);
  if(on&&ix>-1)h.splice(ix,1);if(!on&&ix===-1)h.push(i);saveCFG();}
 /* the ready-made films, and the sections inside their invitation */
@@ -718,23 +710,6 @@ function mediaView(){
     <input class="cinp" id="mfDs" placeholder="وصف قصير" style="margin:8px 0">
     <div style="display:flex;gap:8px"><input class="cinp" id="mfEm" placeholder="رمز 🎬" style="width:90px">
     <label class="cmini" style="flex:1;text-align:center;padding:10px">اختيار الفيديو والرفع 📤<input class="hiddenup" type="file" accept="video/*" onchange="mAddFilm(event)"></label></div>`)+
-  ctlCard('🎥 مقدمات فتح بالفيديو (أنيميشن جديدة)','تظهر كخيارات «لحظة فتح» إضافية في محرر الدعوات — الضيف يلمس فيُعرض فيديوكم ثم تظهر الدعوة',
-   M.vopens.map((v,i)=>`<div class="ctlrow"><span>🎥 ${escA(v.nm)}</span><button class="cmini del" onclick="mDelVopen(${i})">حذف</button></div>`).join('')+
-   `<div style="display:flex;gap:8px;margin-top:10px"><input class="cinp" id="mvNm" placeholder="اسم المقدمة (مثال: افتتاح ملكي)">
-    <label class="cmini" style="white-space:nowrap;padding:10px">رفع 📤<input class="hiddenup" type="file" accept="video/*" onchange="mAddVopen(event)"></label></div>`)+
-  ctlCard('🖼️ قوالب دعوات جديدة','قالب جديد بألوانكم يظهر في المعرض والمحرر فورًا — بلا أي كود',
-   M.customDesigns.map((d,i)=>`<div class="ctlrow"><span>${escA(d.em)} ${escA(d.nm)}
-     <i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:${escA(d.bg)};border:1px solid #ddd"></i>
-     <i style="display:inline-block;width:12px;height:12px;border-radius:3px;background:${escA(d.ac)}"></i></span>
-    <button class="cmini del" onclick="mDelDesign(${i})">حذف</button></div>`).join('')+
-   `<input class="cinp" id="mdNm" placeholder="اسم القالب (مثال: ليالي الياسمين)" style="margin-top:10px">
-    <div style="display:flex;gap:8px;margin:8px 0"><input class="cinp" id="mdEm" placeholder="رمز ✨" style="width:80px">
-     <select class="csel" id="mdCat" style="flex:1"><option value="wed">عرس</option><option value="grad">تخرج</option><option value="oth">مناسبات أخرى</option></select>
-     <select class="csel" id="mdBadge" style="flex:1">${BADGES.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select></div>
-    <div class="ctlrow"><span>الخلفية</span><input type="color" id="mdBg" value="#FFF9EC"></div>
-    <div class="ctlrow"><span>الذهبي/التمييز</span><input type="color" id="mdAc" value="#B98A2F"></div>
-    <div class="ctlrow"><span>الحبر</span><input type="color" id="mdInk" value="#3A2B10"></div>
-    <button class="cbtn" style="margin-top:10px;width:100%" onclick="mAddDesign()">إضافة القالب ونشره ✦</button>`)+
   ctlCard('📺 أنماط عروض مواقع المناسبات','أخفوا أي نمط عرض لا يناسبكم',
    SHN.map((n,i)=>`<label class="ctlrow"><span>${n}</span><input type="checkbox" ${M.hideShows.includes(i)?'':'checked'} onchange="mShowTgl(${i},this.checked)"></label>`).join(''))+
   `</div>`;}
@@ -746,12 +721,8 @@ function ctlView(){
   /* Only the prices of things actually on sale. Four boxes for products whose
      sections are switched off is four chances to set a number nobody sees. */
   ctlCard('💰 أسعار الأقسام الأخرى','سعر الأفلام الجاهزة وباقة التوقيع في «الباقتان»',
-   (CFG.sec.design?pr('design','القوالب الأساسية'):'')+
-   (CFG.sec.ultra?pr('ultra','دعوات «واقعي جدًا»'):'')+
-   (CFG.sec.ai?pr('ai','أفلام سينما AI'):'')+
-   (CFG.sec.sites?pr('site','مواقع المناسبات'):'')+
-   ((CFG.sec.design||CFG.sec.ultra||CFG.sec.ai||CFG.sec.sites)?'':
-    '<p class="cmut">كل هذه الأقسام مُطفأة — لا سعر يُعرض على أحد. سعر المنتج الأساسي في «الباقتان».</p>'))+
+   (CFG.sec.sites?pr('site','مواقع المناسبات (ألبوم الصور)'):
+    '<p class="cmut">قسم مواقع المناسبات مُطفأ. سعر المنتج الأساسي في «الباقتان».</p>'))+
   ctlCard('📲 الدفع D17 + واتساب للتواصل','عند كل «اطلبوا»: يدفع الزبون عبر D17 (رقمكم + المبلغ + إرسال الإثبات)، وواتساب مخصص للاستفسارات والشكاوى — مع فقاعة محادثة عائمة في الموقع. يُسجَّل كل طلب في «الطلبات»',
    `<div class="ctlrow"><span>رقم واتساب (دولي، بدون +)</span></div>
     <input class="cinp" style="direction:ltr;text-align:left" placeholder="21655787973" value="${escA(CFG.wa)}" onchange="ctlWa(this.value)">

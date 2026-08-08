@@ -559,11 +559,9 @@ function ediStartMusic(root){
 
 /* demo entry: dress the emerald wedding template with a full programme */
 function editorialDemo(){
- demoBackup={design:S.design,c:JSON.parse(JSON.stringify(S.c))};
- S.design=2;
- const dz=DESIGNS.find(d=>d.id===2);
+ demoBackup={c:JSON.parse(JSON.stringify(S.c))};
  const when=new Date(Date.now()+37*864e5+5*36e5);
- S.c={...S.c,...dz.def[S.lang],font:0,pal:0,anim:'edi',music:1,autoplay:true,musicStart:'open',
+ S.c={...S.c,...readyDef({cat:'wed'},S.lang),font:0,pal:0,anim:'edi',music:1,autoplay:true,musicStart:'open',
   qr:false,maps:'https://maps.google.com',story:[],guest:'',
   when:when.toISOString().slice(0,16),program:ediDemoProgram()};
  editorialOpen();}

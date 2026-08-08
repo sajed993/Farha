@@ -191,6 +191,41 @@ function readyCustom(){
    snd:f.snd||'',sndN:f.sndN||''}));
  }catch(e){return [];}}
 
+
+/* ═══ النص الافتراضي لكل مناسبة ═══
+   A film opened on the shelf, or created in the dashboard, starts with
+   placeholder text so the invitation is never empty while it is being filled.
+   That text used to be borrowed from the old card designs — each film carried
+   a `design:` number whose only remaining job was to point at a name and a
+   date. The designs are gone, so the defaults live here, by occasion, which
+   is what they were always really keyed on. */
+const RD_DEF = {
+ wed:{ar:{t:'دعوة زفاف',n:'نور & كريم',d:'14 سبتمبر 2026',p:'قصر الأنوار، تونس',m:'يتشرفان بدعوتكم لمشاركتهما فرحة زفافهما'},
+   fr:{t:'Mariage',n:'Nour & Karim',d:'14 · 09 · 2026',p:'Palais El Anouar, Tunis',m:'Nous serions honorés de partager notre bonheur avec vous'},
+   en:{t:'Wedding',n:'Nour & Karim',d:'14 · 09 · 2026',p:'El Anouar Palace, Tunis',m:'We would be honored to share our joy with you'}},
+ henna:{ar:{t:'ليلة الحنّة',n:'نور',d:'13 سبتمبر 2026',p:'دار العائلة، سيدي بوسعيد',m:'ندعوكم لليلة الحنّة — ليلة فرح وزغاريد'},
+   fr:{t:'Soirée du Henné',n:'Nour',d:'13 · 09 · 2026',p:'Maison familiale, Sidi Bou Saïd',m:'Nous vous invitons à la nuit du henné'},
+   en:{t:'Henna Night',n:'Nour',d:'13 · 09 · 2026',p:'Family house, Sidi Bou Said',m:'We invite you to our henna night'}},
+ bday:{ar:{t:'عيد ميلاد',n:'ياسمين',d:'7 ماي 2026',p:'بيتنا، المرسى',m:'ندعوكم لمشاركتنا فرحة عيد الميلاد'},
+   fr:{t:'Anniversaire',n:'Yasmine',d:'07 · 05 · 2026',p:'Chez nous, La Marsa',m:'Nous vous invitons à fêter cet anniversaire avec nous'},
+   en:{t:'Birthday',n:'Yasmine',d:'07 · 05 · 2026',p:'Our home, La Marsa',m:'Come and celebrate with us'}},
+ baby:{ar:{t:'مولود جديد',n:'آدم',d:'21 مارس 2026',p:'بيتنا، قرطاج',m:'بفرحة كبيرة نبشّركم بقدوم مولودنا'},
+   fr:{t:'Naissance',n:'Adam',d:'21 · 03 · 2026',p:'Chez nous, Carthage',m:'C’est avec une immense joie que nous vous annonçons sa naissance'},
+   en:{t:'New Baby',n:'Adam',d:'21 · 03 · 2026',p:'Our home, Carthage',m:'With great joy we announce his arrival'}},
+ grad:{ar:{t:'حفل تخرّج',n:'سلمى',d:'28 جوان 2026',p:'قاعة الحفلات، تونس',m:'بعد سنوات من التعب، وصلنا — شاركونا الفرحة'},
+   fr:{t:'Remise de diplôme',n:'Salma',d:'28 · 06 · 2026',p:'Salle des fêtes, Tunis',m:'Après des années d’efforts — partagez notre joie'},
+   en:{t:'Graduation',n:'Salma',d:'28 · 06 · 2026',p:'The great hall, Tunis',m:'After years of work — come and share the joy'}},
+ save:{ar:{t:'احفظوا التاريخ',n:'نور & كريم',d:'14 سبتمبر 2026',p:'التفاصيل قريبًا',m:'احفظوا التاريخ — التفاصيل قريبًا'},
+   fr:{t:'Réservez la date',n:'Nour & Karim',d:'14 · 09 · 2026',p:'Détails à suivre',m:'Réservez la date — les détails suivront'},
+   en:{t:'Save the Date',n:'Nour & Karim',d:'14 · 09 · 2026',p:'Details to follow',m:'Save the date — details to follow'}}
+};
+/* the placeholder text a film opens with */
+function readyDef(f, lang){
+ const cat = (f && f.cat) || 'wed';
+ const set = RD_DEF[cat] || RD_DEF.wed;
+ return set[lang] || set.ar;
+}
+
 /* The whole shelf: what ships, plus what was added, in that order. */
 function readyCatalogue(){return FILMS_BUILTIN.concat(readyCustom());}
 

@@ -153,18 +153,18 @@ function fetchAllDebounced () {
   __fetchTimer = setTimeout(() => { __fetchTimer = null; fetchAll() }, 800)
 }
 
-function gk(o){const t=String(o.item||'')
-  if(/ملكية|ultra/i.test(t))return 'ultra'
-  if(/موقع|site/i.test(t))return 'site'
-  if(/فيلم|سينما|AI|قبلة|فراشة|القصر|القمر|البندقية|سماء/i.test(t))return 'ai'
-  return 'design'}
-// design id -> visual palette (kept in sync with 02-data.js)
-const DTHUMB={1:{bg:'#FFF9EC',ac:'#B98A2F',ink:'#3A2B10',orn:'✨'},2:{bg:'#16493E',ac:'#D3AC55',ink:'#F1EADA',orn:'🕌'},3:{bg:'#FCFBF7',ac:'#9A8C7B',ink:'#3A342C',orn:'🕊️'},4:{bg:'#FBEFEA',ac:'#C4827A',ink:'#4E2F2A',orn:'🌹'},5:{bg:'#EDF1FA',ac:'#5570B8',ink:'#22304F',orn:'🎓'},6:{bg:'#1B1710',ac:'#E3C77E',ink:'#F6EBD2',orn:'🎓'},7:{bg:'#FFF4F0',ac:'#E58BA6',ink:'#54333E',orn:'🎈'},8:{bg:'#EFF3EC',ac:'#7C9482',ink:'#2F3E33',orn:'☁️'},9:{bg:'#F6EDD9',ac:'#B98A2F',ink:'#4C3A17',orn:'🥂'},10:{bg:'#F6F0E2',ac:'#8A6A2B',ink:'#4C3A17',orn:'🪔'},11:{bg:'#FBF3EC',ac:'#B98A2F',ink:'#4E342B',orn:'📖'}}
-const KINDICON={design:'🎴',ultra:'👑',site:'🌐',ai:'🎬'}
+/* An order used to be sorted into one of four products by matching its item
+   name against words like «ملكية» or «فراشة». Those products are gone; a film
+   is what is sold. What is left recognises only the one that remains. */
+function gk(o){return /موقع|site|ألبوم/i.test(String(o.item||''))?'site':'design'}
+const KINDICON={design:'🎬',site:'🌐'}
 // resolve palette for an order: prefer its saved config colors, else the design default
+/* A plain card for an order that names no film — an event-site album, or an
+   order made before the form asked. It used to take its colours from the
+   design catalogue, which no longer exists. */
 function _thumbPal(o){
-  try{const p=o.payload||{};const c=p.c||{};const d=DTHUMB[p.design]||DTHUMB[1]||{}
-    return {bg:c.bg||d.bg||'#FFF9EC',ac:c.ac||d.ac||'#B98A2F',ink:c.ink||d.ink||'#3A2B10',orn:c.orn||d.orn||'✨',kind:gk(o)}}
+  try{const c=(o.payload&&o.payload.c)||{}
+    return {bg:c.bg||'#FFF9EC',ac:c.ac||'#B98A2F',ink:c.ink||'#3A2B10',orn:c.orn||'✨',kind:gk(o)}}
   catch(e){return {bg:'#FFF9EC',ac:'#B98A2F',ink:'#3A2B10',orn:'✨',kind:'design'}}
 }
 /* ═══ what an order is now ═══
@@ -226,7 +226,7 @@ function miniThumb(o){
     <span style="position:absolute;inset:0;display:grid;place-items:center;font-size:15px;text-shadow:0 1px 6px rgba(0,0,0,.7)">▶</span>
   </div>`
   const pal=_thumbPal(o);const nm=orderName(o)||(o.payload&&o.payload.c&&o.payload.c.n)||''
-  const isVid=pal.kind==='ai'||pal.kind==='site'
+  const isVid=pal.kind==='site'
   return `<div class="miniThumb" onclick="dbPreview(${o.id})" title="${o.inv_slug?'اضغطوا للمعاينة':'معاينة أولية'}" style="cursor:pointer;flex:0 0 auto;width:52px;height:70px;border-radius:8px;overflow:hidden;border:1.5px solid ${pal.ac};background:${pal.bg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 1px 4px rgba(0,0,0,.12)">
     <div style="font-size:15px;line-height:1">${isVid?KINDICON[pal.kind]:pal.orn}</div>
     <div style="width:60%;height:2px;background:${pal.ac};border-radius:2px"></div>
@@ -276,7 +276,7 @@ window.dbPreview = async (id) => {
 
   const pal = _thumbPal(o); const p = o.payload || {}; const c = p.c || {}
   const nm = orderName(o) || c.n || ''; const dt = c.d || ''; const pl = c.p || ''; const msg = c.m || ''
-  const isVid = pal.kind === 'ai' || pal.kind === 'site'
+  const isVid = pal.kind === 'site'
   host.innerHTML = `<div style="max-width:340px;width:100%;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)">
     <div style="background:${pal.bg};padding:30px 22px;text-align:center;border-bottom:3px solid ${pal.ac}">
       <div style="font-size:34px;margin-bottom:8px">${isVid?KINDICON[pal.kind]:pal.orn}</div>
@@ -342,12 +342,9 @@ function orderName (o) {
              ? `<input type="hidden" id="dk${o.id}" value="design">
                 ${orderFilm(o) ? '' : '<small style="color:#A33">⚠️ طلب بلا فيلم — اسألوهم أيّ فيلم يريدون قبل التسليم</small><br>'}`
              : `<select class="csel" id="dk${o.id}" style="margin:4px 6px 4px 0;font-size:.72rem">
-             <option value="design" ${gk(o)==='design'?'selected':''}>🎴 دعوة تصميم</option>
-             <option value="ultra" ${gk(o)==='ultra'?'selected':''}>👑 الباقة الملكية</option>
-             <option value="site" ${gk(o)==='site'?'selected':''}>🌐 موقع مناسبة</option>
-             <option value="ai" ${gk(o)==='ai'?'selected':''}>🎬 فيلم AI</option></select>`}
-           <button class="cmini" style="background:#B98A2F;border-color:#B98A2F;color:#fff" onclick="dbDeliver(${o.id})">🎁 تأكيد الدفع وتسليم</button>
-           <label class="cmini" id="aiup${o.id}" style="display:none;background:#20222A;color:#F3E3B8">📤 اختيار ملف الفيلم<input type="file" accept="video/*" style="display:none" onchange="dbDeliverAi(${o.id},event)"></label>`}
+             <option value="design" ${gk(o)==='design'?'selected':''}>🎬 دعوة بفيلم</option>
+             <option value="site" ${gk(o)==='site'?'selected':''}>🌐 موقع مناسبة (ألبوم)</option></select>`}
+           <button class="cmini" style="background:#B98A2F;border-color:#B98A2F;color:#fff" onclick="dbDeliver(${o.id})">🎁 تأكيد الدفع وتسليم</button>`}
       </span>
       <select class="csel" onchange="dbSetStatus(${o.id},this.value)">
         ${STS.map((s) => `<option ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
@@ -531,31 +528,15 @@ function enterDb() {
     const kEl = document.getElementById('dk' + id)
     const kind = (kEl && kEl.value) || 'design'
     const pl = await ensurePayload(o)
-    if (kind === 'ai') {
-      const lb = document.getElementById('aiup' + id)
-      if (lb) { lb.style.display = 'inline-flex'; toast('📤 اختاروا ملف الفيلم — يُرفع ويُسلَّم برابط خاص') }
-      return
-    }
     let config
-    if (kind === 'ultra') config = { kind: 'ultra', uIdx: pl.uIdx || 0, c: pl.c || {}, design: pl.design || 1 }
-    else if (kind === 'site') config = { kind: 'site', st: pl.st || {}, c: pl.c || {}, design: pl.design || 1 }
+    if (kind === 'site') config = { kind: 'site', st: pl.st || {}, c: pl.c || {} }
     /* An order from the site's request form carries what the customer typed —
        the names, the date, the place, the film they picked — but none of it in
        the shape a design config wants. Left alone it delivered an invitation
        with placeholder names, and everything had to be retyped by hand. */
     else if (pl.tier || pl.filmId || pl.choice) config = configFromRequest(pl)
-    else config = { kind: 'design', design: pl.design || 1, c: pl.c || {} }
+    else config = { kind: 'design', c: pl.c || {} }
     await invCreate(o, config)
-  }
-  window.dbDeliverAi = async (id, ev) => {
-    const o = dbOrders.find((x) => String(x.id) === String(id)); if (!o) return
-    const file = ev.target.files && ev.target.files[0]; if (!file) return
-    toast('جارٍ رفع الفيلم… ⏳')
-    try {
-      const url = await window.__dbUpload(file, 'videos')
-      await invCreate(o, { kind: 'ai', video: url, title: o.item, design: 1 })
-    } catch (e) { toast('تعذّر الرفع — تأكدوا من schema-2') }
-    ev.target.value = ''
   }
   window.dbEditFull = (slug) => {
     if (!slug) return

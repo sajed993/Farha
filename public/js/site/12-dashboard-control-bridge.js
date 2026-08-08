@@ -68,24 +68,11 @@ function loadCFG(){
  if(cc.envStyle)CFG.envStyle=cc.envStyle;Object.assign(CFG.env,cc.env||{});
  Object.assign(CFG.vid,cc.vid||{});
  CFG.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),(fc.media||{}),(pub?{}:(lc.media||{})));
- for(let i=DESIGNS.length-1;i>=0;i--)if(DESIGNS[i]._custom)DESIGNS.splice(i,1);
- (CFG.media.customDesigns||[]).forEach((cd,ix)=>{const nm=cd.nm||('قالب '+(ix+1));
-  DESIGNS.push({_custom:true,id:200+ix,cat:cd.cat||'wed',badge:cd.badge||'',
-   name:{ar:nm,fr:nm,en:nm},sub:{ar:'تصميم خاص بكم',fr:'Design exclusif',en:'Exclusive design'},
-   tag:{ar:'خاص · جديد',fr:'Exclusif · Nouveau',en:'Exclusive · New'},
-   bg:cd.bg||'#FFF9EC',ac:cd.ac||'#B98A2F',ink:cd.ink||'#3A2B10',foil:true,orn:cd.orn||'✨',corners:'svg',layer:'bg-damask',
-   def:{ar:{t:'دعوة',n:'نور & كريم',d:'2026',p:'تونس',m:'يتشرفان بدعوتكم لمشاركة فرحتهما'},
-        fr:{t:'Invitation',n:'Nour & Karim',d:'2026',p:'Tunis',m:'Ont la joie de vous convier à leur fête'},
-        en:{t:'Invitation',n:'Nour & Karim',d:'2026',p:'Tunis',m:'Joyfully invite you to celebrate with them'}}});});
  const P={uOrder:CFG.price.ultra,aiOrderB:CFG.price.ai,stOrder:CFG.price.site};
  ['ar','fr','en'].forEach(L=>{for(const k in P){if(T0[k][L])T[L][k]=T0[k][L].replace(/\d+/,P[k]);}});
- DESIGNS.forEach(d=>{const o=CFG.designs[d.id];d._hide=!!(o&&o.vis===false);
-  if(o&&o.badge!==undefined)d.badge=o.badge;});
- try{lsSet(LSK.meta,{designs:DESIGNS.map(d=>({id:d.id,name:(d.name&&(d.name.ar||d.name))||('تصميم '+d.id),em:d.pet||'🎴'}))});}catch(e){}}
+}
 window.__loadForEdit=function(cfg,slug){try{
  cfg=cfg||{};
- if(cfg.design!=null)S.design=cfg.design;
- openEditor(S.design||1);
  if(cfg.c)S.c={...S.c,...cfg.c};
  /* the same keys __applyInvite restores — opening an invitation to edit it
     must not quietly drop the film, palette and song on the way in */
@@ -109,8 +96,8 @@ function showEditSaveBar(){
    only {kind, design, c, st}, so one edit stripped the film from an
    invitation that had been delivered with it. */
 function _editConfig(){
- const o={kind:S._editKind||'design',design:S.design||1,
-  c:JSON.parse(JSON.stringify(S.c)),st:_slimSt(S.st),uIdx:S._editUidx||0};
+ const o={kind:S._editKind||'design',
+  c:JSON.parse(JSON.stringify(S.c)),st:_slimSt(S.st)};
  INV_KEYS.forEach(function(key){ if(S.c[key]!==undefined)o[key]=S.c[key]; });
  return o;}
 window.saveEditToInvite=async function(){
@@ -163,28 +150,20 @@ window.__applyInvite=function(cfg,guest){try{
  if(cfg.c)S.c={...S.c,...cfg.c};
  INV_KEYS.forEach(function(key){ if(cfg[key]!==undefined)S.c[key]=cfg[key]; });
  if(guest)S.c.guest=String(guest).slice(0,40);
- if(k==='ultra'){window.__setUltraOvr&&window.__setUltraOvr({n:cfg.c&&cfg.c.n,d:cfg.c&&cfg.c.d});ultraOpen(Math.min(2,Math.max(0,(+cfg.uIdx)||0)));return;}
+ /* مواقع المناسبات is still a product; the card designs, the «واقعي جدًا»
+    invitations and the AI films are not. Anything that is not an event site
+    is an editorial invitation now. */
  if(k==='site'){if(cfg.st)S.st=Object.assign({},S.st,cfg.st);playShow();return;}
- if(k==='ai'){aiPremiere(cfg.video||'',cfg.title||'فيلمكم الخاص');return;}
- if(cfg.design!=null&&!cfg.cart)S.design=cfg.design;
  ceremony(false);
 }catch(e){}};
-function vopenBtns(){return ((CFG.media&&CFG.media.vopens)||[]).map((v,i)=>`<button class="opt ${S.c.anim==='v'+i?'on':''}" onclick="setC('anim','v'+${i})">🎥 ${esc(v.nm||'فيديو')}</button>`).join('');}
 function cfgShow(d){return !d._hide;}
 function applyCFGdom(){
  try{ensureWaFloat()}catch(e){}
  try{cartFab()}catch(e){}
- const map={ultra:'#ultra',premium:'#premium',sites:'#sites',datef:'#datef',open:'#open',
-  ready:'#ready',cats:'#cats',gallery:'#gallery'};
+ const map={sites:'#sites',datef:'#datef',ready:'#ready'};
  for(const k in map){const on=!!CFG.sec[k];const e=document.querySelector(map[k]);
   if(e)e.style.display=on?'':'none';
   document.querySelectorAll('[onclick*="scrollSec(\''+k+'\')"]').forEach(a=>a.style.display=on?'':'none');}
- const aw=document.getElementById('aiwrap');if(aw)aw.style.display=CFG.sec.ai?'':'none';
- /* the editor is reachable from several buttons; with the design flow off they
-    would all land on a page the visitor was not offered */
- const dz=!!CFG.sec.design;
- document.querySelectorAll('[onclick*="openScratch"],[data-needs="design"]')
-  .forEach(b=>{b.style.display=dz?'':'none';});
  const ex=document.querySelector('.cfg-banner');
  const want=!!(CFG.banner&&CFG.banner.on&&CFG.banner.txt&&S.view==='land');
  if(!want&&ex)ex.remove();
@@ -234,13 +213,13 @@ function toggleExtra(id){const a=S.extras||[];const i=a.indexOf(id);if(i>=0)a.sp
 function orderLabel(){const tr=pTier()||{};const nm=(tr.name&&tr.name[S.lang])||'دعوة';const ex=(S.extras||[]).length?(' +'+(S.extras.length)+(S.lang==='ar'?' إضافة':' extras')):'';return nm+ex;}
 function buyBundle(){const label=orderLabel();const total=priceTotal();
  placeOrder(label,total);
- if(S._pay){S._pay.payload={design:S.design||0,c:JSON.parse(JSON.stringify(S.c)),tier:S.tier,extras:(S.extras||[]).slice(),breakdown:{tier:(pTier()||{}).price||0,extras:(S.extras||[]).map(id=>{const e=pExtras().find(x=>x.id===id);return e?{id:e.id,price:e.price}:null;}).filter(Boolean),total:total}};}}
+ if(S._pay){S._pay.payload={c:JSON.parse(JSON.stringify(S.c)),tier:S.tier,extras:(S.extras||[]).slice(),breakdown:{tier:(pTier()||{}).price||0,extras:(S.extras||[]).map(id=>{const e=pExtras().find(x=>x.id===id);return e?{id:e.id,price:e.price}:null;}).filter(Boolean),total:total}};}}
 function placeOrder(item,price){
  const arr=lsGet(LSK.orders,[]);
  arr.unshift({id:'W'+String(Date.now()).slice(-6),item:String(item),price:price,ts:Date.now(),st:'جديد'});
  lsSet(LSK.orders,arr.slice(0,200));
  openPaySheet(item,price);
- S._pay.payload={design:S.design||0,c:JSON.parse(JSON.stringify(S.c))};}
+ S._pay.payload={c:JSON.parse(JSON.stringify(S.c))};}
 function payRib(){return String(CFG.rib||'32016788101212289120').replace(/\s/g,'');}
 function payFlouci(){return String(CFG.flouci||CFG.d17||'').replace(/\D/g,'');}
 function payMethod(){return S._pay&&S._pay.method||'d17';}
@@ -323,8 +302,6 @@ function payProof(){const p=S._pay||{};
  const hasMedia=!!(S.st&&((S.st.photos&&S.st.photos.length)||S.st.video||S.st.track));
  const baseSt=JSON.parse(JSON.stringify(S.st||{}));
  const cSnap=JSON.parse(JSON.stringify(S.c));
- const uIdxSnap=(typeof uIdx!=='undefined'?uIdx:0);
- const designSnap=S.design||0;
  const extra=p.payload||{};
  if(S._pay&&S._pay.fromCart)cartSet([]);
  if(hasMedia)toast(S.lang==='ar'?'⏳ جارٍ حفظ صوركم… ثم يُسجَّل طلبكم':'⏳ Saving your media… then your order is recorded');
@@ -339,7 +316,7 @@ function payProof(){const p=S._pay||{};
   if(st&&st.__uploadErr){const er=st.__uploadErr;const kind=er.type==='videos'?(S.lang==='ar'?'الفيديو':'The video'):er.type==='music'?(S.lang==='ar'?'الموسيقى':'The music'):(S.lang==='ar'?'إحدى الصور':'A photo');
    const msg=er.sizeMB?(S.lang==='ar'?`⚠️ ${kind} حجمه ${er.sizeMB} ميغا، الحد الأقصى ${er.maxMB} ميغا. جرّبوا ملف أصغر أو أقصر.`:`⚠️ ${kind} is ${er.sizeMB}MB, the max is ${er.maxMB}MB. Please use a smaller/shorter file.`):(S.lang==='ar'?`⚠️ تعذّر رفع ${kind}. حاولوا مرة أخرى.`:`⚠️ Could not upload ${kind}. Please try again.`);
    toast(msg);}
-  const payload=Object.assign({design:designSnap,c:cSnap,st:st,uIdx:uIdxSnap},extra);
+  const payload=Object.assign({c:cSnap,st:st},extra);
   dbHook('order',{item:String(p.item),price:p.price,phone:phn,customer_name:nm,ref:(m==='rib'?(p.ref||''):''),method:m,payload:payload});
   if(hasMedia)toast(S.lang==='ar'?'📨 استلمنا طلبكم بصوركم — بعد تأكيد الدفع تصلكم دعوتكم 💛':'📨 Order received with your media ✓');
  })();}
@@ -351,7 +328,7 @@ function render(){
  applyCFGdom._raf=requestAnimationFrame(function(){try{applyCFGdom()}catch(e){}});
  const sameView=prevView===S.view;
  const keepY=sameView?window.scrollY:0;
- app.innerHTML=S.view==='land'?landView():editorView();
+ app.innerHTML=landView();
  if(S.view==='land'){ambient();try{filmShelfMount()}catch(e){}try{heroSpectrumMount()}catch(e){}}
  window.scrollTo(0,sameView?keepY:0);
  /* a backstop: whatever happened before this repaint, the page's ability to
@@ -364,24 +341,8 @@ function scrollSec(id){
  setTimeout(()=>{const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'});},60);}
 function toggleLang(){S.lang=S.lang==='ar'?'fr':S.lang==='fr'?'en':'ar';
  document.documentElement.dir=T[S.lang].dir;document.documentElement.lang=S.lang;
- if(S.view==='edit'){const dz=getDesign();Object.assign(S.c,dz.def[S.lang]);
-  if(dz.story)S.c.story=JSON.parse(JSON.stringify(dz.story[S.lang]));}
  render();}
-function setPmFilter(k){S.pmFilter=k;render();setTimeout(()=>{const el=document.getElementById('premium');if(el)el.scrollIntoView();},40);}
-function setFilter(f,stay){S.filter=f;if(S.view==='land'&&stay)render(),scrollSec('gallery');else if(S.view==='land')render();}
-function openEditor(id){const dz=DESIGNS.find(d=>d.id===id)||DESIGNS[0];S.design=dz.id;S.view='edit';
- S.c={...S.c,...dz.def[S.lang],font:0,pal:0,when:'',maps:'',qr:false,program:[],guest:'',
-  anim:(dz.anim!=null?dz.anim:S.c.anim),
-  story:dz.story?JSON.parse(JSON.stringify(dz.story[S.lang])):[]};render();}
-function openScratch(){S.design=0;S.view='edit';
- S.c={...S.c,...SCRATCH_DEF[S.lang],font:0,pal:0,when:'',maps:'',qr:false,program:[],guest:'',story:[],
-  bg:'#FFF9EC',ac:'#B98A2F',ink:'#3A2B10',orn:'✨',corners:'svg',layer:'bg-damask',frame:true,foil:true};render();}
-function setC(k,v){S.c[k]=v;
- const ae=document.activeElement;
- const typing=!!(ae&&(ae.tagName==='TEXTAREA'||(ae.tagName==='INPUT'&&['text','url','color','range'].includes(ae.type))));
- if(typing||['t','n','d','p','m','when','bg','ac','ink','guest'].includes(k)){
-  const st=document.getElementById('stage');if(st)st.innerHTML=inviteHTML(getDesign(),S.c);}
- else render();}
+function setC(k,v){S.c[k]=v;render();}
 function addEmoji(e){S.c.m=(S.c.m?S.c.m+' ':'')+e;render();}
 function addDay(){S.c.program.push({time:'19:00',title:'',place:'',map:'',music:0,photos:[]});render();}
 function delDay(i){S.c.program.splice(i,1);render();}

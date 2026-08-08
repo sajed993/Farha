@@ -83,11 +83,9 @@ function filmShelfHTML(){
 /* Open the full invitation dressed in the chosen film. */
 function openReady(id){
  const f=readyFilm(id);
- demoBackup={design:S.design,c:JSON.parse(JSON.stringify(S.c))};
- S.design=f.design;
- const dz=DESIGNS.find(d=>d.id===f.design)||DESIGNS[1];
+ demoBackup={c:JSON.parse(JSON.stringify(S.c))};
  const when=new Date(Date.now()+37*864e5+5*36e5);
- S.c={...S.c,...dz.def[S.lang],font:0,pal:0,anim:'edi',music:1,autoplay:true,musicStart:'open',
+ S.c={...S.c,...readyDef(f,S.lang),font:0,pal:0,anim:'edi',music:1,autoplay:true,musicStart:'open',
   qr:false,maps:'https://maps.google.com',story:[],guest:'',
   when:when.toISOString().slice(0,16),
   film:f.id,films:{hero:f.v,hall:f.v,detail:f.v,date:f.v,venue:f.p},

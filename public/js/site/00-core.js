@@ -18,3 +18,24 @@ function scrollSync(){
   document.body.style.overflow=open?'hidden':'';
  }catch(e){}
 }
+
+/* ═══ three small helpers that outlived the files they were born in ═══
+   These lived among the old card designs. The editorial invitation, the wax
+   envelope and the share buttons still use them, so they move here rather
+   than being rescued one crash at a time. */
+
+/* «نور & كريم» / «Nour et Karim» → the pair of names, however they were joined */
+const NAME_SEP=/\s*&\s*|\s*\+\s*|\s+و\s+|\s+and\s+|\s+et\s+/i;
+function inNameParts(n){return String(n==null?'':n).replace(/\s+/g,' ').trim()
+ .split(NAME_SEP).map(s=>s.trim()).filter(Boolean);}
+function inInitials(n){return inNameParts(n).slice(0,2)
+ .map(s=>Array.from(s)[0]||'').filter(Boolean);}
+
+/* Arabic-Indic digits were tried and rejected: the invitations read better
+   with Latin numerals. Kept as the single place that decision lives. */
+function toAr(n){return String(n);}
+
+/* copying a link where the clipboard API is refused (http, old iOS) */
+function fallbackCopy(txt,done){try{const ta=document.createElement('textarea');ta.value=txt;
+ ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();
+ document.execCommand('copy');ta.remove();done();}catch(e){toast('📋');}}
