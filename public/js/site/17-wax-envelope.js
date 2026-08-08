@@ -186,11 +186,18 @@ function waxEnvelope(host,after){
   cv.style.transition='opacity .55s ease,transform .55s ease';
   cv.style.opacity='0';cv.style.transform='scale(.82) translateY(6%)';
   env.classList.add('cracked');
-  setTimeout(()=>env.classList.add('open'),320);      /* flap folds back */
-  setTimeout(()=>env.classList.add('lift'),1180);     /* note rises out */
+  /* The opening used to run two and a half seconds before the invitation was
+     handed over, and the envelope was already gone at 1.9s — six hundred
+     milliseconds of nothing at the end. Measured from the seal, the first
+     note landed at 2.6s and the song did not reach full volume until 4s,
+     which is why it felt like the music arrived late rather than with the
+     opening. The beats are the same, closer together, and the invitation
+     arrives as the envelope clears rather than a beat afterwards. */
+  setTimeout(()=>env.classList.add('open'),280);      /* flap folds back */
+  setTimeout(()=>env.classList.add('lift'),700);      /* note rises out */
   setTimeout(()=>{const w=host.querySelector('#wenv');
-   if(w){w.classList.add('gone');}},1900);
-  setTimeout(()=>{if(after)after();},2500);};
+   if(w){w.classList.add('gone');}},1180);
+  setTimeout(()=>{if(after)after();},1280);};
 
  envWax(cv,ini);}
 ;

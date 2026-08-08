@@ -20,6 +20,7 @@ const MEL={
  2:{wave:'triangle',bpm:138,notes:[[523,1],[523,1],[659,2],[523,2],[698,2],[659,4],[523,1],[523,1],[659,2],[523,2],[784,2],[698,4],[880,2],[784,2],[698,2],[659,4]]},
  3:{wave:'sine',bpm:88,notes:[[587,2],[622,2],[740,3],[622,2],[587,2],[554,3],[587,2],[698,2],[622,3],[587,2],[554,2],[587,5]]}};
 let fadeI=null;
+const FADE_IN=320;   /* ms, from silence to full when a track starts */
 function fadeTo(v,ms,cb){if(!AUD){if(cb)cb();return;}
  clearInterval(fadeI);
  const from=AUD.volume,steps=Math.max(1,Math.round(ms/40)),dv=(v-from)/steps;let k=0;
@@ -62,7 +63,10 @@ function playTrack(url,vol,from,to){
   me.onended=()=>{ if(AUD!==me)return; landed=st<=0; tries=0; seek(); me.play().catch(()=>{}); };
  }
  AUD.play().catch(()=>{});
- fadeTo(vol===undefined?trackVol(url):vol,1400);}
+ /* Long enough not to click, short enough that the song is simply there.
+    A 1.4-second swell meant that a guest who had just pressed the seal spent
+    another second and a half wondering whether there was music at all. */
+ fadeTo(vol===undefined?trackVol(url):vol,FADE_IN);}
 function playMusic(i){stopMusic();
  if(!i)return;
  if(S.c.trackUrl){playTrack(S.c.trackUrl,undefined,S.c.trackFrom,S.c.trackTo);return;}
