@@ -12,7 +12,56 @@ function loadCFG(){const cc=lsGet(LSK.cfg,{})||{};const o=JSON.parse(JSON.string
  Object.assign(o.vid,cc.vid||{});
  o.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),cc.media||{});return o;}
 let CFG=loadCFG();
-function saveCFG(){CFG.v=4;lsSet(LSK.cfg,CFG);if(window.__dbSaveCfg)window.__dbSaveCfg(CFG);toast('حُفظ — سيظهر على الموقع فورًا ✓');}
+/* ============ saving the config ============
+   Thirty-four places call saveCFG, and thirteen of them are wired to
+   oninput. Every keystroke in the text editors was therefore a full-row
+   UPDATE of the whole config — typing one 160-character message meant 160
+   round trips, about 3.8 MB over the wire, and 320 toasts. The field that
+   changed was never sent on its own; the entire object went every time.
+
+   Fixing it at the thirty-four call sites would have been thirty-four
+   chances to miss one. This is the single funnel they all pass through, so
+   the debounce lives here and nothing above it has to know.
+
+   Two clocks, because the two writes cost differently. The local copy is
+   the safety net for a reload, so it settles quickly. The network write is
+   the expensive one, so it waits until typing actually stops. Both are
+   flushed the moment the tab is hidden or closed — a debounce that can lose
+   work is worse than no debounce at all. */
+const CFG_LOCAL_MS = 300, CFG_REMOTE_MS = 1500;
+let _cfgLocalT = null, _cfgRemoteT = null, _cfgPending = false;
+
+function _cfgWriteLocal(){
+ _cfgLocalT = null;
+ try{ lsSet(LSK.cfg, CFG); }catch(e){}
+}
+function _cfgWriteRemote(){
+ _cfgRemoteT = null;
+ if(!_cfgPending) return;
+ _cfgPending = false;
+ if(window.__dbSaveCfg) window.__dbSaveCfg(CFG);      /* toasts on success */
+ else toast('حُفظ ✓');
+}
+/* everything outstanding, right now — for closing tabs and for actions that
+   should feel instant */
+function flushCFG(){
+ if(_cfgLocalT){ clearTimeout(_cfgLocalT); _cfgWriteLocal(); }
+ if(_cfgRemoteT){ clearTimeout(_cfgRemoteT); }
+ _cfgWriteRemote();
+}
+function saveCFG(now){
+ CFG.v = 4;
+ _cfgPending = true;
+ if(now === true){ flushCFG(); return; }
+ if(!_cfgLocalT)  _cfgLocalT  = setTimeout(_cfgWriteLocal,  CFG_LOCAL_MS);
+ clearTimeout(_cfgRemoteT);
+ _cfgRemoteT = setTimeout(_cfgWriteRemote, CFG_REMOTE_MS);
+}
+if(typeof window!=='undefined'){
+ window.addEventListener('pagehide', flushCFG);
+ window.addEventListener('beforeunload', flushCFG);
+ document.addEventListener('visibilitychange', function(){ if(document.hidden) flushCFG(); });
+}
 function ctlExport(){const pub=lsGet(LSK.wishes,[]).filter(w=>w.ok).slice(0,20).map(w=>({txt:w.txt,n:w.n}));
  const obj=Object.assign(JSON.parse(JSON.stringify(CFG)),{pub:pub});
  const js='window.FARHA_CFG='+JSON.stringify(obj)+';';
@@ -156,11 +205,11 @@ function rdNewAdd(){
  while(readyCatalogue().some(f=>f.id===id)){id='film-'+(L.length+n);n++;}
  L.push({id:id,cat:'wed',v:'',p:'',nameAr:'دعوة جديدة',
    sw0:'#3E3020',sw1:'#AE7E70',sw2:'#EFDFC2'});
- saveCFG();renderContent();
+ saveCFG(true);   /* structural: write at once */renderContent();
  toast('أُضيفت دعوة — ارفعوا فيديوها لتظهر على الموقع');}
 function rdNewDel(i){const L=rdCustom();const f=L[i];
  if(f&&CFG.films&&CFG.films[f.id])delete CFG.films[f.id];
- L.splice(i,1);saveCFG();renderContent();toast('حُذفت ✓');}
+ L.splice(i,1);saveCFG(true);   /* structural: write at once */renderContent();toast('حُذفت ✓');}
 function rdNewUp(ev,i,field){
  mediaUp(ev.target,url=>{const L=rdCustom();if(L[i])L[i][field]=url;});}
 /* a poster grabbed from the film itself, so a new invitation is never blank */
@@ -317,7 +366,7 @@ function txProgDel(id,i){const r=txProgRows(id);
  r.splice(i,1);txProgSet(id,r);renderContent();}
 function txClear(id){
  if(CFG.films[id]){delete CFG.films[id].txt;delete CFG.films[id].prog;}
- saveCFG();renderContent();
+ saveCFG(true);   /* structural: write at once */renderContent();
  toast('أُعيدت النصوص الأصلية ✓');}
 
 function txtView(){
@@ -750,6 +799,15 @@ function roStatus(ts,v){const a=lsGet(LSK.orders,[]);const o=a.find(x=>x.ts===ts
 window.addEventListener('storage',function(e){if(e&&e.key&&(e.key===LSK.wishes||e.key===LSK.orders||e.key===LSK.meta)){try{renderContent()}catch(x){}}});
 
 const NAV=[['over','📊','نظرة عامة'],['ctl','🎛️','التحكم بالموقع'],['media','🎬','المحتوى والأفلام'],['txt','✍️','نصوص الدعوات'],['off','\u{1F48E}','الباقتان'],['orders','🛒','الطلبات'],['inv','💌','الدعوات'],['tpl','🖼️','القوالب والأفلام'],['guests','👥','الضيوف والردود'],['wish','💬','التهاني'],['ana','📈','التحليلات'],['set','⚙️','الإعدادات']];
+/* Typing in the search box re-rendered every panel on the page on each
+   keystroke — sixteen film rows, the orders table and the rest, thrown away
+   and rebuilt per character. No database behind it, but the same fault. */
+let _searchT=null;
+function searchQ(v){
+ S.q=v;
+ clearTimeout(_searchT);
+ _searchT=setTimeout(function(){ _searchT=null; renderContent(); },200);
+}
 function newOrdersCount(){return ORDERS.filter(o=>o.d<1&&o.status==='جديد').length;}
 function shell(inner,title){
  return `<div class="layout">
@@ -763,7 +821,7 @@ function shell(inner,title){
   <div class="top">
    <button class="burger" onclick="S.side=!S.side;render()">☰</button>
    <h1>${title}</h1>
-   <div class="search">🔎<input placeholder="ابحثوا في الطلبات والدعوات…" value="${esc(S.q)}" oninput="S.q=this.value;renderContent()"></div>
+   <div class="search">🔎<input placeholder="ابحثوا في الطلبات والدعوات…" value="${esc(S.q)}" oninput="searchQ(this.value)"></div>
    <div style="position:relative">
     <button class="bell" onclick="S.notif=!S.notif;render()">🔔<i></i></button>
     <div class="notif ${S.notif?'open':''}">${NOTIFS.map(n=>`<div class="n"><span>${n.em}</span><div><b>${n.b}</b><span>${n.s}</span></div></div>`).join('')}</div>
