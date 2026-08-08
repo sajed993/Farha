@@ -46,15 +46,29 @@ a{color:inherit;text-decoration:none}
  border-radius:999px;padding:10px 18px}
 .search input{border:none;outline:none;flex:1;background:none;font-size:.9rem}
 .bell{position:relative;font-size:1.25rem;padding:8px}
-.bell i{position:absolute;top:4px;inset-inline-end:2px;width:9px;height:9px;border-radius:99px;background:var(--red);
- font-style:normal;box-shadow:0 0 0 2px var(--paper)}
-.notif{position:absolute;top:110%;inset-inline-end:0;width:300px;background:#fff;border-radius:16px;
- box-shadow:var(--shadow);border:1px solid var(--line);padding:10px;display:none;z-index:50}
+/* The dot was always on, because it was decoration. It is a count now, and
+   it is absent when there is nothing to count. */
+.bell i{position:absolute;top:0;inset-inline-end:-2px;min-width:17px;height:17px;padding:0 4px;
+ border-radius:99px;background:var(--red);color:#fff;font-style:normal;font-size:.62rem;
+ font-weight:800;line-height:17px;text-align:center;box-shadow:0 0 0 2px var(--paper)}
+.notif{position:absolute;top:110%;inset-inline-end:0;width:min(330px,86vw);background:#fff;border-radius:16px;
+ box-shadow:var(--shadow);border:1px solid var(--line);padding:8px;display:none;z-index:50}
 .notif.open{display:block}
-.notif .n{display:flex;gap:10px;padding:10px;border-radius:11px;font-size:.82rem;line-height:1.6}
+.notif .n-h{font-size:.72rem;font-weight:800;color:var(--taupe);padding:6px 10px 8px;
+ border-bottom:1px solid var(--line);margin-bottom:4px}
+.notif .n-list{max-height:min(64vh,420px);overflow:auto}
+.notif .n{display:flex;gap:10px;padding:10px;border-radius:11px;font-size:.82rem;line-height:1.6;
+ width:100%;text-align:start;background:none;border:none;cursor:pointer}
 .notif .n:hover{background:var(--cream)}
-.notif .n b{display:block;font-size:.84rem}
+.notif .n b{display:block;font-size:.84rem;font-weight:700}
 .notif .n span{color:var(--taupe);font-size:.72rem}
+.notif .n>span{font-size:1rem;line-height:1.4}
+/* unread is marked by a rule down the side rather than a colour wash, so a
+   long list still reads as one list */
+.notif .n.unread{background:rgba(185,138,47,.07)}
+.notif .n.unread b{color:var(--gold3)}
+.notif .n.unread::before{content:'';width:3px;border-radius:3px;background:var(--gold2);flex:none}
+.notif .n-empty{padding:18px 12px 20px;color:var(--taupe);font-size:.78rem;line-height:1.9;text-align:center}
 .avatar{width:40px;height:40px;border-radius:99px;background:linear-gradient(120deg,var(--gold),var(--gold3));
  color:#FFF9EC;display:grid;place-items:center;font-weight:700;font-family:var(--serif);font-size:1.1rem;
  box-shadow:0 6px 16px -6px rgba(138,106,43,.7)}

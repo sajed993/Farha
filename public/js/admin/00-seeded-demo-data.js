@@ -65,12 +65,9 @@ const WTXT=['ألف مبروك! فرحتكم فرحتنا 💛','ما شاء ا�
 let WISHES=[];for(let i=0;i<22;i++){WISHES.push({id:i+1,txt:WTXT[Math.floor(R()*WTXT.length)],
  who:CUST[Math.floor(R()*CUST.length)],inv:INV[Math.floor(R()*INV.length)].n,
  d:Math.floor(R()*14),ok:R()<0.8});}
-/* notifications */
-const NOTIFS=[
- {em:'🛒',b:'طلب جديد — عرس ذهبي فاخر',s:'قبل 8 دقائق · أميرة بن علي'},
- {em:'💌',b:'23 ردًّا جديدًا على دعوة نور & كريم',s:'قبل ساعة'},
- {em:'✨',b:'فيلم «أبواب القصر» تخطّى 100 استخدام',s:'اليوم'},
- {em:'⭐',b:'تقييم 5 نجوم من هند صفر',s:'أمس'}];
+/* The four invented notifications that used to live here are gone. They never
+   changed, which made the bell look like news when it was decoration. It is
+   built from the real rows now — see 09-notifications.js. */
 
 ;
 

@@ -1091,8 +1091,12 @@ function shell(inner,title){
    <h1>${title}</h1>
    <div class="search">🔎<input placeholder="ابحثوا في الطلبات والدعوات…" value="${esc(S.q)}" oninput="searchQ(this.value)"></div>
    <div style="position:relative">
-    <button class="bell" onclick="S.notif=!S.notif;render()">🔔<i></i></button>
-    <div class="notif ${S.notif?'open':''}">${NOTIFS.map(n=>`<div class="n"><span>${n.em}</span><div><b>${n.b}</b><span>${n.s}</span></div></div>`).join('')}</div>
+    <button class="bell" onclick="notifToggle()" title="التنبيهات">🔔${(()=>{const u=notifUnread();
+     return u?`<i>${u>9?'٩+':fmtN(u)}</i>`:'';})()}</button>
+    <div class="notif ${S.notif?'open':''}">
+     <div class="n-h">التنبيهات</div>
+     <div class="n-list">${notifHTML()}</div>
+    </div>
    </div>
    <div class="avatar">أ</div>
   </div>
