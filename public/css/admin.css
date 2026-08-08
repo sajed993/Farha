@@ -378,15 +378,65 @@ html[dir=rtl] .txl input,html[dir=rtl] .txl textarea{padding:9px 34px 9px 11px}
 .sndnow{font-size:.76rem;color:#6A5A3E;margin:2px 0 4px}
 
 /* -- where a song starts and ends -- */
-/* Three columns, two rows: each of «تبدأ» and «تنتهي» keeps its own box and
-   its own «الآن» on one line. Left to wrap, the labels drifted a line away
-   from the boxes they name. */
-.sndtrim{display:grid;grid-template-columns:max-content minmax(0,7rem) max-content;
- gap:6px 8px;align-items:center;justify-content:start;margin-top:7px}
-.sndtrim>span{font-size:.76rem;font-weight:600;color:#6A5A3E}
-.sndtrim input{width:100%;padding:7px 9px;border-radius:9px;border:1px solid var(--line);
- background:#fff;font-family:var(--num);font-size:.82rem;color:#3A2B10;text-align:center}
-.sndtrim input::placeholder{font-family:inherit;font-size:.72rem}
-.sndtrim input:focus{outline:none;border-color:#B98A2F;box-shadow:0 0 0 3px rgba(185,138,47,.16)}
-.sndtrim .act{padding:7px 11px;font-size:.74rem}
+/* Two number boxes asked someone to do by arithmetic what only ears can do.
+   The row now holds one way in, and the fitting happens in the studio. */
+.sndtrim{margin-top:8px}
+.sndtrim .act{padding:9px 14px;font-size:.78rem}
 .sndlab{margin-top:6px;font-size:.74rem;color:#8A7A63;font-family:var(--num);direction:rtl}
+
+/* ═══ استوديو الأغنية — the film and the song, side by side ═══ */
+#stuveil{position:fixed;inset:0;z-index:900;background:rgba(24,17,6,.62);
+ backdrop-filter:blur(3px);display:grid;place-items:center;padding:16px}
+.stu{background:#FBF7EF;border:1px solid #EDE4D2;border-radius:20px;
+ width:min(940px,96vw);max-height:92dvh;overflow:auto;
+ box-shadow:0 40px 90px -30px rgba(60,40,10,.5)}
+.stu-h{display:flex;align-items:center;gap:10px;padding:14px 18px;
+ border-bottom:1px solid #EFE6D4;position:sticky;top:0;background:#FBF7EF;z-index:2}
+.stu-h b{color:#8A6210;font-size:.98rem}
+.stu-h em{color:#8A7A63;font-size:.78rem;font-style:normal;flex:1;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stu-x{border:none;background:#F0E7D5;color:#6A5A3E;border-radius:9px;
+ width:30px;height:30px;cursor:pointer;font-size:.9rem}
+/* the film is the thing being judged, so it gets real room */
+.stu-b{display:grid;grid-template-columns:262px 1fr;gap:18px;padding:16px 18px 20px}
+.stu-v{border-radius:14px;overflow:hidden;background:#141414;aspect-ratio:9/16}
+.stu-v video{width:100%;height:100%;object-fit:cover;display:block}
+.stu-c{min-width:0}
+
+/* Time runs left to right. Every waveform does, and a mirrored one is
+   misread before it is read. */
+.stu-wrap{position:relative;direction:ltr;background:#F4ECDA;border:1px solid #E7DCC4;
+ border-radius:12px;height:132px;overflow:hidden;touch-action:none}
+#stucv{width:100%;height:100%;display:block;cursor:ew-resize}
+.stu-load{position:absolute;inset:0;display:grid;place-items:center;
+ color:#8A7A63;font-size:.8rem}
+
+.stu-t{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.stu-t .act{padding:9px 16px;font-size:1rem;line-height:1}
+.stu-now{font-family:var(--num);font-size:.82rem;color:#8A7A63;min-width:3.4rem}
+.stu-lab{font-family:var(--num);font-size:.84rem;color:#3A2B10;
+ display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.stu-lab b{color:#8A6210}
+.stu-lab span{color:#8A7A63;font-size:.78rem}
+.stuloop{background:#F0E7D5;border-radius:20px;padding:3px 10px}
+
+.stu-n{display:flex;align-items:center;gap:6px;margin-top:9px;flex-wrap:wrap}
+.stu-n>span{font-size:.76rem;font-weight:600;color:#6A5A3E;min-width:7.6rem}
+.stu-n .act{padding:6px 11px;font-size:.75rem;font-family:var(--num)}
+.stu-snap>span{min-width:auto}
+.stu-snap .act{font-family:inherit}
+.stu-f{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.stu-f .act{padding:11px 18px;font-size:.85rem}
+.stu-hint{color:#8A7A63;font-size:.75rem;line-height:1.9;margin:12px 0 0}
+
+@media(max-width:760px){
+ .stu-b{grid-template-columns:1fr;gap:12px;padding:12px 12px 16px}
+ /* The film is capped by height, not width: at full size it pushed the wave
+    and the buttons past the fold, so you were dragging an edge you could not
+    see the film respond to — which is the one thing this screen is for. */
+ .stu-v{height:min(30dvh,260px);width:auto;aspect-ratio:9/16;margin:0 auto}
+ .stu-wrap{height:104px}
+ .stu-n>span{min-width:auto;width:100%}
+ .stu-n .act{flex:1;min-width:0}
+ .stu-f .act{flex:1}
+}

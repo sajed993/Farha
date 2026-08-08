@@ -465,14 +465,7 @@ function readyView(){
       ${o.snd?`<button class="act" onclick="ctlFilm('${id}','snd','');ctlFilm('${id}','sndN','');ctlFilm('${id}','snd0','');ctlFilm('${id}','snd1','');renderContent()">↺ الأصلية</button>`:''}
      </div>
      <div class="sndtrim">
-      <span>تبدأ</span>
-      <input id="snd0-${id}" type="number" min="0" step="0.1" dir="ltr" placeholder="0"
-       value="${o.snd0||''}" onchange="ctlFilmTrim('${id}','snd0',this.value)">
-      <button class="act" onclick="ctlFilmMark('${id}','snd0')">الآن</button>
-      <span>تنتهي</span>
-      <input id="snd1-${id}" type="number" min="0" step="0.1" dir="ltr" placeholder="آخر الأغنية"
-       value="${o.snd1||''}" onchange="ctlFilmTrim('${id}','snd1',this.value)">
-      <button class="act" onclick="ctlFilmMark('${id}','snd1')">الآن</button>
+      <button class="act gold" onclick="sndStudio('${id}')">🎬 اضبطوا الأغنية على الفيلم</button>
      </div>
      <div class="sndlab" id="sndlab-${id}">${
        (+o.snd1||0) > (+o.snd0||0)
