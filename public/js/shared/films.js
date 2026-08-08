@@ -11,8 +11,9 @@
    is spoken for. Still unused from the songs we hold:
      إليسا — عيشالك
    Most tracks in /media/snd are 60-second Opus excerpts cut from the loudest
-   part of a song. بياض is the exception: it carries the sound that came with
-   its own footage, so it is fifteen seconds and loops. All of them are
+   part of a song. Two carry the sound that came with their own footage
+   instead: بياض, and أوّل أغنية — thirty-three seconds of a needle on a
+   record, which is why that film and its song are the same length. All of them are
    levelled to the same loudness, and none of them is allowed past the
    ceiling — the gain is whichever is smaller, the one that matches or the
    one that keeps the loudest sample under full scale. */
@@ -151,6 +152,16 @@ const FILMS_BUILTIN=[
   snd:'/media/snd/stair.webm',sndN:'إليسا — عروسة احلامي'},
 
 
+ {id:'record',cat:'wed',v:'/media/inv/record.mp4',p:'/media/inv/record.jpg',
+  name:{ar:'أوّل أغنية',fr:'La Première Chanson',en:'The First Song'},
+  blurb:{ar:'يدٌ تُنزل الإبرة على الأسطوانة، والفستان الأبيض ينتظر خلفها',
+   fr:'Une main pose l’aiguille sur le disque, la robe blanche attend derrière',
+   en:'A hand lowers the needle onto the record, the white dress waiting behind'},
+  dress:{ar:['أنيق كلاسيكي','ذهبي دافئ · بنّي عميق'],
+   fr:['Classique élégant','Or chaud · brun profond'],
+   en:['Classic formal','Warm gold · deep brown']},
+  sw:['#160904','#92755F','#F5DFD3'],
+  snd:'/media/snd/record.webm',sndN:'صوت الفيلم نفسه'},
  {id:'blanc',cat:'wed',v:'/media/inv/blanc.mp4',p:'/media/inv/blanc.jpg',design:1,
   name:{ar:'بياض',fr:'Blancheur',en:'Whiteness'},
   blurb:{ar:'أبيض وأسود على بياض: يدها موضوعة في يده، ولا شيء آخر في الكادر',
