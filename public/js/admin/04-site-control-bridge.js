@@ -275,6 +275,50 @@ function newFilmsView(){
   +`<button class="act gold" onclick="rdNewAdd()">+ دعوة جديدة</button>`);}
 
 function ctlPriceReady(k,v){CFG.price[k]=Math.max(0,parseInt(v)||0);saveCFG();}
+/* ======= موسيقى كل فيلم =======
+   The url and name boxes existed, but there was no way to put a file at the
+   other end of that url — only to paste one that was already there. The
+   upload helper and the music bucket both existed and neither was ever used
+   from here, so this is the button that joins them. */
+async function ctlFilmSnd(id, ev){
+ const f = ev.target.files && ev.target.files[0];
+ ev.target.value = '';                      /* so the same file can be re-picked */
+ if(!f) return;
+ if(!window.__dbUpload){ toast('سجّلوا الدخول أوّلًا لرفع الملفات'); return; }
+ const mb = f.size / 1048576;
+ if(mb > 12){
+  toast('الملف ' + Math.round(mb) + ' ميغا — الحدّ 12. اقتصّوا مقطعًا أقصر.');
+  return;
+ }
+ toast('جارٍ رفع الموسيقى…');
+ try{
+  const url = await window.__dbUpload(f, 'music');
+  CFG.films[id] = CFG.films[id] || {};
+  CFG.films[id].snd = url;
+  /* a name to show, taken from the file, only if there is not one already */
+  if(!CFG.films[id].sndN)
+   CFG.films[id].sndN = String(f.name||'').replace(/\.[^.]+$/,'').slice(0,60);
+  saveCFG(true);
+  renderContent();
+  toast('رُفعت الموسيقى ✓');
+ }catch(e){
+  toast('تعذّر الرفع — شغّلوا schema-2-storage.sql');
+ }
+}
+/* hear what is actually set before anyone else does */
+let _sndPrev = null;
+function ctlFilmPlay(id){
+ if(_sndPrev){ try{ _sndPrev.pause(); }catch(e){} _sndPrev = null; renderContent(); return; }
+ const o = (CFG.films||{})[id] || {};
+ let url = o.snd;
+ if(!url){ try{ url = (readyCatalogue().find(f=>f.id===id)||{}).snd; }catch(e){} }
+ if(!url){ toast('لا موسيقى لهذا الفيلم بعد'); return; }
+ const a = new Audio(url); a.volume = .9; _sndPrev = a;
+ a.play().then(function(){ toast('تشغيل — اضغطوا مرّة أخرى للإيقاف'); },
+                 function(){ toast('تعذّر التشغيل — تأكّدوا من الرابط'); _sndPrev = null; });
+ a.onended = function(){ _sndPrev = null; };
+}
+
 function readyView(){
  const F=CFG.films||{},E=CFG.edi||{};
  const envOpt=(cur)=>ENVL.map(([k,n])=>
@@ -294,6 +338,9 @@ function readyView(){
   'لكل فيلم: إظهاره أو إخفاؤه، اسمه، سعره الخاص، شكل ظرفه، وطريقة عرض فيلمه. '
   +'اتركوا «الافتراضي» ليتبع الإعداد العام.',
   RDFILMS.map(([id,nm,cat])=>{const o=F[id]||{};
+   /* what this film ships with, so an empty box can show it rather than
+      leaving the owner to wonder what «default» means */
+   let shipped={}; try{ shipped=readyCatalogue().find(f=>f.id===id)||{}; }catch(e){}
    return `<div class="filmrow ${o.vis===false?'off':''}">
     <div class="filmrow-h">
      <span class="sw-toggle ${o.vis===false?'':'on'}"
@@ -310,10 +357,16 @@ function readyView(){
       <option value="">الافتراضي</option>${envOpt(o.env||'')}</select></label>
      <label>عرض الفيلم<select onchange="ctlFilm('${id}','vid',this.value)">
       <option value="">الافتراضي</option>${vidOpt(o.vid||'')}</select></label>
-     <label>رابط الموسيقى<input placeholder="/media/snd/….webm"
-      value="${escA(o.snd||'')}" onchange="ctlFilm('${id}','snd',this.value)"></label>
-     <label>اسم الأغنية<input placeholder="الفنّان — العنوان"
+     <label>اسم الأغنية<input placeholder="${escA(shipped.sndN||'الفنّان — العنوان')}"
       value="${escA(o.sndN||'')}" onchange="ctlFilm('${id}','sndN',this.value)"></label>
+     <label>رابط الموسيقى<input placeholder="${escA(shipped.snd||'/media/snd/….webm')}"
+      value="${escA(o.snd||'')}" onchange="ctlFilm('${id}','snd',this.value)"></label>
+     <div class="sndrow">
+      <label class="sndup">↑ ارفعوا أغنية
+       <input type="file" accept="audio/*" onchange="ctlFilmSnd('${id}',event)"></label>
+      <button class="act" onclick="ctlFilmPlay('${id}')">▶ اسمعوها</button>
+      ${o.snd?`<button class="act" onclick="ctlFilm('${id}','snd','');ctlFilm('${id}','sndN','');renderContent()">↺ الأصلية</button>`:''}
+     </div>
     </div>
    </div>`;}).join(''))
  + ctlCard('🧩 أقسام الدعوة','ما يظهر داخل الدعوة نفسها — بلا أي شيء عن الطعام أو الحساسية.',
