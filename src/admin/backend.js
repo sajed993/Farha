@@ -123,7 +123,14 @@ async function fetchAll() {
   try {
     // All four queries fire in PARALLEL (one round-trip instead of four).
     const [o, w, r, iv, ev] = await Promise.all([
-      sb.from('orders').select('id,item,price,customer_name,phone,status,ref,method,inv_slug,created_at').order('created_at', { ascending: false }).limit(200),
+      /* The whole payload is a design config and can be large, so it is still
+         left out of the list — but the handful of fields a row actually shows
+         are pulled out of the JSON by the database itself. Cheap, and it means
+         an order says what it is without a second round trip. */
+      sb.from('orders').select('id,item,price,customer_name,phone,status,ref,method,inv_slug,created_at,' +
+        'pFilm:payload->>filmId,pOcc:payload->>occ,pNames:payload->>names,pWhen:payload->>when,' +
+        'pTime:payload->>time,pPlace:payload->>place,pTier:payload->>tier,pWish:payload->>wish,pMsg:payload->>msg')
+        .order('created_at', { ascending: false }).limit(200),
       sb.from('wishes').select('*').order('created_at', { ascending: false }).limit(200),
       sb.from('rsvps').select('*').order('created_at', { ascending: false }).limit(500),
       sb.from('invitations').select('*').order('created_at', { ascending: false }).limit(300),
@@ -160,8 +167,64 @@ function _thumbPal(o){
     return {bg:c.bg||d.bg||'#FFF9EC',ac:c.ac||d.ac||'#B98A2F',ink:c.ink||d.ink||'#3A2B10',orn:c.orn||d.orn||'✨',kind:gk(o)}}
   catch(e){return {bg:'#FFF9EC',ac:'#B98A2F',ink:'#3A2B10',orn:'✨',kind:'design'}}
 }
+/* ═══ what an order is now ═══
+   The rows here were built for the old catalogue — a palette square guessed
+   from a design id, and a four-way «kind» guessed by matching the item name
+   against product names that no longer exist. The product is a ready film
+   now, and everything the customer chose sits in payload: which film, the
+   occasion, the two names, the date and time, the place, their message. None
+   of it was on screen. */
+const OCCL = { wed: '💍 عرس', henna: '🌿 حنّة', bday: '🎂 عيد ميلاد',
+               baby: '👶 مولود', grad: '🎓 تخرّج', save: '📅 احفظوا التاريخ' }
+
+/* A row carries the flat pFilm/pOcc/… columns; once the full payload has been
+   fetched for a delivery it carries that instead. Both read the same here. */
+function ordPl (o) {
+  const p = o.payload || {}
+  return {
+    filmId: p.filmId || o.pFilm || '', occ: p.occ || o.pOcc || '',
+    names: p.names || o.pNames || '', when: p.when || o.pWhen || '',
+    time: p.time || o.pTime || '', place: p.place || o.pPlace || '',
+    tier: p.tier || o.pTier || '', wish: p.wish || o.pWish || '',
+    msg: p.msg || o.pMsg || '', choice: p.choice || ''
+  }
+}
+function orderFilm (o) {
+  try {
+    const id = ordPl(o).filmId
+    if (!id || typeof readyCatalogue !== 'function') return null
+    return readyCatalogue().find((x) => x.id === id) || null
+  } catch (e) { return null }
+}
+/* the customer's own words and dates, laid out the way they typed them */
+function orderFacts (o) {
+  const p = ordPl(o)
+  const f = orderFilm(o)
+  const bits = []
+  if (p.occ && OCCL[p.occ]) bits.push(OCCL[p.occ])
+  if (f) bits.push('🎬 ' + ((f.name && f.name.ar) || f.id))
+  else if (p.tier === 'sign' || p.choice === 'new') bits.push('✦ فيلم خاصّ — التوقيع')
+  if (p.names) bits.push('👰 ' + p.names)
+  if (p.when) bits.push('📅 ' + p.when + (p.time ? ' · ' + p.time : ''))
+  if (p.place) bits.push('📍 ' + p.place)
+  return bits
+}
+/* an order made through the new form carries a film or a tier; an old one
+   carries neither, and only those still need the four-way picker */
+function orderIsNew (o) {
+  const p = ordPl(o)
+  return !!(p.tier || p.filmId || p.choice || p.occ)
+}
+
 // small CSS invitation thumbnail for an order row
 function miniThumb(o){
+  const f=orderFilm(o)
+  /* a real frame from the film they ordered beats a coloured square guessed
+     from a design number that no longer means anything */
+  if(f) return `<div class="miniThumb" onclick="dbPreview(${o.id})" title="${E((f.name&&f.name.ar)||'')} — اضغطوا للمشاهدة" style="cursor:pointer;flex:0 0 auto;width:52px;height:70px;border-radius:8px;overflow:hidden;border:1.5px solid #B98A2F;background:#141414;position:relative;box-shadow:0 1px 4px rgba(0,0,0,.12)">
+    <img src="${E(f.p)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">
+    <span style="position:absolute;inset:0;display:grid;place-items:center;font-size:15px;text-shadow:0 1px 6px rgba(0,0,0,.7)">▶</span>
+  </div>`
   const pal=_thumbPal(o);const nm=orderName(o)||(o.payload&&o.payload.c&&o.payload.c.n)||''
   const isVid=pal.kind==='ai'||pal.kind==='site'
   return `<div class="miniThumb" onclick="dbPreview(${o.id})" title="${o.inv_slug?'اضغطوا للمعاينة':'معاينة أولية'}" style="cursor:pointer;flex:0 0 auto;width:52px;height:70px;border-radius:8px;overflow:hidden;border:1.5px solid ${pal.ac};background:${pal.bg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 1px 4px rgba(0,0,0,.12)">
@@ -180,6 +243,37 @@ window.dbPreview = async (id) => {
   host.innerHTML = '<div style="color:#F3E3B8;font-family:sans-serif">⏳ جارٍ التحميل…</div>'
   host.onclick = (e) => { if (e.target === host) host.remove() }
   if (typeof ensurePayload === 'function') { try { await ensurePayload(o) } catch (e) {} }
+
+  /* An order for a ready film should show that film playing. The point of
+     opening this is to see what they actually bought, and a coloured square
+     with their names on it never answered that. */
+  const film = orderFilm(o)
+  if (film) {
+    const pl = ordPl(o)
+    const facts = orderFacts(o)
+    host.innerHTML = `<div style="max-width:min(360px,92vw);width:100%;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);max-height:92dvh;overflow-y:auto">
+      <div style="background:#141414;aspect-ratio:9/16;position:relative">
+        <video src="${E(film.v)}" poster="${E(film.p)}" autoplay muted loop playsinline
+               style="width:100%;height:100%;object-fit:cover;display:block"></video>
+      </div>
+      <div style="padding:16px 18px">
+        <b style="font-family:Georgia,serif;font-size:1.15rem;color:#8A6210">${E((film.name && film.name.ar) || film.id)}</b>
+        <div style="color:#8A7A63;font-size:.74rem;margin-top:2px">${E(o.item || '')} · ${o.price || ''} د.ت${o.phone ? ' · 📱 ' + E(o.phone) : ''}</div>
+        ${facts.length ? '<div class="ordfacts" style="margin-top:10px">' + facts.map((x) => '<span>' + E(x) + '</span>').join('') + '</div>' : ''}
+        ${pl.msg ? '<p class="ordmsg">' + E(pl.msg) + '</p>' : ''}
+        ${pl.wish ? '<p class="ordmsg quiet">ما يتمنّونه: ' + E(pl.wish) + '</p>' : ''}
+      </div>
+      <div style="padding:12px 14px;background:#faf7f0;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+        ${o.inv_slug
+          ? `<button class="cmini" onclick="dbEditFull('${E(o.inv_slug)}')">🎨 فتح وتعديل كامل</button>
+             <button class="cmini" onclick="dbCopyLink('${E(o.inv_slug)}')">🔗 نسخ الرابط</button>`
+          : '<span style="font-size:.7rem;color:#A33">لم تُسلَّم بعد</span>'}
+        <button class="cmini" onclick="document.getElementById('previewModal').remove()">إغلاق ✕</button>
+      </div>
+    </div>`
+    return
+  }
+
   const pal = _thumbPal(o); const p = o.payload || {}; const c = p.c || {}
   const nm = orderName(o) || c.n || ''; const dt = c.d || ''; const pl = c.p || ''; const msg = c.m || ''
   const isVid = pal.kind === 'ai' || pal.kind === 'site'
@@ -228,6 +322,9 @@ function orderName (o) {
       ${miniThumb(o)}
       <span style="flex:1">${orderName(o) ? '<b style="color:#8A6210;font-size:1.02em">👤 ' + E(orderName(o)) + '</b><br>' : ''}<b>#${o.id}</b> · ${E(o.item)} — ${o.price} د.ت<br>
       <small style="color:#8A7A63">${new Date(o.created_at).toLocaleString('ar-TN')}${o.phone ? ' · 📱 ' + E(o.phone) : ''}${o.method ? ' · ' + ({d17:'💳 D17',flouci:'📱 Flouci',rib:'🏦 تحويل بنكي'}[o.method] || o.method) : ''}${o.ref ? ' · 🧾 <b style="color:#8A6210">' + E(o.ref) + '</b>' : ''}</small><br>
+      ${orderFacts(o).length ? '<div class="ordfacts">' + orderFacts(o).map((x) => '<span>' + E(x) + '</span>').join('') + '</div>' : ''}
+      ${ordPl(o).msg ? '<p class="ordmsg">' + E(ordPl(o).msg) + '</p>' : ''}
+      ${ordPl(o).wish ? '<p class="ordmsg quiet">ما يتمنّونه: ' + E(ordPl(o).wish) + '</p>' : ''}
       ${o.inv_slug
         ? `<small style="color:#2F6B3A">🎁 دعوة جاهزة: ?i=${E(o.inv_slug)} · 👥 ${dbRsvps.filter(r => r.inv_slug === o.inv_slug).length} ردًا</small><br>
            <button class="cmini" onclick="dbCopyLink('${E(o.inv_slug)}')">🔗 نسخ الرابط</button>
@@ -237,11 +334,18 @@ function orderName (o) {
            <button class="cmini" onclick="dbGuestLink('${E(o.inv_slug)}')">🔗 رابط الضيوف للأصحاب</button>
            <button class="cmini" onclick="dbEditNames(${o.id})">✏️ الأسماء</button>
            <button class="cmini" onclick="dbEditFull('${E(o.inv_slug)}')">🎨 فتح وتعديل كامل</button>`
-        : `<select class="csel" id="dk${o.id}" style="margin:4px 6px 4px 0;font-size:.72rem">
+        : `${orderIsNew(o)
+             /* An order from the new form is always a ready film with the
+                customer's own details — asking which of four old product
+                kinds it is invites the wrong answer. The picker stays only
+                for orders made before the form was rebuilt. */
+             ? `<input type="hidden" id="dk${o.id}" value="design">
+                ${orderFilm(o) ? '' : '<small style="color:#A33">⚠️ طلب بلا فيلم — اسألوهم أيّ فيلم يريدون قبل التسليم</small><br>'}`
+             : `<select class="csel" id="dk${o.id}" style="margin:4px 6px 4px 0;font-size:.72rem">
              <option value="design" ${gk(o)==='design'?'selected':''}>🎴 دعوة تصميم</option>
              <option value="ultra" ${gk(o)==='ultra'?'selected':''}>👑 الباقة الملكية</option>
              <option value="site" ${gk(o)==='site'?'selected':''}>🌐 موقع مناسبة</option>
-             <option value="ai" ${gk(o)==='ai'?'selected':''}>🎬 فيلم AI</option></select>
+             <option value="ai" ${gk(o)==='ai'?'selected':''}>🎬 فيلم AI</option></select>`}
            <button class="cmini" style="background:#B98A2F;border-color:#B98A2F;color:#fff" onclick="dbDeliver(${o.id})">🎁 تأكيد الدفع وتسليم</button>
            <label class="cmini" id="aiup${o.id}" style="display:none;background:#20222A;color:#F3E3B8">📤 اختيار ملف الفيلم<input type="file" accept="video/*" style="display:none" onchange="dbDeliverAi(${o.id},event)"></label>`}
       </span>

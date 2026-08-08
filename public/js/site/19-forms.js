@@ -259,6 +259,9 @@ function frmSetOcc(cat) {
   if (wasPaired === isPaired) set('ordNameB', keep.b);
   set('ordWhen', keep.when); set('ordTime', keep.time);
   set('ordPlace', keep.place); set('ordMsg', keep.msg);
+  /* the films for this occasion come to the front */
+  const fh = document.getElementById('ordFilms');
+  if (fh) fh.innerHTML = frmFilmPicker();
 }
 
 function openOrder(filmId, tier) {
@@ -297,11 +300,7 @@ function openOrder(filmId, tier) {
     <div id="ordEvent">${frmEventHTML(FRM_CAT)}</div>
 
     ${sign ? '' : `<label class="frm-l">${esc(t().ordFilm)}</label>
-    <div class="frm-radio">
-      ${f ? `<label><input type="radio" name="ordf" value="this" checked><span>${esc(t().ordFilmThis)}</span></label>` : ''}
-      <label><input type="radio" name="ordf" value="other" ${f ? '' : 'checked'}><span>${esc(t().ordFilmOther)}</span></label>
-      <label><input type="radio" name="ordf" value="new"><span>${esc(t().ordFilmNew)}</span></label>
-    </div>`}
+    <div id="ordFilms">${frmFilmPicker()}</div>`}
 
     <label class="frm-l">${esc(t().ordWish)}</label>
     <textarea id="ordWish" rows="${sign ? 5 : 3}" placeholder="${esc(t().ordWishPh)}"></textarea>
@@ -322,9 +321,59 @@ function closeOrder() {
   if (d) d.remove();
   scrollSync();
 }
+/* ═══ choosing the film ═══
+   The first package is a ready film — that is the whole product — but the
+   form asked for it with three radio buttons, one of which («اختاروا لي»)
+   was ticked by default. Most orders therefore arrived naming no film at
+   all, and an order with no film is delivered as a bare design.
+
+   So it is a wall of posters now: you pick the one you saw. The occasion
+   chosen above floats its own films to the front rather than hiding the
+   rest, because somebody who liked a wedding film for their engagement
+   should not have to fight the form for it. */
+function frmFilmPicker() {
+  let all = [];
+  try { all = readyCatalogue().filter((x) => x.v && (typeof readyCfg !== 'function' || readyCfg(x.id).vis !== false)); }
+  catch (e) { return ''; }
+  if (!all.length) return '';
+  const mine = all.filter((x) => x.cat === FRM_CAT);
+  const rest = all.filter((x) => x.cat !== FRM_CAT);
+  const cats = t().rdCats || {};
+  const cell = (x) => {
+    const nm = (typeof readyName === 'function') ? readyName(x) : (x.name[S.lang] || x.id);
+    const pr = (typeof readyPrice === 'function') ? readyPrice(x) : '';
+    return `<button type="button" class="frm-film ${FRM_FILM && FRM_FILM.id === x.id ? 'on' : ''}"
+      onclick="frmPickFilm('${x.id}')" aria-pressed="${FRM_FILM && FRM_FILM.id === x.id}">
+      <img src="${esc(x.p)}" alt="" loading="lazy">
+      <span class="frm-filmn">${esc(nm)}</span>
+      <em>${esc(cats[x.cat] || '')}${pr ? ' · ' + pr + ' ' + esc(t().cur) : ''}</em>
+      <i class="frm-filmtick">✓</i>
+    </button>`;
+  };
+  return `<div class="frm-films">${mine.concat(rest).map(cell).join('')}</div>
+   <p class="frm-filmnote">${esc(t().ordFilmNote)}</p>`;
+}
+function frmPickFilm(id) {
+  const f = (typeof readyFilm === 'function') ? readyFilm(id) : null;
+  if (!f) return;
+  FRM_FILM = f;
+  const host = document.getElementById('ordFilms');
+  if (host) host.innerHTML = frmFilmPicker();
+  /* the header carries the price, and the price follows the film */
+  const head = document.querySelector('#ordveil .frm-pick');
+  if (head) {
+    const nm = (typeof readyName === 'function') ? readyName(f) : f.name[S.lang];
+    const pr = (typeof readyPrice === 'function') ? readyPrice(f) : '';
+    head.className = 'frm-pick';
+    head.innerHTML = `<img src="${esc(f.p)}" alt="" loading="lazy">
+      <span><b>${esc(nm)}</b><em>${pr} ${esc(t().cur)}</em></span>`;
+  }
+  const sel = document.querySelector('.frm-film.on');
+  if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+
 function frmVal(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; }
 function frmCollect() {
-  const pickEl = document.querySelector('input[name="ordf"]:checked');
   const f = FRM_FILM;
   return {
     at: frmNow(), lang: S.lang,
@@ -337,8 +386,8 @@ function frmCollect() {
     wish: frmVal('ordWish'),
     filmId: f ? f.id : '', filmName: f ? (typeof readyName === 'function' ? readyName(f) : f.name[S.lang]) : '',
     tier: FRM_TIER,
-    /* no radio on a Signature form — it can only ever be a new film */
-    choice: (FRM_TIER === 'sign') ? 'new' : (pickEl ? pickEl.value : 'other'),
+    /* Signature is always a new film; the ready package is always one of ours */
+    choice: (FRM_TIER === 'sign') ? 'new' : (f ? f.id : ''),
     price: f && typeof readyPrice === 'function' ? readyPrice(f)
          : (typeof offTier === 'function' ? offTier()[FRM_TIER].price : 0)
   };
@@ -366,6 +415,14 @@ function submitOrder() {
   /* the names are what the invitation is titled with — an order without them
      costs a round trip on WhatsApp to ask */
   if (!o.nameA) { toast(t().ordNeedNames); const e = document.getElementById('ordNameA'); if (e) e.focus(); return; }
+  /* an order for the ready package with no film named is an order we cannot
+     deliver without a phone call — ask here instead */
+  if (FRM_TIER !== 'sign' && !o.filmId) {
+    toast(t().ordNeedFilm);
+    const w = document.querySelector('#ordFilms .frm-films');
+    if (w && w.scrollIntoView) w.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
   frmPush(FRM_K.orders, o);
   closeOrder();
   orderThanks(o);

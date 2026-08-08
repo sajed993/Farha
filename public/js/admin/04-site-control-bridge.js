@@ -739,14 +739,19 @@ function mediaView(){
    SHN.map((n,i)=>`<label class="ctlrow"><span>${n}</span><input type="checkbox" ${M.hideShows.includes(i)?'':'checked'} onchange="mShowTgl(${i},this.checked)"></label>`).join(''))+
   `</div>`;}
 function ctlView(){
- const meta=lsGet(LSK.meta,null);
- const designs=(meta&&meta.designs&&meta.designs.length)?meta.designs:TPL.map(x=>({id:x.id,name:x.n,em:x.em}));
- const B=[['','بدون'],['hot','🔥 رواج'],['new','✨ جديد'],['star','⭐ مميّز']];
  const pr=(k,l)=>`<div class="ctlrow"><span>${l}</span><span style="display:flex;gap:6px;align-items:center"><input class="cinp num" type="number" min="0" value="${CFG.price[k]}" onchange="ctlPrice('${k}',this.value)"> د.ت</span></div>`;
  return `<div class="cgrid">`+
   ctlCard('🧩 أقسام الموقع','فعّلوا أو أخفوا أقسامًا كاملة — يتحدّث الموقع فورًا',
    SECL.map(([k,l])=>`<label class="ctlrow"><span>${l}</span><input type="checkbox" ${CFG.sec[k]?'checked':''} onchange="ctlSec('${k}',this.checked)"></label>`).join(''))+
-  ctlCard('💰 الأسعار',' تُحدَّث أزرار الطلب على الموقع مباشرة',pr('design','القوالب الأساسية (زر الشراء في المحرر والمعرض)')+pr('ultra','دعوات «واقعي جدًا»')+pr('ai','أفلام سينما AI')+pr('site','مواقع المناسبات'))+
+  /* Only the prices of things actually on sale. Four boxes for products whose
+     sections are switched off is four chances to set a number nobody sees. */
+  ctlCard('💰 أسعار الأقسام الأخرى','سعر الأفلام الجاهزة وباقة التوقيع في «الباقتان»',
+   (CFG.sec.design?pr('design','القوالب الأساسية'):'')+
+   (CFG.sec.ultra?pr('ultra','دعوات «واقعي جدًا»'):'')+
+   (CFG.sec.ai?pr('ai','أفلام سينما AI'):'')+
+   (CFG.sec.sites?pr('site','مواقع المناسبات'):'')+
+   ((CFG.sec.design||CFG.sec.ultra||CFG.sec.ai||CFG.sec.sites)?'':
+    '<p class="cmut">كل هذه الأقسام مُطفأة — لا سعر يُعرض على أحد. سعر المنتج الأساسي في «الباقتان».</p>'))+
   ctlCard('📲 الدفع D17 + واتساب للتواصل','عند كل «اطلبوا»: يدفع الزبون عبر D17 (رقمكم + المبلغ + إرسال الإثبات)، وواتساب مخصص للاستفسارات والشكاوى — مع فقاعة محادثة عائمة في الموقع. يُسجَّل كل طلب في «الطلبات»',
    `<div class="ctlrow"><span>رقم واتساب (دولي، بدون +)</span></div>
     <input class="cinp" style="direction:ltr;text-align:left" placeholder="21655787973" value="${escA(CFG.wa)}" onchange="ctlWa(this.value)">
@@ -755,16 +760,15 @@ function ctlView(){
   ctlCard('📣 شريط إعلان أعلى الموقع','',
    `<label class="ctlrow"><span>تفعيل الشريط</span><input type="checkbox" ${CFG.banner.on?'checked':''} onchange="ctlBan('on',this.checked)"></label>
     <input class="cinp" placeholder="نص الإعلان…" value="${escA(CFG.banner.txt)}" onchange="ctlBan('txt',this.value)">`)+
-  ctlCard('🖼️ القوالب: الظهور والشارات','أخفوا أي قالب أو غيّروا شارته (رواج/جديد/مميّز) على الموقع',
-   designs.map(d=>{const o=CFG.designs[d.id]||{};const vis=o.vis!==false;const bd=(o.badge!==undefined?o.badge:'');
-    return `<div class="ctlrow"><span>${d.em||'🎴'} ${escA(d.name)}</span><span style="display:flex;gap:8px;align-items:center">
-     <select class="csel" onchange="ctlBadge(${d.id},this.value)">${B.map(([v,l])=>`<option value="${v}" ${bd===v?'selected':''}>${l}</option>`).join('')}</select>
-     <label style="display:flex;gap:5px;align-items:center;font-size:.72rem">ظاهر <input type="checkbox" ${vis?'checked':''} onchange="ctlVis(${d.id},this.checked)"></label></span></div>`;}).join(''))+
-  `</div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="cbtn" onclick="saveCFG()">💾 حفظ (معاينة حيّة في متصفحكم)</button>
-  <button class="cbtn" style="background:linear-gradient(120deg,#2F6B3A,#1E4A28);color:#fff" onclick="ctlExport()">🌍 نشر للجميع — تنزيل farha-config.js</button></div>
-  <p class="chint">🔎 <b>معاينة حيّة:</b> الحفظ يطبّق التغييرات فورًا على الموقع في متصفحكم (نفس النطاق).<br>
-  🌍 <b>النشر لكل الزوّار:</b> اضغطوا «نشر للجميع» ثم ارفعوا ملف <b>farha-config.js</b> في نفس مجلد الاستضافة (بجانب ملفَي الموقع) — تسري الأسعار والأقسام والقوالب والإعلان والتهاني المنشورة على كل زائر.<br>
-  📥 تنبيه صادق: صندوقا «الطلبات والتهاني الواردة» يلتقطان ما يحدث على هذا المتصفح/النطاق فقط — الطلبات من أجهزة الزبائن تصلكم عبر واتساب، أمّا جمعها تلقائيًا في اللوحة فيحتاج خادمًا (Backend) يمكن بناؤه لاحقًا.</p>`;}
+  /* The old template list lived here as a second place to hide things that
+     nobody sells any more. The shelf is the films, and they are hidden and
+     renamed in «المحتوى والأفلام» — one place, not two that disagree. */
+  ctlCard('🎬 الأفلام','إظهارها وإخفاؤها وأسعارها وأغانيها',
+   `<p class="cmut">كل فيلم على الرفّ يُعدَّل في «المحتوى والأفلام» — الاسم والسعر والظهور والأغنية.</p>
+    <button class="cbtn" style="margin-top:8px" onclick="go('media')">فتح المحتوى والأفلام ←</button>`)+
+  `</div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="cbtn" onclick="saveCFG(true)">💾 حفظ ونشر الآن</button></div>
+  <p class="chint">☁️ <b>كل تغيير هنا يُنشر تلقائيًا</b> لكل زائر على كل جهاز، ولكل لوحة تحكم مفتوحة — لا ملفات تُرفع ولا خطوة ثانية. الحفظ يدويًّا أعلاه لمن يستعجل فقط.<br>
+  🛒 الطلبات والتهاني والردود تصل من أجهزة الزبائن مباشرة إلى قاعدة البيانات وتظهر في «الطلبات» و«التهاني» و«الضيوف والردود» فور وصولها.</p>`;}
 function realWishesHTML(){if(window.__dbWishesHTML)return window.__dbWishesHTML();const a=lsGet(LSK.wishes,[]);if(!a.length)return '';
  return `<div class="ctlcard" style="margin-bottom:16px"><h3>📥 تهانٍ واردة من الموقع (${a.length})</h3><p class="cmut">انشروا التهنئة لتظهر لكل الضيوف في الدعوات</p>`+
   a.slice(0,40).map(w=>`<div class="ctlrow"><span>“${escA(w.txt)}” — <b>${escA(w.n||'ضيف')}</b></span>

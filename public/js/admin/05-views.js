@@ -102,7 +102,42 @@ function invView(){
     <button class="act" onclick="toast('نُسخ رابط الدعوة 🔗')">رابط</button></td>
   </tr>`).join('')}</tbody></table></div>`;}
 
+/* This page listed the old template catalogue — «عرس ذهبي فاخر» and the rest —
+   which nobody can order any more. The product is the film shelf, so the page
+   shows that: which film, how many people bought it, and whether it is on the
+   shelf at all. Editing still lives in المحتوى والأفلام; this is the ledger. */
+function tplViewReal(){
+ const R=window.__dbRows||{};
+ const orders=R.orders||[];
+ let list=[];try{list=readyCatalogue();}catch(e){}
+ if(S.q)list=list.filter(f=>((f.name&&f.name.ar)||'').includes(S.q)||f.id.includes(S.q));
+ const uses=(id)=>orders.filter(o=>(o.pFilm||(o.payload&&o.payload.filmId))===id).length;
+ const sold=(id)=>orders.filter(o=>(o.pFilm||(o.payload&&o.payload.filmId))===id)
+   .reduce((a,o)=>a+(+o.price||0),0);
+ const cats={wed:'أعراس',henna:'حنّة',bday:'عيد ميلاد',baby:'مولود',grad:'تخرّج',save:'احفظوا التاريخ'};
+ const ranked=list.slice().sort((a,b)=>uses(b.id)-uses(a.id));
+ const total=orders.filter(o=>o.pFilm||(o.payload&&o.payload.filmId)).length;
+ if(!list.length)return `<div class="card"><h3>🎬 الأفلام</h3><p class="cmut">لا أفلام بعد.</p></div>`;
+ return `<div class="card">
+  <h3>🎬 الأفلام على الرفّ <span class="sub">${fmtN(list.length)} فيلم · ${fmtN(total)} طلب</span></h3>
+  <div class="filmgrid">${ranked.map(f=>{
+   const o=(typeof readyCfg==='function')?readyCfg(f.id):{};
+   const n=uses(f.id), hidden=o.vis===false;
+   return `<div class="filmcard ${hidden?'off':''}">
+    <div class="filmcard-p"><img src="${escA(f.p)}" alt="" loading="lazy">
+     ${n?`<span class="filmcard-n">${fmtN(n)}</span>`:''}</div>
+    <b>${escA((o.nm&&o.nm.trim())||(f.name&&f.name.ar)||f.id)}</b>
+    <em>${escA(cats[f.cat]||'')} · ${o.price||CFG.price.ready||99} د.ت</em>
+    <small>${n?fmtN(n)+' طلب · '+fmtN(sold(f.id))+' د.ت':'لا طلبات بعد'}${hidden?' · مخفي':''}</small>
+    <div class="filmcard-a">
+     <button class="act" onclick="go('media')">تعديل</button>
+     ${(o.snd||f.snd)?`<button class="act" onclick="go('media');setTimeout(()=>sndStudio('${f.id}'),120)">🎬 الأغنية</button>`:''}
+    </div>
+   </div>`;}).join('')}</div>
+  <p class="cmut" style="margin-top:10px">الترتيب حسب عدد الطلبات. التعديل والأغاني في «المحتوى والأفلام».</p>
+ </div>`;}
 function tplView(){
+ if(window.__dbMode&&window.__dbRows)return tplViewReal();
  return `<div class="card"><h3>🖼️ القوالب <span class="sub">${fmtN(TPL.length)}</span></h3>
   <div class="tpl-grid">${TPL.map((t,i)=>{
    const uses=ORDERS.filter(o=>o.tpl===t.n).length;
@@ -172,7 +207,11 @@ function guestsViewReal(){
    <td style="color:var(--taupe);max-width:200px">${escA((g.message||'').slice(0,60))}</td></tr>`).join('')}
   </tbody></table>`:'<p class="cmut">لا ردود بعد.</p>'}</div>`;}
 
-function wishView(){return realWishesHTML()+_wishView0();}
+/* The seeded wishes were appended even in cloud mode, so invented
+   congratulations sat under the real ones and looked just as real. */
+function wishView(){return (window.__dbMode&&window.__dbRows)
+ ? realWishesHTML()
+ : realWishesHTML()+_wishView0();}
 function _wishView0(){
  let list=WISHES;if(S.q)list=list.filter(w=>(w.txt+w.who+w.inv).includes(S.q));
  return `<div class="card"><h3>💬 تهاني الضيوف <span class="sub">${fmtN(list.filter(w=>w.ok).length)} منشورة · ${fmtN(list.filter(w=>!w.ok).length)} بانتظار المراجعة</span></h3>
