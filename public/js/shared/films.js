@@ -89,7 +89,8 @@ const FILMS_BUILTIN=[
    fr:'La toque et un bouquet de roses sous un ciel clair',
    en:'The cap and an armful of pink roses under a clear sky'},
   dress:{ar:['أنيق نهاري','ألوان فاتحة'],fr:['Chic de jour','Tons clairs'],en:['Daytime smart','Light tones']},
-  sw:['#1C2030','#C86A8A','#D8DEEE']},
+  sw:['#1C2030','#C86A8A','#D8DEEE'],
+  snd:'/media/snd/grad.webm',sndN:'بيانو التخرّج'},
 
  /* ── henna night ── */
  {id:'henna',cat:'henna',v:'/media/inv/henna.mp4',p:'/media/inv/henna.jpg',design:10,

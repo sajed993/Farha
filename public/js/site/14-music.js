@@ -13,7 +13,8 @@ const TRACKS={1:'/media/snd/piano.webm'};
    loudness in the ear. */
 const TRACK_VOL={'marble.webm':.32,'oneday.webm':.48,'wisteria.webm':.23,
  'rings.webm':.68,'piano.webm':1,'henna.webm':.30,
- 'zellij.webm':.35,'ray.webm':.35,'vow.webm':.35,'stair.webm':.35,'blanc.webm':.35};
+ 'zellij.webm':.35,'ray.webm':.35,'vow.webm':.35,'stair.webm':.35,'blanc.webm':.35,
+ 'grad.webm':.35};
 function trackVol(url){return TRACK_VOL[String(url).split('/').pop()]||.6;}
 const MEL={
  2:{wave:'triangle',bpm:138,notes:[[523,1],[523,1],[659,2],[523,2],[698,2],[659,4],[523,1],[523,1],[659,2],[523,2],[784,2],[698,4],[880,2],[784,2],[698,2],[659,4]]},
