@@ -110,14 +110,29 @@ const VIDSCOPE=[['site','أفلام الموقع','الدعوات الجاهزة
  ['customer','فيديوهات الزبائن','الدعوات التي يبنيها الزبون بفيديو خاص']];
 /* pending choice per scope, applied only on confirm */
 let VIDTRY={site:null,customer:null};
+/* Which viewer, if any, is running. There are two on this page and both used
+   to load the moment it opened — two invitations playing their own music at
+   once, over the top of anything you tried to listen to. Nothing loads now
+   until it is asked for, and starting one stops everything else. */
+let VIDLIVE=null;
+function vidStop(){ if(VIDLIVE!==null){ VIDLIVE=null; renderContent(); } }
+function vidStart(scope){
+ if(typeof sndStop==='function') sndStop();   /* the song preview gives way */
+ VIDLIVE=scope; renderContent();
+}
 let VIDFILM='marble', VIDSEC='hall';
 function vidPick(scope,k){VIDTRY[scope]=k;renderContent();}
 function vidConfirm(scope){
  const k=VIDTRY[scope];if(!k)return;
  CFG.vid[scope]=k;VIDTRY[scope]=null;saveCFG();renderContent();}
 function vidCancel(scope){VIDTRY[scope]=null;renderContent();}
-function vidFilm(v){VIDFILM=v;renderContent();}
-function vidSec(v){VIDSEC=v;renderContent();}
+function vidFilm(v){VIDFILM=v;VIDLIVE=null;renderContent();}
+/* the poster of whichever film the viewer is set to, as the still */
+function vidPoster(){
+ try{ const f=readyCatalogue().find(x=>x.id===VIDFILM); return (f&&f.p)||''; }
+ catch(e){ return ''; }
+}
+function vidSec(v){VIDSEC=v;VIDLIVE=null;renderContent();}
 function vidView(){
  return VIDSCOPE.map(([scope,nm,ds])=>{
   const cur=CFG.vid[scope]||'full';
@@ -139,7 +154,13 @@ function vidView(){
         `<option value="${v}" ${VIDSEC===v?'selected':''}>${n}</option>`).join('')}</select>
       <span class="cmut" style="font-size:.76rem">معاينة حيّة من الموقع نفسه</span>
      </div>
-     <div class="vidphone"><iframe src="${url}" title="preview" loading="lazy"></iframe></div>
+     <div class="vidphone">${VIDLIVE===scope
+       ? `<iframe src="${url}" title="preview"></iframe>
+          <button class="vidoff" onclick="vidStop()" title="إيقاف">■</button>`
+       : `<button class="vidplay" onclick="vidStart('${scope}')"
+            style="background-image:url('${escA(vidPoster())}')">
+            <i>▶</i><span>شغّلوا المعاينة</span>
+            <small>فيها صوت — تبدأ عند الضغط فقط</small></button>`}</div>
     </div>
     ${tryK&&tryK!==cur?`<div class="vidconfirm">
       <span>تجربة: <b>${VIDL.find(v=>v[0]===tryK)[1]}</b> — غير محفوظ بعد</span>
@@ -307,8 +328,14 @@ async function ctlFilmSnd(id, ev){
 }
 /* hear what is actually set before anyone else does */
 let _sndPrev = null;
+function sndStop(){
+ if(_sndPrev){ try{ _sndPrev.pause(); }catch(e){} _sndPrev = null; }
+}
 function ctlFilmPlay(id){
- if(_sndPrev){ try{ _sndPrev.pause(); }catch(e){} _sndPrev = null; renderContent(); return; }
+ if(_sndPrev){ sndStop(); renderContent(); return; }
+ /* a running viewer is playing its own music — it has to stop first, or
+    there is no hearing the song you asked for */
+ if(VIDLIVE!==null){ VIDLIVE=null; renderContent(); }
  const o = (CFG.films||{})[id] || {};
  let url = o.snd;
  if(!url){ try{ url = (readyCatalogue().find(f=>f.id===id)||{}).snd; }catch(e){} }
@@ -359,8 +386,9 @@ function readyView(){
       <option value="">الافتراضي</option>${vidOpt(o.vid||'')}</select></label>
      <label>اسم الأغنية<input placeholder="${escA(shipped.sndN||'الفنّان — العنوان')}"
       value="${escA(o.sndN||'')}" onchange="ctlFilm('${id}','sndN',this.value)"></label>
-     <label>رابط الموسيقى<input placeholder="${escA(shipped.snd||'/media/snd/….webm')}"
-      value="${escA(o.snd||'')}" onchange="ctlFilm('${id}','snd',this.value)"></label>
+     <div class="sndnow">${o.snd
+       ? '♪ موسيقى مرفوعة'
+       : (shipped.snd ? '♪ الموسيقى الأصلية' : '— بلا موسيقى')}</div>
      <div class="sndrow">
       <label class="sndup">↑ ارفعوا أغنية
        <input type="file" accept="audio/*" onchange="ctlFilmSnd('${id}',event)"></label>

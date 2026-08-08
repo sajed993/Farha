@@ -355,3 +355,24 @@ html[dir=rtl] .txl input,html[dir=rtl] .txl textarea{padding:9px 34px 9px 11px}
  box-shadow:0 0 0 3px rgba(185,138,47,.16)}
 .txl.has input,.txl.has textarea{border-color:rgba(47,107,58,.3)}
 .txl.one{max-width:22rem}
+
+/* -- the invitation viewer: off until asked for -- */
+.vidplay{position:relative;display:grid;place-content:center;gap:5px;width:100%;height:100%;
+ border:none;border-radius:inherit;cursor:pointer;text-align:center;color:#FFF6F3;
+ background-size:cover;background-position:center;font-family:inherit}
+.vidplay::before{content:"";position:absolute;inset:0;border-radius:inherit;
+ background:linear-gradient(180deg,rgba(30,17,24,.35),rgba(30,17,24,.72))}
+.vidplay>*{position:relative;z-index:1}
+.vidplay i{font-style:normal;display:grid;place-items:center;justify-self:center;
+ width:48px;height:48px;border-radius:50%;font-size:1.1rem;color:#241319;
+ background:linear-gradient(158deg,#E7C98A,#C2994A 55%,#8E6B28);
+ box-shadow:0 8px 22px -10px rgba(0,0,0,.6)}
+.vidplay span{font-size:.84rem;font-weight:700}
+.vidplay small{font-size:.68rem;opacity:.72;line-height:1.5;padding:0 10px}
+.vidplay:hover i{transform:scale(1.06)}
+.vidoff{position:absolute;top:8px;inset-inline-end:8px;z-index:2;width:30px;height:30px;
+ border-radius:50%;cursor:pointer;font-size:.7rem;color:#FFF6F3;
+ background:rgba(30,17,24,.7);backdrop-filter:blur(4px)}
+.vidoff:hover{background:rgba(30,17,24,.9)}
+/* what a film's music currently is, now that the url box is gone */
+.sndnow{font-size:.76rem;color:#6A5A3E;margin:2px 0 4px}
