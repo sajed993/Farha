@@ -6,8 +6,14 @@ const TRACKS={1:'/media/snd/piano.webm'};
 /* Measured RMS per clip ran from 0.049 to 0.258 and wisteria peaked at 1.053,
    which clips. These gains level everything to ~0.06 RMS and pull every peak
    back under 1, so switching films does not jump in volume. */
+/* The five newest tracks were not in this table, so they fell through to the
+   0.6 default and played about seventy per cent louder than the ones beside
+   them. They are all levelled to 0.169 RMS at the file, and marble — 0.187 at
+   .32 — is what the rest are tuned against, so 0.169 × .35 lands on the same
+   loudness in the ear. */
 const TRACK_VOL={'marble.webm':.32,'oneday.webm':.48,'wisteria.webm':.23,
- 'rings.webm':.68,'piano.webm':1,'henna.webm':.30};
+ 'rings.webm':.68,'piano.webm':1,'henna.webm':.30,
+ 'zellij.webm':.35,'ray.webm':.35,'vow.webm':.35,'stair.webm':.35,'blanc.webm':.35};
 function trackVol(url){return TRACK_VOL[String(url).split('/').pop()]||.6;}
 const MEL={
  2:{wave:'triangle',bpm:138,notes:[[523,1],[523,1],[659,2],[523,2],[698,2],[659,4],[523,1],[523,1],[659,2],[523,2],[784,2],[698,4],[880,2],[784,2],[698,2],[659,4]]},

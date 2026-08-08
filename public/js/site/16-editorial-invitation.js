@@ -523,9 +523,39 @@ function editorialOpen(){
  waxEnvelope(stage,()=>{
   if(!veil)return;
   const inner=veil.querySelector('.edi-stage');
-  if(inner)mountEditorial(inner);});
- ediPreload(()=>{});
- try{if(S.c.music&&S.c.autoplay)playMusic(S.c.music);}catch(e){}}
+  if(inner){ mountEditorial(inner); ediStartMusic(inner); }});
+ ediPreload(()=>{});}
+
+/* The music used to start here, at the moment the invitation mounted —
+   before the guest had even reached for the seal. Whatever they took to press
+   it, five seconds or fifty, the song was already that far in by the time any
+   film appeared. For most of the shelf that only meant an arbitrary entry
+   point. For بياض it broke the film: that footage was cut to the opening of
+   its song, note for frame, and none of it survived the wait.
+
+   It starts with the film now. The first frame and the first note together,
+   which is also the only arrangement a browser reliably allows — pressing the
+   seal is the gesture that earns the right to make sound. */
+function ediStartMusic(root){
+ try{
+  if(!S.c.music||!S.c.autoplay)return;
+  const v=root&&root.querySelector('.edi-hero video, .edi-ph.film video');
+  let done=false;
+  const go=()=>{ if(done)return; done=true;
+   try{ if(v)v.currentTime=0; }catch(e){}
+   try{ playMusic(S.c.music); }catch(e){} };
+  if(!v){ go(); return; }
+  if(!v.paused&&v.readyState>=2&&v.currentTime>0){ go(); return; }
+  v.addEventListener('playing',go,{once:true});
+  /* A film that never reports playing must not leave the invitation silent.
+     Two and a half seconds was too patient: the heavier designs mount slowly
+     and ليلة الحنّة sat quiet for five seconds after the seal. One second is
+     long enough for a film that is going to start — بياض reports playing
+     within twenty milliseconds — and short enough that a film which is not
+     going to start does not cost the guest the opening. */
+  setTimeout(go,1000);
+ }catch(e){}
+}
 
 /* demo entry: dress the emerald wedding template with a full programme */
 function editorialDemo(){
