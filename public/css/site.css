@@ -3467,3 +3467,10 @@ html[lang=fr] .hero .sub{
 @media(hover:hover){.frm-film:hover{transform:translateY(-2px)}}
 .frm-filmnote{color:#8A7A63;font-size:.7rem;line-height:1.8;margin:8px 0 0}
 @media(prefers-reduced-motion:reduce){.frm-film,.frm-filmtick{transition:none}}
+
+/* one way to see the rest of the shelf, for anyone who wants a wedding film
+   for their engagement — deliberate, rather than mixed in by default */
+.frm-allfilms{display:block;margin:8px auto 0;background:none;border:none;
+ color:#8A6210;font-size:.75rem;font-weight:700;font-family:inherit;cursor:pointer;
+ text-decoration:underline;text-underline-offset:3px;padding:4px 8px}
+.frm-allfilms:hover{color:#B98A2F}

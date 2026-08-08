@@ -259,9 +259,18 @@ function frmSetOcc(cat) {
   if (wasPaired === isPaired) set('ordNameB', keep.b);
   set('ordWhen', keep.when); set('ordTime', keep.time);
   set('ordPlace', keep.place); set('ordMsg', keep.msg);
-  /* the films for this occasion come to the front */
+  /* The shelf is filtered to the new occasion, so a film chosen under the old
+     one may no longer be on screen. Keeping it selected would send an order
+     naming a film the customer can no longer see; it is dropped and asked for
+     again. Choosing a film from the shelf sets the occasion to match, so this
+     only fires when the occasion is changed by hand. */
+  FRM_ALLFILMS = false;
   const fh = document.getElementById('ordFilms');
-  if (fh) fh.innerHTML = frmFilmPicker();
+  if (fh) {
+    if (FRM_FILM && !frmFilmList().some((x) => x.id === FRM_FILM.id)) FRM_FILM = null;
+    fh.innerHTML = frmFilmPicker();
+    frmHead();
+  }
 }
 
 function openOrder(filmId, tier) {
@@ -269,6 +278,7 @@ function openOrder(filmId, tier) {
   const f = (typeof readyFilm === 'function' && filmId) ? readyFilm(filmId) : null;
   FRM_FILM = f;
   FRM_TIER = (tier === 'sign') ? 'sign' : 'ready';
+  FRM_ALLFILMS = false;
   /* tapping a film already says what the occasion is; the chips still let it
      be changed, for anyone who liked a wedding film for their engagement */
   FRM_CAT = (f && f.cat) || 'wed';
@@ -331,45 +341,84 @@ function closeOrder() {
    chosen above floats its own films to the front rather than hiding the
    rest, because somebody who liked a wedding film for their engagement
    should not have to fight the form for it. */
-function frmFilmPicker() {
+/* Films for the occasion that was chosen above, and only those. They used to
+   be merely sorted to the front with everything else trailing behind, so
+   picking «تخرّج» still showed weddings underneath — which reads as the filter
+   being broken rather than as generosity. Anyone who does want a wedding film
+   for their engagement can still ask, with «كل الأفلام». */
+let FRM_ALLFILMS = false;
+function frmFilmList() {
   let all = [];
   try { all = readyCatalogue().filter((x) => x.v && (typeof readyCfg !== 'function' || readyCfg(x.id).vis !== false)); }
-  catch (e) { return ''; }
-  if (!all.length) return '';
+  catch (e) { return []; }
+  if (FRM_ALLFILMS) return all;
   const mine = all.filter((x) => x.cat === FRM_CAT);
-  const rest = all.filter((x) => x.cat !== FRM_CAT);
+  /* an occasion we have no film for must not leave the form with nothing to
+     choose — better to show everything than to show an empty shelf */
+  return mine.length ? mine : all;
+}
+function frmFilmPicker() {
+  const list = frmFilmList();
+  if (!list.length) return '';
+  let total = 0;
+  try { total = readyCatalogue().filter((x) => x.v && (typeof readyCfg !== 'function' || readyCfg(x.id).vis !== false)).length; }
+  catch (e) { total = list.length; }
   const cats = t().rdCats || {};
   const cell = (x) => {
     const nm = (typeof readyName === 'function') ? readyName(x) : (x.name[S.lang] || x.id);
     const pr = (typeof readyPrice === 'function') ? readyPrice(x) : '';
-    return `<button type="button" class="frm-film ${FRM_FILM && FRM_FILM.id === x.id ? 'on' : ''}"
-      onclick="frmPickFilm('${x.id}')" aria-pressed="${FRM_FILM && FRM_FILM.id === x.id}">
-      <img src="${esc(x.p)}" alt="" loading="lazy">
+    const on = !!(FRM_FILM && FRM_FILM.id === x.id);
+    return `<button type="button" class="frm-film ${on ? 'on' : ''}" data-film="${esc(x.id)}"
+      onclick="frmPickFilm('${x.id}')" aria-pressed="${on}">
+      <img src="${esc(x.p)}" alt="" loading="lazy" decoding="async">
       <span class="frm-filmn">${esc(nm)}</span>
       <em>${esc(cats[x.cat] || '')}${pr ? ' · ' + pr + ' ' + esc(t().cur) : ''}</em>
       <i class="frm-filmtick">✓</i>
     </button>`;
   };
-  return `<div class="frm-films">${mine.concat(rest).map(cell).join('')}</div>
+  const more = (!FRM_ALLFILMS && list.length < total)
+    ? `<button type="button" class="frm-allfilms" onclick="frmShowAll()">${esc(t().ordFilmAll)}</button>` : '';
+  return `<div class="frm-films">${list.map(cell).join('')}</div>${more}
    <p class="frm-filmnote">${esc(t().ordFilmNote)}</p>`;
+}
+function frmShowAll() {
+  FRM_ALLFILMS = true;
+  const host = document.getElementById('ordFilms');
+  if (host) host.innerHTML = frmFilmPicker();
+}
+/* the card at the top of the sheet, which carries the price */
+function frmHead() {
+  const head = document.querySelector('#ordveil .frm-pick');
+  if (!head) return;
+  const f = FRM_FILM;
+  if (!f) {
+    const O = t().off, sign = FRM_TIER === 'sign';
+    const price = (typeof offTier === 'function') ? offTier()[FRM_TIER].price : 0;
+    head.className = 'frm-pick tier';
+    head.innerHTML = `<span class="frm-tiern">${esc(typeof offName === 'function' ? offName(FRM_TIER) : (sign ? O.sName : O.rName))}</span>
+      <span><em>${price} ${esc(t().cur)}</em></span>`;
+    return;
+  }
+  const nm = (typeof readyName === 'function') ? readyName(f) : f.name[S.lang];
+  const pr = (typeof readyPrice === 'function') ? readyPrice(f) : '';
+  head.className = 'frm-pick';
+  head.innerHTML = `<img src="${esc(f.p)}" alt="" loading="lazy">
+    <span><b>${esc(nm)}</b><em>${pr} ${esc(t().cur)}</em></span>`;
 }
 function frmPickFilm(id) {
   const f = (typeof readyFilm === 'function') ? readyFilm(id) : null;
   if (!f) return;
   FRM_FILM = f;
+  /* Only the two buttons whose state changed are touched. Rebuilding the grid
+     recreated every <img>, so every poster was fetched and decoded again on
+     each tap — the whole strip flickered and the scroll position jumped. */
   const host = document.getElementById('ordFilms');
-  if (host) host.innerHTML = frmFilmPicker();
-  /* the header carries the price, and the price follows the film */
-  const head = document.querySelector('#ordveil .frm-pick');
-  if (head) {
-    const nm = (typeof readyName === 'function') ? readyName(f) : f.name[S.lang];
-    const pr = (typeof readyPrice === 'function') ? readyPrice(f) : '';
-    head.className = 'frm-pick';
-    head.innerHTML = `<img src="${esc(f.p)}" alt="" loading="lazy">
-      <span><b>${esc(nm)}</b><em>${pr} ${esc(t().cur)}</em></span>`;
-  }
-  const sel = document.querySelector('.frm-film.on');
-  if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  if (host) host.querySelectorAll('.frm-film').forEach((b) => {
+    const on = b.dataset.film === id;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  frmHead();
 }
 
 function frmVal(id) { const e = document.getElementById(id); return e ? e.value.trim() : ''; }
