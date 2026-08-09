@@ -10,7 +10,10 @@
    <img>, which paints immediately and costs nothing, and is upgraded to a
    real video only while it is on screen — then torn back down, returning the
    decoder. */
-const LAZYV_MAX = 5;            /* never hold more than this many decoders */
+/* Two, not five. Five was chosen to bound the number of live decoders, but
+   each one also downloads a whole film — measured, the landing page shipped
+   6.88MB before a visitor had touched anything, 5.87MB of it video. */
+const LAZYV_MAX = 2;
 const lazyvLive = [];
 
 function lazyvPoster(src){ return src.slice(0, -4) + '.jpg'; }
@@ -63,20 +66,27 @@ function lazyvUp(host){
 function lazyvReleaseAll(){ while (lazyvLive.length) lazyvDown(lazyvLive[0]); }
 
 /* Watch a set of hosts and keep only the visible ones upgraded. */
-function lazyvWatch(hosts){
+function lazyvWatch(hosts, max){
  if (!hosts.length) return;
  const still = window.matchMedia &&
    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- const saver = navigator.connection && navigator.connection.saveData;
- if (still || saver) return;            /* posters only */
- if (!('IntersectionObserver' in window)) { hosts.slice(0, 2).forEach(lazyvUp); return; }
+ const c = navigator.connection || {};
+ const saver = c.saveData;
+ /* a film is a poster's worth of story and a hundred times its weight; on a
+    2G handset it is not worth the wait */
+ const slow = /(^|-)2g$/.test(c.effectiveType || '');
+ if (still || saver || slow) return;    /* posters only */
+ if (max === 0) return;                 /* the caller says posters too */
+ if (!('IntersectionObserver' in window)) { hosts.slice(0, 1).forEach(lazyvUp); return; }
  const io = new IntersectionObserver(function(es){
   es.forEach(function(e){
    const h = e.target;
    if (e.isIntersecting && h.offsetParent !== null) lazyvUp(h);
    else lazyvDown(h);
   });
- }, { threshold: .25 });
+ /* .55, not .25 — a card a quarter on screen is one the visitor is scrolling
+    past, and it was costing a whole film to glance at */
+ }, { threshold: .55 });
  hosts.forEach(function(h){ io.observe(h); });
 }
 
@@ -127,13 +137,21 @@ function heroSpectrum(){
   </span>`).join('')}</div>
   <div class="spec-veil"></div><div class="hero-grain"></div>`;}
 
-/* Decode only while the hero is on screen. Five clips playing behind a
-   scrolled-past hero is what makes a phone run hot. */
+/* The hero is five vertical bands of film behind the title — a texture, not
+   the product. All five were on screen at once, so all five downloaded: about
+   ten megabytes for a background, before the visitor had chosen anything.
+
+   On a phone each band is roughly seventy pixels wide, where motion is not
+   readable and a still frame of the same film is indistinguishable. So the
+   hero is posters on phones, and two of the five move on a screen wide enough
+   for it to be worth anything. The shelf below is where the films are the
+   point, and there they still play. */
 function heroSpectrumMount(){
  const h=document.querySelector('.hero');
  if(!h||h.dataset.specMounted)return;
  h.dataset.specMounted='1';
- lazyvWatch([...h.querySelectorAll('.spec-b')]);}
+ const wide = window.innerWidth >= 900;
+ lazyvWatch([...h.querySelectorAll('.spec-b')], wide ? 2 : 0);}
 function landView(){
  return navHTML()+`
  <header class="hero">

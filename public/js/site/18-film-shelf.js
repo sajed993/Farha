@@ -123,7 +123,7 @@ function filmShelfMount(){
  const host=document.getElementById('ready');
  if(!host||host.dataset.mounted)return;
  host.dataset.mounted='1';
- lazyvWatch([...host.querySelectorAll('.iph-scr')]);}
+ lazyvWatch([...host.querySelectorAll('.iph-scr')], 2);}
 
 /* Placeholder copy for the optional notes until the couple fills them in. */
 function ediDemoNote(k){

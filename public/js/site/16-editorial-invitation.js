@@ -48,11 +48,17 @@ function ediPlate(k,cls){
  const film=S.c.films&&S.c.films[k];
  if(film&&/\.mp4$/i.test(film)){
   const cue=EDI_CUE[k]||0, dur=EDI_DUR[film]||0;
-  const src=film+(cue>0&&dur?('#t='+(dur*cue).toFixed(1)):'');
+  const at=(cue>0&&dur)?+(dur*cue).toFixed(1):0;
   const poster=film.replace(/\.mp4$/,'.jpg');
-  /* only the first plate preloads in full — the rest wait until they scroll in */
-  return `<div class="edi-ph film ${cls||''}"><video src="${src}" poster="${poster}"
-    muted loop playsinline preload="${k==='hero'?'auto':'metadata'}"></video></div>`;}
+  /* The cue used to be baked into the src as a #t= fragment. It reads well —
+     the browser starts decoding at the cue instead of being seeked afterwards
+     — but a fragment makes a different URL, and a different URL is a different
+     resource: the same film was downloaded once per plate. Four plates, four
+     downloads. Measured on قصر الرخام, a guest transferred 16MB of a 4MB film.
+     The cue is carried as data now and applied once the metadata is in, so all
+     four plates share one file and one download. */
+  return `<div class="edi-ph film ${cls||''}"><video src="${film}" poster="${poster}"
+    ${at?`data-at="${at}"`:''} muted loop playsinline preload="${k==='hero'?'auto':'metadata'}"></video></div>`;}
  if(film)
   return `<div class="edi-ph has ${cls||''}" style="background-image:url('${film}')"></div>`;
  const on=ediImgOK[k];
@@ -523,7 +529,7 @@ function editorialOpen(){
  waxEnvelope(stage,()=>{
   if(!veil)return;
   const inner=veil.querySelector('.edi-stage');
-  if(inner){ mountEditorial(inner); ediStartMusic(inner); }});
+  if(inner){ mountEditorial(inner); ediCuePlates(inner); ediStartMusic(inner); }});
  ediPreload(()=>{});}
 
 /* The music used to start here, at the moment the invitation mounted —
@@ -536,6 +542,22 @@ function editorialOpen(){
    It starts with the film now. The first frame and the first note together,
    which is also the only arrangement a browser reliably allows — pressing the
    seal is the gesture that earns the right to make sound. */
+/* Put each plate at its own moment of the film. Applied after the metadata
+   arrives, because a seek before that is silently dropped. */
+function ediCuePlates(root){
+ try{
+  (root||document).querySelectorAll('video[data-at]').forEach(function(v){
+   const at=parseFloat(v.dataset.at)||0;
+   if(!at) return;
+   const put=function(){ try{ if(Math.abs(v.currentTime-at)>0.25) v.currentTime=at; }catch(e){} };
+   if(v.readyState>=1) put(); else v.addEventListener('loadedmetadata',put,{once:true});
+   /* a looping clip returns to zero, not to its cue */
+   v.addEventListener('seeked',function(){ v.dataset.cued='1'; },{once:true});
+   v.addEventListener('ended',put);
+  });
+ }catch(e){}
+}
+
 function ediStartMusic(root){
  try{
   if(!S.c.music||!S.c.autoplay)return;
