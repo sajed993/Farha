@@ -518,7 +518,7 @@ function editorialOpen(){
     the invitation asks for its own */
  try{lazyvReleaseAll()}catch(e){}
  veil=document.createElement('div');
- veil.className='veil edi-veil-root'+(S.c.ediPal?' pal-'+S.c.ediPal:'');
+ veil.className='veil edi-veil-root'+(S.c.ediPal?' pal-'+S.c.ediPal:'')+(S.c.ediFont?' font-'+S.c.ediFont:'');
  /* a film added from the dashboard carries its colours rather than a class */
  if(S.c.ediSw){const v=ediPaletteVars(S.c.ediSw);if(v)veil.setAttribute('style',v);}
  document.body.appendChild(veil);scrollSync();

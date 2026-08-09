@@ -3474,3 +3474,74 @@ html[lang=fr] .hero .sub{
  color:#8A6210;font-size:.75rem;font-weight:700;font-family:inherit;cursor:pointer;
  text-decoration:underline;text-underline-offset:3px;padding:4px 8px}
 .frm-allfilms:hover{color:#B98A2F}
+
+/* ═══════════ الستارة ═══════════
+   The sixth opening, and the first that is not paper. An agency opening is
+   not a letter — it is a curtain somebody pulls. Two velvet panels meet under
+   a gold rod; the same wax medallion sits where they meet, and pressing it
+   draws them apart.
+
+   The panels carry a repeating gradient rather than an image, so the whole
+   thing costs nothing to load and stays sharp at any size. */
+.wenv.es-curtain{background:radial-gradient(120% 90% at 50% 0%,#2A1F16 0%,#170F09 55%,#0B0705 100%)}
+.es-curtain .cu-rod{position:absolute;top:5.5%;left:3%;right:3%;height:12px;border-radius:9px;z-index:6;
+ background:linear-gradient(180deg,#F6E7BE,#B98A2F 42%,#7A5A1E);
+ box-shadow:0 4px 14px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.55)}
+.es-curtain .cu-fin{position:absolute;top:50%;width:30px;height:30px;border-radius:50%;
+ background:radial-gradient(circle at 34% 30%,#F8EBC6,#B98A2F 58%,#6E5019);
+ transform:translateY(-50%);box-shadow:0 3px 10px rgba(0,0,0,.45)}
+.es-curtain .cu-fin.l{left:-16px}
+.es-curtain .cu-fin.r{right:-16px}
+
+/* each panel is half the screen, pleated with a repeating gradient */
+.es-curtain .cu-pan{position:absolute;top:6.4%;bottom:0;width:52%;z-index:5;
+ transition:transform 1.15s cubic-bezier(.62,0,.28,1);will-change:transform;
+ background:
+  repeating-linear-gradient(90deg,
+   rgba(0,0,0,.34) 0 2px, rgba(255,255,255,.05) 2px 16px,
+   rgba(0,0,0,.20) 16px 34px, rgba(255,255,255,.03) 34px 52px),
+  linear-gradient(180deg,#7E1F2A 0%,#5E141D 46%,#3A0C13 100%)}
+.es-curtain .cu-pan.l{left:0;transform-origin:left center;
+ border-radius:0 10px 0 0;box-shadow:8px 0 26px rgba(0,0,0,.45)}
+.es-curtain .cu-pan.r{right:0;transform-origin:right center;
+ border-radius:10px 0 0 0;box-shadow:-8px 0 26px rgba(0,0,0,.45)}
+/* a soft sheen down the fold nearest the middle */
+.es-curtain .cu-pan i{position:absolute;top:0;bottom:0;width:34%;pointer-events:none;
+ background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,225,190,.16),rgba(255,255,255,0))}
+.es-curtain .cu-pan.l i{right:0}
+.es-curtain .cu-pan.r i{left:0}
+.es-curtain .cu-vig{position:absolute;inset:0;z-index:7;pointer-events:none;
+ background:radial-gradient(75% 55% at 50% 46%,rgba(0,0,0,0) 40%,rgba(0,0,0,.5) 100%)}
+
+/* the card behind them, revealed as they part */
+.es-curtain .cu-note{position:absolute;left:12%;right:12%;top:26%;z-index:3;
+ display:grid;justify-items:center;gap:.55em;text-align:center;
+ opacity:0;transform:translateY(8%) scale(.97);
+ transition:transform .62s cubic-bezier(.2,.8,.2,1),opacity .3s ease}
+.es-curtain .cu-note span{font-family:'Reem Kufi',var(--bodyA);font-size:clamp(.66rem,2.4vw,.8rem);
+ letter-spacing:.34em;color:rgba(246,231,190,.82)}
+.es-curtain .cu-note b{font-family:var(--dispA);font-weight:700;
+ font-size:clamp(1.5rem,6.6vw,2.5rem);color:#F8EEDA;line-height:1.35;
+ text-shadow:0 3px 24px rgba(0,0,0,.6)}
+.wenv-env.lift .cu-note{opacity:1;transform:translateY(-2%) scale(1)}
+
+/* pressing the seal draws them back */
+.wenv-env.open .cu-pan.l{transform:translateX(-101%)}
+.wenv-env.open .cu-pan.r{transform:translateX(101%)}
+@media(prefers-reduced-motion:reduce){
+ .es-curtain .cu-pan,.es-curtain .cu-note{transition-duration:.01ms}}
+
+/* ═══ a different voice for an opening ═══
+   Aref Ruqaa is a wedding hand — calligraphic, ceremonial, exactly wrong for
+   an agency announcing itself. Reem Kufi is geometric and modern and reads as
+   a company rather than a couple, and Cinzel does the same job in Latin. Both
+   were already being loaded for other parts of the site, so this costs
+   nothing to add. */
+.font-kufi .edi-t,.font-kufi .edi-n,.font-kufi .edi-big,
+.font-kufi .edi-sec h3,.font-kufi .wenv-note b,.font-kufi .cu-note b{
+ font-family:'Reem Kufi',var(--bodyA)!important;font-weight:600;letter-spacing:0}
+html[lang=fr] .font-kufi .edi-t,html[lang=en] .font-kufi .edi-t,
+html[lang=fr] .font-kufi .edi-n,html[lang=en] .font-kufi .edi-n{
+ font-family:'Cinzel',serif!important;letter-spacing:.06em}
+/* a touch more air between lines — Kufi sets tighter than Ruqaa */
+.font-kufi .edi-n{line-height:1.5}

@@ -174,6 +174,42 @@ const FILMS_BUILTIN=[
   snd:'/media/snd/blanc.webm',sndN:'صوت الفيلم نفسه'},
 
  /* ── save the date ── */
+ /* ── افتتاح الوكالات ──
+    Two for a travel agency and two for any opening. These do not use the
+    envelope: an agency is announced from behind a curtain, not posted in a
+    letter — see envStyle 'curtain'. */
+ {id:'takeoff',cat:'open',v:'/media/inv/takeoff.mp4',p:'/media/inv/takeoff.jpg',env:'curtain',
+  name:{ar:'إقلاع',fr:'Décollage',en:'Take Off'},
+  blurb:{ar:'مدينة تلمع من فوق، وأبراج تطلع من الضوء — السفر كما يُحكى',
+   fr:'Une ville qui brille vue d’en haut et des tours qui montent dans la lumière',
+   en:'A city glittering from above and towers rising into the light'},
+  dress:{ar:['لباس أنيق','أزرق وذهبي'],fr:['Tenue élégante','Bleu et or'],en:['Smart dress','Blue and gold']},
+  sw:['#05070C','#1E7C86','#EDF3F6'],
+  snd:'/media/snd/takeoff.webm',sndN:'صوت الفيلم نفسه'},
+ {id:'boarding',cat:'open',v:'/media/inv/boarding.mp4',p:'/media/inv/boarding.jpg',env:'curtain',
+  name:{ar:'بوّابة السفر',fr:'La Porte',en:'The Gate'},
+  blurb:{ar:'مطار عند الغروب، وطائرة تنتظر عند البوّابة',
+   fr:'Un aéroport au crépuscule et un avion qui attend à la porte',
+   en:'An airport at dusk, and an aircraft waiting at the gate'},
+  dress:{ar:['لباس عمل أنيق','رمادي وكحلي'],fr:['Business chic','Gris et marine'],en:['Business smart','Grey and navy']},
+  sw:['#0A0B0E','#4A3E2D','#EFF3F8'],
+  snd:'/media/snd/boarding.webm',sndN:'صوت الفيلم نفسه'},
+ {id:'grandopen',cat:'open',v:'/media/inv/grandopen.mp4',p:'/media/inv/grandopen.jpg',env:'curtain',
+  name:{ar:'قريبًا نفتح',fr:'Bientôt',en:'Opening Soon'},
+  blurb:{ar:'حرير يتحرّك ببطء، وسطران يقولان إنّ شيئًا جميلًا قادم',
+   fr:'De la soie qui bouge lentement, et deux lignes qui annoncent quelque chose de beau',
+   en:'Silk moving slowly, and two lines saying something lovely is coming'},
+  dress:{ar:['أنيق وهادئ','بيج وعاجي'],fr:['Chic et calme','Beige et ivoire'],en:['Quietly smart','Beige and ivory']},
+  sw:['#141110','#8A7461','#F1EDE9'],
+  snd:'/media/snd/grandopen.webm',sndN:'موسيقى افتتاح ١'},
+ {id:'newdoors',cat:'open',v:'/media/inv/newdoors.mp4',p:'/media/inv/newdoors.jpg',env:'curtain',
+  name:{ar:'أبواب جديدة',fr:'Portes Ouvertes',en:'New Doors'},
+  blurb:{ar:'مقرّ جديد تحت سماء المساء، وماء هادئ وزيتونة',
+   fr:'Un nouveau siège sous le ciel du soir, une eau calme et un olivier',
+   en:'New premises under an evening sky, still water and an olive tree'},
+  dress:{ar:['لباس عمل','ألوان هادئة'],fr:['Tenue de travail','Tons sobres'],en:['Business dress','Quiet tones']},
+  sw:['#080A0D','#1E7C86','#F4F1EE'],
+  snd:'/media/snd/newdoors.webm',sndN:'موسيقى افتتاح ٢'},
  {id:'soon',cat:'save',v:'/media/inv/soon.mp4',p:'/media/inv/soon.jpg',design:3,
   name:{ar:'قريبًا',fr:'Bientôt',en:'Coming Soon'},
   blurb:{ar:'حريرٌ عاجي وظلٌّ يتحرك، وسطرٌ واحد: شيءٌ جميل قادم',
@@ -182,7 +218,7 @@ const FILMS_BUILTIN=[
   sw:['#4A3E34','#A58E7C','#E8DDCE']}
 ];
 /* order matters — the chips read in this order */
-const RD_CATS=['all','wed','henna','bday','baby','grad','save'];
+const RD_CATS=['all','wed','henna','bday','baby','grad','save','open'];
 
 /* Occasions. Custom films may introduce their own, so the chip row is built
    from whatever the catalogue actually contains rather than this list alone. */
@@ -226,6 +262,9 @@ const RD_DEF = {
  grad:{ar:{t:'حفل تخرّج',n:'سلمى',d:'28 جوان 2026',p:'قاعة الحفلات، تونس',m:'بعد سنوات من التعب، وصلنا — شاركونا الفرحة'},
    fr:{t:'Remise de diplôme',n:'Salma',d:'28 · 06 · 2026',p:'Salle des fêtes, Tunis',m:'Après des années d’efforts — partagez notre joie'},
    en:{t:'Graduation',n:'Salma',d:'28 · 06 · 2026',p:'The great hall, Tunis',m:'After years of work — come and share the joy'}},
+ open:{ar:{t:'دعوة افتتاح',n:'وكالة الأفق للأسفار',d:'12 سبتمبر 2026',p:'شارع الحبيب بورقيبة، تونس',m:'يسرّنا دعوتكم لحضور افتتاح مقرّنا الجديد'},
+   fr:{t:'Inauguration',n:'Agence Al Ufuq Voyages',d:'12 · 09 · 2026',p:'Avenue Habib Bourguiba, Tunis',m:'Nous avons le plaisir de vous convier à l’inauguration de notre nouvelle agence'},
+   en:{t:'Grand Opening',n:'Al Ufuq Travel',d:'12 · 09 · 2026',p:'Avenue Habib Bourguiba, Tunis',m:'We are pleased to invite you to the opening of our new office'}},
  save:{ar:{t:'احفظوا التاريخ',n:'نور & كريم',d:'14 سبتمبر 2026',p:'التفاصيل قريبًا',m:'احفظوا التاريخ — التفاصيل قريبًا'},
    fr:{t:'Réservez la date',n:'Nour & Karim',d:'14 · 09 · 2026',p:'Détails à suivre',m:'Réservez la date — les détails suivront'},
    en:{t:'Save the Date',n:'Nour & Karim',d:'14 · 09 · 2026',p:'Details to follow',m:'Save the date — details to follow'}}

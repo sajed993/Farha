@@ -91,7 +91,11 @@ function openReady(id){
   film:f.id,films:{hero:f.v,hall:f.v,detail:f.v,date:f.v,venue:f.p},
   ediPal:f._custom?'':f.id, ediSw:f._custom?f.sw:null,
   /* whatever the dashboard set for this film, else the scope default */
-  envStyle:readyCfg(f.id).env||'',vidStyle:readyCfg(f.id).vid||'',
+  /* the dashboard's choice first, then the film's own — an agency opening
+     ships with the curtain because a letter is the wrong object for it */
+  envStyle:readyCfg(f.id).env||f.env||'',vidStyle:readyCfg(f.id).vid||'',
+  /* a different face for a different kind of occasion */
+  ediFont:f.cat==='open'?'kufi':'',
   dress:f.dress?{t:(f.dress[S.lang]||[])[0]||'',d:(f.dress[S.lang]||[])[1]||'',sw:f.sw||null}:null,
   trackUrl:readyCfg(f.id).snd||f.snd||'',
   trackName:readyCfg(f.id).sndN||f.sndN||'',

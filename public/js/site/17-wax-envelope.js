@@ -3,7 +3,12 @@
    opening sequence; only the paper around it differs. The dashboard picks
    which is active and can switch any of them off. */
 
-const ENV_STYLES=['classic','full','macro','silk','press'];
+/* «الستارة» is the sixth, and the first that is not paper at all. An agency
+   opening is not a letter — nobody posts an envelope to announce a shop. It
+   is a curtain, and somebody pulls it. The interaction is the same seal in
+   the middle; only what surrounds it changes, which is the whole point of
+   this file. */
+const ENV_STYLES=['classic','full','macro','silk','press','curtain'];
 /* Fall back to classic when the chosen style has been switched off, so the
    guest never lands on a blank screen. */
 function envStyleActive(){
@@ -144,6 +149,12 @@ function envBody(style,c){
  if(style==='press')return `
    <span class="es-deboss"><span>${esc(inInitials(c.n).join(' '))}</span></span>
    <span class="es-ring"></span><span class="es-rule"></span>${NAMES}`;
+ if(style==='curtain')return `
+   <span class="cu-rod"><i class="cu-fin l"></i><i class="cu-fin r"></i></span>
+   <span class="cu-pan l"><i></i></span>
+   <span class="cu-pan r"><i></i></span>
+   <span class="cu-vig"></span>
+   <div class="cu-note"><span>${kick}</span><b>${nm}</b></div>`;
  /* classic */
  return `
    <div class="wenv-lin"></div>
