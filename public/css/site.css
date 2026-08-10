@@ -3840,43 +3840,65 @@ html[data-theme=dark] .hero-grain{mix-blend-mode:overlay;opacity:.16}
 @media(prefers-reduced-motion:reduce){.edi-ph.film video{transition:none}}
 
 /* ══════════ نافذة الطائرة ══════════
-   The seventh opening. A cabin wall, a porthole, and a shade that lifts on
-   three views before the invitation arrives. Everything except the views is
-   drawn, so it costs one gradient per part and scales to any screen. */
-.wenv.es-window{background:radial-gradient(120% 80% at 50% 4%,#1A212C 0%,#0D131B 46%,#070A0F 100%)}
+   The seventh opening: a cabin wall, a porthole, and a shade that lifts on
+   three views before the invitation arrives.
+
+   Everything here is positioned against .wenv-env, which in bleed mode is
+   `position:absolute; inset:0` at specificity 0,3,0. The first version sized
+   the porthole by styling .wenv-env at 0,2,0 and lost — so the window came out
+   390px wide across the whole screen with the content overflowing the viewport
+   by 118px. The cabin is the full-bleed box now, which is what it should have
+   been, and the porthole is placed inside it. */
+.wenv.es-window{background:#080B11;padding:0}
 .es-window .wenv-wax{display:none}
-.es-window .wenv-env{background:none;box-shadow:none;border:0;aspect-ratio:auto;
- width:min(78vw,330px);margin-inline:auto}
-.wn-wall{position:absolute;inset:-14% -22%;z-index:0;border-radius:26px;
- background:linear-gradient(158deg,#1B222C 0%,#111821 44%,#0A0F15 100%);
- box-shadow:inset 0 2px 0 rgba(255,255,255,.05)}
-.wn-port{position:relative;z-index:2;display:block;width:100%;aspect-ratio:1/1.42;
- cursor:pointer}
-.wn-bezel{position:absolute;inset:0;border-radius:48% 48% 46% 46%/40% 40% 52% 52%;
- background:linear-gradient(150deg,#59636F,#2A323C 42%,#414B57 70%,#1E252E);
- box-shadow:0 22px 48px -18px rgba(0,0,0,.85),inset 0 2px 7px rgba(255,255,255,.16)}
-.wn-glass{position:absolute;inset:7.5%;border-radius:48% 48% 46% 46%/40% 40% 52% 52%;
- overflow:hidden;background:#05080D;
+.es-window .wenv-env{filter:none}
+.es-window .wn-wall{position:absolute;inset:0;z-index:0;border-radius:0;
+ background:
+  radial-gradient(90% 46% at 50% 108%,rgba(255,255,255,.05),transparent 70%),
+  linear-gradient(158deg,#1E2530 0%,#141B24 42%,#0A0E14 100%)}
+/* the seat-back shadow above, so the wall is not a flat panel */
+.es-window .wn-wall::after{content:"";position:absolute;inset:0;
+ background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,transparent 26%,transparent 74%,rgba(0,0,0,.5) 100%)}
+
+.es-window .wn-port{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);
+ z-index:2;width:min(63vw,262px);aspect-ratio:1/1.44;cursor:pointer;
+ -webkit-tap-highlight-color:transparent}
+.wn-bezel{position:absolute;inset:0;border-radius:46% 46% 46% 46%/36% 36% 40% 40%;
+ background:linear-gradient(152deg,#5E6875,#2C343E 40%,#454F5B 68%,#20272F);
+ box-shadow:0 26px 54px -20px rgba(0,0,0,.9),inset 0 2px 7px rgba(255,255,255,.18)}
+/* the inner reveal — a real window is three rings deep, not one */
+.wn-bezel::after{content:"";position:absolute;inset:5.5%;
+ border-radius:46% 46% 46% 46%/36% 36% 40% 40%;
+ background:linear-gradient(152deg,#39414C,#1D242C 58%,#2E363F);
+ box-shadow:inset 0 2px 5px rgba(0,0,0,.6)}
+.wn-glass{position:absolute;inset:10%;border-radius:45% 45% 45% 45%/35% 35% 39% 39%;
+ overflow:hidden;background:#05080D;z-index:2;
  box-shadow:inset 0 0 0 2px rgba(8,12,18,.92),inset 0 10px 26px rgba(0,0,0,.6)}
 .wn-view{position:absolute;inset:0;opacity:0;transition:opacity .55s ease;
  background-size:cover;background-position:center;font-style:normal}
 .wn-view.on{opacity:1}
-.wn-view b{position:absolute;inset-inline:0;bottom:7%;text-align:center;font-weight:500;
- font-size:.74rem;letter-spacing:.12em;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.85)}
+.wn-view b{position:absolute;inset-inline:0;bottom:6%;text-align:center;font-weight:500;
+ font-size:clamp(.62rem,2.4vw,.74rem);letter-spacing:.1em;color:#fff;
+ text-shadow:0 2px 12px rgba(0,0,0,.9)}
 .wn-glare{position:absolute;inset:0;pointer-events:none;
- background:linear-gradient(112deg,rgba(255,255,255,.18) 0 15%,transparent 33%)}
-.wn-shade{position:absolute;left:0;right:0;top:0;height:100%;
- background:linear-gradient(180deg,#69737F,#525C68 68%,#454E59);
+ background:linear-gradient(112deg,rgba(255,255,255,.16) 0 14%,transparent 32%)}
+.wn-shade{position:absolute;left:-2%;right:-2%;top:0;height:100%;
+ background:linear-gradient(180deg,#6E7885,#576169 66%,#49525C);
  border-bottom:2px solid #2E3640;
  transform:translateY(0);transition:transform 1.05s cubic-bezier(.3,.85,.25,1)}
 .wn-shade::after{content:"";position:absolute;left:50%;bottom:6px;transform:translateX(-50%);
- width:34%;height:5px;border-radius:99px;background:rgba(18,24,30,.72)}
+ width:32%;height:5px;border-radius:99px;background:rgba(16,21,27,.75)}
 .wn-port.open .wn-shade{transform:translateY(-101%)}
-.wn-note{position:relative;z-index:3;text-align:center;margin-top:clamp(16px,3.4vh,26px)}
-.wn-note span{display:block;font-size:.72rem;letter-spacing:.2em;color:var(--gold-hi,#E3C685);
- margin-bottom:.5em}
-.wn-note b{display:block;font-family:var(--disp);font-weight:700;color:#F4ECDB;
- font-size:clamp(1.25rem,5.4vw,1.8rem);line-height:1.4}
+
+/* the name sits under the window, clear of it, and never in the flow */
+.es-window .wn-note{position:absolute;left:0;right:0;bottom:14%;z-index:3;text-align:center;
+ padding:0 8vw}
+.es-window .wn-note span{display:block;font-size:clamp(.62rem,2.4vw,.72rem);letter-spacing:.24em;
+ color:#E3C685;margin-bottom:.6em}
+.es-window .wn-note b{display:block;font-family:var(--disp);font-weight:700;color:#F4ECDB;
+ font-size:clamp(1.2rem,5.2vw,1.72rem);line-height:1.42;text-wrap:balance}
+.es-window .wenv-to{color:#8C97A6}
+.es-window .wenv-hint{color:#C6B79B}
 @media(prefers-reduced-motion:reduce){.wn-shade,.wn-view{transition:none}}
 
 /* The hint is told to fade when the envelope opens by setting its opacity

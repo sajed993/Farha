@@ -178,10 +178,22 @@ const FILMS_BUILTIN=[
     Two for a travel agency and two for any opening. These do not use the
     envelope: an agency is announced from behind a curtain, not posted in a
     letter — see envStyle 'curtain'. */
- /* The footage this film used had the word TRAVEL burnt into it at a size
-    that landed straight under the agency's Arabic name — flagged twice and
-    never fixable in CSS. This clip carries no text at all. */
- {id:'takeoff',cat:'open',layout:'sticky',icon:'compass',font:'kufi',v:'/media/inv/skyline.mp4',p:'/media/inv/skyline.jpg',env:'window',
+ /* The clean clip that came with the window references. الإقلاع keeps its own
+    footage; this is a second opening film for anyone who wants one with no
+    words in the picture at all. Plates rather than a sticky film, so the two
+    do not look like the same invitation twice. */
+ {id:'horizon',cat:'open',icon:'compass',font:'kufi',v:'/media/inv/skyline.mp4',p:'/media/inv/skyline.jpg',env:'window',
+  name:{ar:'الأفق',fr:'Horizon',en:'Horizon'},
+  blurb:{ar:'طائرة فوق بحرٍ من السحاب، وخطوط ضوء تمتدّ نحو الشمس',
+   fr:'Un avion au-dessus d’une mer de nuages, des traînées de lumière vers le soleil',
+   en:'A plane over a sea of cloud, light trails running to the sun'},
+  dress:{ar:['لباس أنيق','كحلي وذهبي'],fr:['Tenue élégante','Bleu nuit et or'],en:['Smart dress','Navy and gold']},
+  sw:['#141B24','#5E7C9E','#E6D8BE']},
+  /* No song of its own yet, so it plays the house piano. It is not given
+     الإقلاع's track: one song per film is the rule, and the check that
+     enforces it caught this before the commit did. */
+
+ {id:'takeoff',cat:'open',layout:'sticky',icon:'compass',font:'kufi',v:'/media/inv/takeoff.mp4',p:'/media/inv/takeoff.jpg',env:'window',
   name:{ar:'إقلاع',fr:'Décollage',en:'Take Off'},
   blurb:{ar:'مدينة تلمع من فوق، وأبراج تطلع من الضوء — السفر كما يُحكى',
    fr:'Une ville qui brille vue d’en haut et des tours qui montent dans la lumière',
