@@ -473,6 +473,14 @@ function readyView(){
   let h=`<option value="" ${cur?'':'selected'}>الافتراضي — لون الفيلم</option>`;
   for(const k in C) h+=`<option value="${k}" ${cur===k?'selected':''}>${C[k].ar}</option>`;
   return h;};
+ /* A photographed seal is the whole thing — its own shape, colour and die —
+    so choosing one puts the two settings above it out of work. Said on the
+    label rather than left for the owner to discover. */
+ const waxImgOpt=(cur)=>{
+  const S2=(typeof WAX_STAMPS!=='undefined')?WAX_STAMPS:{};
+  let h=`<option value="" ${cur?'':'selected'}>بلا — ختم مرسوم</option>`;
+  for(const k in S2) h+=`<option value="${k}" ${cur===k?'selected':''}>${S2[k]}</option>`;
+  return h;};
  const waxEmOpt=(cur)=>{
   const E=(typeof WAX_EMS!=='undefined')?WAX_EMS:{};
   let h='';
@@ -518,6 +526,9 @@ function readyView(){
       ${waxColOpt(o.wax!==undefined?o.wax:(shipped.wax||''))}</select></label>
      <label>ما يُطبع على الختم<select onchange="ctlFilm('${id}','waxEm',this.value)">
       ${waxEmOpt(o.waxEm!==undefined?o.waxEm:(shipped.waxEm||''))}</select></label>
+     <label>ختم جاهز (صورة)<select onchange="ctlFilm('${id}','waxImg',this.value)">
+      ${waxImgOpt(o.waxImg!==undefined?o.waxImg:(shipped.waxImg||''))}</select>
+      <small class="cmut">اختياره يُلغي اللون والنقش فوقه</small></label>
      <label>اسم الأغنية<input placeholder="${escA(shipped.sndN||'الفنّان — العنوان')}"
       value="${escA(o.sndN||'')}" onchange="ctlFilm('${id}','sndN',this.value)"></label>
      <div class="sndnow">${o.snd

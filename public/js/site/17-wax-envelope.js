@@ -62,9 +62,15 @@ function envWax(cv,initials){
   if(chosen)return chosen;
   const v=getComputedStyle(cv).getPropertyValue('--wax').trim();
   return v||'#2A2622';};
- /* and the emblem pressed into it, if it is not the initials */
- let wenvEm=null;
+ /* A photographed seal replaces the painted one outright; otherwise a mark
+    is pressed into the paint. */
+ let wenvEm=null,wenvStamp=null;
  (function(){
+  const st=(S.c&&S.c.waxImg)||'';
+  if(st&&typeof waxStampURL==='function'&&waxStampURL(st)){
+   const im=new Image();
+   im.onload=function(){wenvStamp=im;try{paint();}catch(e){}};
+   im.src=waxStampURL(st); return;}
   const k=(S.c&&S.c.waxEm)||'ini';
   if(k==='ini'||typeof waxEmblemURI!=='function')return;
   const im=new Image();
@@ -77,6 +83,11 @@ function envWax(cv,initials){
   cv.width=Math.max(140,Math.round(r.width*2));
   cv.height=Math.max(140,Math.round(r.height*2));
   const w=cv.width,h=cv.height,cx=w/2,cy=h/2,rr=Math.min(w,h)*.46;
+  if(wenvStamp && wenvStamp.complete && wenvStamp.naturalWidth){
+   ctx.clearRect(0,0,w,h);
+   const d=rr*2.14;
+   ctx.drawImage(wenvStamp,cx-d/2,cy-d/2,d,d);
+   return;}
   ctx.clearRect(0,0,w,h);
 
   /* the blob: a circle pushed out of true, the way poured wax spreads */

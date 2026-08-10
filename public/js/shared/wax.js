@@ -65,3 +65,41 @@ function waxEmblemURI(key, colour, weight) {
     + "</svg>";
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
+
+/* ═══ الأختام الجاهزة ═══
+   Photographed seals, cut out of their backgrounds and kept as WebP with an
+   alpha channel — 22 of them, 450 KB for the set. Choosing one replaces the
+   drawn seal entirely rather than restyling it: the picture already carries
+   its own shape, its own colour and its own die, so the colour and emblem
+   settings have nothing left to say. The dashboard says so on the label.
+
+   They are the whole seal, so they are drawn to fill the same circle the
+   painted one occupied, and the scratch-to-open still erases the canvas over
+   them exactly as before. */
+const WAX_STAMPS = {
+  'branch-black': 'غصن — أسود',
+  'wreath-sage': 'إكليل قلب — مريمي',
+  'branch-copper': 'غصن — نحاسي',
+  'doves-ivory': 'حمامتان — عاجي',
+  'branch-navy': 'غصن — كحلي',
+  'branch-blush': 'غصن — وردي باهت',
+  'birds-rose': 'عصفوران — وردي',
+  'birds-gold': 'عصفوران — ذهبي',
+  'branch-sage': 'غصن — مريمي',
+  'bismillah-pink': 'بسم الله — وردي',
+  'branch-silver': 'غصن — فضّي',
+  'invited-gold': 'You’re invited — ذهبي',
+  'feet-blue': 'قدمان صغيرتان — سماوي',
+  'cap-gold': 'قبّعة تخرّج — ذهبي',
+  'rings-gold': 'خاتمان — ذهبي',
+  'heart-gold': 'قلب — ذهبي',
+  'branch-burgundy': 'غصن — خمري',
+  'flowers-cream': 'زهور برّية — كريمي',
+  'bow-pink': 'شريطة — وردي',
+  'cherub-pink': 'ملاك — وردي',
+  'rose-burgundy': 'وردة على بيضاوي — خمري',
+  'blossom-gold': 'زهر — ذهبي',
+};
+function waxStampURL(key){
+  return WAX_STAMPS[key] ? ('/media/wax/' + key + '.webp') : '';
+}

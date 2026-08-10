@@ -437,18 +437,27 @@ function ediWaxShade(hex,amt){
  const f=a=>Math.max(0,Math.min(255,Math.round(amt>=0?a+(255-a)*amt:a*(1+amt))));
  return 'rgb('+f(r)+','+f(g)+','+f(b)+')';}
 
-let ediWaxImg=null;
+let ediWaxImg=null,ediWaxStamp=null;
 function ediWax(cv,initials){
  const ctx=cv.getContext('2d');if(!ctx)return;
  const seal=cv.parentElement;
  let strokes=0,done=false;
- /* the emblem, if this film is sealed with a mark rather than its initials */
- ediWaxImg=null;
- const emKey=(S.c&&S.c.waxEm)||'ini';
- if(emKey!=='ini' && typeof waxEmblemURI==='function'){
-  const im=new Image();
-  im.onload=function(){ediWaxImg=im;try{paint();}catch(e){}};
-  im.src=waxEmblemURI(emKey,'#1B1006',5.5);
+ /* Either a photographed seal, which is the whole thing, or a mark pressed
+    into the painted one. A stamp wins: it already carries its own shape and
+    colour, so there is nothing left for those settings to say. */
+ ediWaxImg=null; ediWaxStamp=null;
+ const stampKey=(S.c&&S.c.waxImg)||'';
+ if(stampKey && typeof waxStampURL==='function' && waxStampURL(stampKey)){
+  const st=new Image();
+  st.onload=function(){ediWaxStamp=st;try{paint();}catch(e){}};
+  st.src=waxStampURL(stampKey);
+ }else{
+  const emKey=(S.c&&S.c.waxEm)||'ini';
+  if(emKey!=='ini' && typeof waxEmblemURI==='function'){
+   const im=new Image();
+   im.onload=function(){ediWaxImg=im;try{paint();}catch(e){}};
+   im.src=waxEmblemURI(emKey,'#1B1006',5.5);
+  }
  }
 
  function paint(){
@@ -457,6 +466,10 @@ function ediWax(cv,initials){
   cv.height=Math.max(120,Math.round(r.height*2));
   const w=cv.width,h=cv.height,cx=w/2,cy=h/2,rr=Math.min(w,h)*.47;
   ctx.clearRect(0,0,w,h);
+  if(ediWaxStamp && ediWaxStamp.complete && ediWaxStamp.naturalWidth){
+   const d=rr*2.08;
+   ctx.drawImage(ediWaxStamp,cx-d/2,cy-d/2,d,d);
+   return;}
   /* The ramp was four fixed golds. It is built from one base colour now — the
      film's --wax, or whatever the dashboard chose for it — so a seal can be
      navy or sage without a second copy of this function. */
