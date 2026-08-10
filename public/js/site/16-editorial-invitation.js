@@ -421,10 +421,35 @@ function ediDateParts(){
  return {wd:'',day:num?(S.lang==='ar'?toAr(num[0]):num[0]):raw,rest:num?raw.replace(num[0],'').trim():''};}
 
 /* ---- the wax seal you scratch ---- */
+/* The seal's base colour: whatever the dashboard set for this film, else the
+   film palette's own --wax, else the old gold. */
+function ediWaxBase(el){
+ const chosen=(S.c&&S.c.waxCol&&typeof waxHex==='function')?waxHex(S.c.waxCol):'';
+ if(chosen)return chosen;
+ try{const v=getComputedStyle(el).getPropertyValue('--wax').trim();if(v)return v;}catch(e){}
+ return '#A87A28';}
+/* lighten or darken a hex by an amount, so one colour makes a whole ramp */
+function ediWaxShade(hex,amt){
+ const m=String(hex).replace('#','');
+ const n=m.length===3?m.split('').map(c=>c+c).join(''):m;
+ const v=parseInt(n,16);
+ let r=(v>>16)&255,g=(v>>8)&255,b=v&255;
+ const f=a=>Math.max(0,Math.min(255,Math.round(amt>=0?a+(255-a)*amt:a*(1+amt))));
+ return 'rgb('+f(r)+','+f(g)+','+f(b)+')';}
+
+let ediWaxImg=null;
 function ediWax(cv,initials){
  const ctx=cv.getContext('2d');if(!ctx)return;
  const seal=cv.parentElement;
  let strokes=0,done=false;
+ /* the emblem, if this film is sealed with a mark rather than its initials */
+ ediWaxImg=null;
+ const emKey=(S.c&&S.c.waxEm)||'ini';
+ if(emKey!=='ini' && typeof waxEmblemURI==='function'){
+  const im=new Image();
+  im.onload=function(){ediWaxImg=im;try{paint();}catch(e){}};
+  im.src=waxEmblemURI(emKey,'#1B1006',5.5);
+ }
 
  function paint(){
   const r=cv.getBoundingClientRect();
@@ -432,9 +457,13 @@ function ediWax(cv,initials){
   cv.height=Math.max(120,Math.round(r.height*2));
   const w=cv.width,h=cv.height,cx=w/2,cy=h/2,rr=Math.min(w,h)*.47;
   ctx.clearRect(0,0,w,h);
+  /* The ramp was four fixed golds. It is built from one base colour now — the
+     film's --wax, or whatever the dashboard chose for it — so a seal can be
+     navy or sage without a second copy of this function. */
+  const base=ediWaxBase(cv);
   const g=ctx.createRadialGradient(w*.36,h*.3,w*.04,cx,cy,rr*1.15);
-  g.addColorStop(0,'#D6A85B');g.addColorStop(.34,'#A87A28');
-  g.addColorStop(.7,'#6E4614');g.addColorStop(1,'#3E260A');
+  g.addColorStop(0,ediWaxShade(base,.32));g.addColorStop(.34,base);
+  g.addColorStop(.7,ediWaxShade(base,-.3));g.addColorStop(1,ediWaxShade(base,-.55));
   ctx.beginPath();
   const n=30;
   for(let i=0;i<=n;i++){const a=i/n*Math.PI*2;
@@ -449,10 +478,18 @@ function ediWax(cv,initials){
   ctx.beginPath();ctx.arc(cx,cy,rr*.72,0,Math.PI*2);ctx.stroke();
   ctx.strokeStyle='rgba(255,238,196,.16)';ctx.lineWidth=w*.006;
   ctx.beginPath();ctx.arc(cx,cy,rr*.62,0,Math.PI*2);ctx.stroke();
-  ctx.fillStyle='rgba(34,18,2,.6)';
-  ctx.font='700 '+Math.round(w*.24)+'px '+(S.lang==='ar'?'"Aref Ruqaa",serif':'"Cormorant Garamond",serif');
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(initials||'✦',cx,cy+w*.015);}
+  const em=(S.c&&S.c.waxEm)||'ini';
+  if(em!=='ini' && ediWaxImg && ediWaxImg.complete && ediWaxImg.naturalWidth){
+   /* debossed: a pale copy a hair above, the dark one in place */
+   const d=rr*1.06, x=cx-d/2, y=cy-d/2;
+   ctx.globalAlpha=.30; ctx.drawImage(ediWaxImg,x,y-w*.008,d,d);
+   ctx.globalAlpha=.62; ctx.drawImage(ediWaxImg,x,y,d,d);
+   ctx.globalAlpha=1;
+  }else{
+   ctx.fillStyle='rgba(20,12,4,.62)';
+   ctx.font='700 '+Math.round(w*.24)+'px '+(S.lang==='ar'?'"Aref Ruqaa",serif':'"Cormorant Garamond",serif');
+   ctx.textAlign='center';ctx.textBaseline='middle';
+   ctx.fillText(initials||'✦',cx,cy+w*.015);}}
 
  const at=e=>{const r=cv.getBoundingClientRect();
   const p=(e.touches&&e.touches[0])||e;

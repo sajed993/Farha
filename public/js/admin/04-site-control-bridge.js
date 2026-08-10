@@ -464,6 +464,20 @@ function readyView(){
   return h;};
  const fontOpt=(cur)=>FONTL.map(([k,n])=>
    `<option value="${k}" ${cur===k?'selected':''}>${n}</option>`).join('');
+ /* The wax seal: its colour, and what is pressed into it. Both the envelope
+    the guest breaks open and the seal they scratch to find the date read the
+    same two settings, so a film is sealed once rather than twice. Empty means
+    the colour the film's own palette carries and the couple's initials. */
+ const waxColOpt=(cur)=>{
+  const C=(typeof WAX_COLS!=='undefined')?WAX_COLS:{};
+  let h=`<option value="" ${cur?'':'selected'}>الافتراضي — لون الفيلم</option>`;
+  for(const k in C) h+=`<option value="${k}" ${cur===k?'selected':''}>${C[k].ar}</option>`;
+  return h;};
+ const waxEmOpt=(cur)=>{
+  const E=(typeof WAX_EMS!=='undefined')?WAX_EMS:{};
+  let h='';
+  for(const k in E) h+=`<option value="${k}" ${cur===k?'selected':''}>${E[k]}</option>`;
+  return h;};
  return newFilmsView()
  + ctlCard('💰 سعر الدعوات الجاهزة',
   'السعر المعروض والسعر المشطوب فوقه. اجعلوا المشطوب صفرًا لإخفاء الخصم.',
@@ -500,6 +514,10 @@ function readyView(){
       ${iconOpt(o.icon!==undefined?o.icon:(shipped.icon||''))}</select></label>
      <label>خطّ الدعوة<select onchange="ctlFilm('${id}','font',this.value)">
       ${fontOpt(o.font!==undefined?o.font:(shipped.font||''))}</select></label>
+     <label>لون الختم<select onchange="ctlFilm('${id}','wax',this.value)">
+      ${waxColOpt(o.wax!==undefined?o.wax:(shipped.wax||''))}</select></label>
+     <label>ما يُطبع على الختم<select onchange="ctlFilm('${id}','waxEm',this.value)">
+      ${waxEmOpt(o.waxEm!==undefined?o.waxEm:(shipped.waxEm||''))}</select></label>
      <label>اسم الأغنية<input placeholder="${escA(shipped.sndN||'الفنّان — العنوان')}"
       value="${escA(o.sndN||'')}" onchange="ctlFilm('${id}','sndN',this.value)"></label>
      <div class="sndnow">${o.snd

@@ -104,6 +104,9 @@ function openReady(id){
   /* the occasion, so the invitation knows whose words to use — a wedding
      matches nothing in EDI_WORDS and keeps every default, which is intended */
   ediCat:f.cat||'',
+  /* the seal: the dashboard's choice for this film, then the film's own */
+  waxCol:readyCfg(f.id).wax||f.wax||'',
+  waxEm:readyCfg(f.id).waxEm||f.waxEm||'',
   ediLayout:readyCfg(f.id).layout||f.layout||'',
   ediIcon:readyCfg(f.id).icon||f.icon||'',
   ediFont:readyCfg(f.id).font||f.font||'',

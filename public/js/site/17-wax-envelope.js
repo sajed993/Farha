@@ -56,9 +56,21 @@ function envShade(hex,amt){
 function envWax(cv,initials){
  const ctx=cv.getContext('2d');if(!ctx)return null;
  let done=false,strokes=0;
+ /* the dashboard's colour for this film first, then the film palette's own */
  const waxOf=()=>{
+  const chosen=(S.c&&S.c.waxCol&&typeof waxHex==='function')?waxHex(S.c.waxCol):'';
+  if(chosen)return chosen;
   const v=getComputedStyle(cv).getPropertyValue('--wax').trim();
   return v||'#2A2622';};
+ /* and the emblem pressed into it, if it is not the initials */
+ let wenvEm=null;
+ (function(){
+  const k=(S.c&&S.c.waxEm)||'ini';
+  if(k==='ini'||typeof waxEmblemURI!=='function')return;
+  const im=new Image();
+  im.onload=function(){wenvEm=im;try{paint();}catch(e){}};
+  im.src=waxEmblemURI(k,'#000',5.5);
+ })();
 
  function paint(){
   const r=cv.getBoundingClientRect();
@@ -95,13 +107,20 @@ function envWax(cv,initials){
   ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=w*.013;
   ctx.beginPath();ctx.arc(cx,cy,rr*.69,0,Math.PI*2);ctx.stroke();
 
-  const fs=Math.round(w*.23);
-  ctx.font='700 '+fs+'px '+(S.lang==='ar'?'"Aref Ruqaa",serif':'"Cormorant Garamond",serif');
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillStyle='rgba(0,0,0,.5)';
-  ctx.fillText(initials||'✦',cx,cy+w*.018);
-  ctx.fillStyle='rgba(255,255,255,.15)';
-  ctx.fillText(initials||'✦',cx,cy+w*.004);}
+  const em=(S.c&&S.c.waxEm)||'ini';
+  if(em!=='ini' && wenvEm && wenvEm.complete && wenvEm.naturalWidth){
+   const d=rr*1.02, x=cx-d/2, y=cy-d/2;
+   ctx.globalAlpha=.22; ctx.drawImage(wenvEm,x,y-w*.01,d,d);   /* the lit edge */
+   ctx.globalAlpha=.5;  ctx.drawImage(wenvEm,x,y,d,d);         /* the press */
+   ctx.globalAlpha=1;
+  }else{
+   const fs=Math.round(w*.23);
+   ctx.font='700 '+fs+'px '+(S.lang==='ar'?'"Aref Ruqaa",serif':'"Cormorant Garamond",serif');
+   ctx.textAlign='center';ctx.textBaseline='middle';
+   ctx.fillStyle='rgba(0,0,0,.5)';
+   ctx.fillText(initials||'✦',cx,cy+w*.018);
+   ctx.fillStyle='rgba(255,255,255,.15)';
+   ctx.fillText(initials||'✦',cx,cy+w*.004);}}
 
  const at=e=>{const r=cv.getBoundingClientRect();
   const p=(e.touches&&e.touches[0])||e;

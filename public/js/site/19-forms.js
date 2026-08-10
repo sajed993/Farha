@@ -107,7 +107,10 @@ const FRM_IDEAS = {
              'حلمٌ تحقّق، ونحبّ أن نحتفل به معكم'],
       save: ['احفظوا التاريخ — التفاصيل قريبًا',
              'شيءٌ جميل قادم، ونريدكم معنا فيه',
-             'سجّلوا هذا اليوم عندكم من الآن']
+             'سجّلوا هذا اليوم عندكم من الآن'],
+      open: ['يسرّنا دعوتكم لحضور افتتاح مقرّنا الجديد',
+             'بابٌ جديد يُفتح، ونحبّ أن تكونوا أوّل من يعبره',
+             'اشتغلنا على هذا المكان طويلًا — تعالوا نفتحه معًا']
     },
     wish: ['ألوان دافئة، ذهبي وكريمي، وموسيقى هادئة',
            'شيء بسيط وأنيق — أبيض وأخضر، بلا زخرفة كثيرة',
@@ -132,6 +135,9 @@ const FRM_IDEAS = {
       grad: ['Après des années de travail, nous y sommes — partagez notre joie',
              'Nous vous invitons à la cérémonie de remise des diplômes',
              'Un rêve réalisé, que nous aimerions fêter avec vous'],
+      open: ['Nous avons le plaisir de vous convier à l’inauguration de notre nouvelle adresse',
+             'Une porte s’ouvre — soyez les premiers à la franchir',
+             'Nous avons longtemps travaillé sur ce lieu : ouvrons-le ensemble'],
       save: ['Réservez la date — les détails suivront',
              'Quelque chose de beau arrive, et nous vous y voulons',
              'Notez ce jour dès maintenant']
@@ -159,6 +165,9 @@ const FRM_IDEAS = {
       grad: ['After years of work, we made it — share the joy',
              'We invite you to the graduation ceremony',
              'A dream come true, and we would love to celebrate it with you'],
+      open: ['We are pleased to invite you to the opening of our new place',
+             'A new door opens — be the first through it',
+             'We worked on this place for a long time. Come and open it with us'],
       save: ['Save the date — details to follow',
              'Something lovely is coming, and we want you there',
              'Put this day in your calendar now']
@@ -172,6 +181,22 @@ const FRM_IDEAS = {
 };
 function frmIdeas() { return FRM_IDEAS[S.lang] || FRM_IDEAS.ar; }
 
+/* Which occasions the form offers. This was a hand-written list, so adding
+   افتتاح to the shelf added it everywhere except here — the one place a
+   customer actually orders from. It is read off the catalogue now: every
+   occasion RD_CATS knows about that has at least one film still on the shelf.
+   Adding the next one will need no edit here at all. */
+function frmOccs() {
+  let cats = ['wed','henna','bday','baby','grad','save'];
+  try {
+    const films = readyCatalogue().filter(x => x.v &&
+      (typeof readyCfg !== 'function' || readyCfg(x.id).vis !== false));
+    const have = RD_CATS.filter(k => k !== 'all' && films.some(f => f.cat === k));
+    if (have.length) cats = have;
+  } catch (e) {}
+  return cats.filter(k => (t().rdCats || {})[k]);
+}
+
 /* Which name boxes an occasion needs. [id, label, required] */
 function frmNameFields(cat) {
   const N = t().ordN;
@@ -179,6 +204,7 @@ function frmNameFields(cat) {
   if (cat === 'bday') return [['ordNameA', N.celebrant, true], ['ordNameB', N.age, false]];
   if (cat === 'grad') return [['ordNameA', N.grad, true], ['ordNameB', N.degree, false]];
   if (cat === 'henna') return [['ordNameA', N.bride, true], ['ordNameB', N.groomOpt, false]];
+  if (cat === 'open') return [['ordNameA', N.biz, true], ['ordNameB', N.bizWhat, false]];
   return [['ordNameA', N.groom, true], ['ordNameB', N.bride, true]];
 }
 /* the one string the invitation is titled with, built from the parts */
@@ -188,6 +214,7 @@ function frmJoinNames(cat, a, b) {
   if (!b) return a;
   if (cat === 'bday') return a;                   /* the second box is an age */
   if (cat === 'baby' || cat === 'grad') return a; /* parents / degree are context */
+  if (cat === 'open') return a;                   /* the trade is context, not a name */
   return a + (S.lang === 'ar' ? ' و ' : ' & ') + b;
 }
 
@@ -222,7 +249,7 @@ function frmEventHTML(cat) {
   const fields = frmNameFields(cat);
   const msgIdeas = frmIdeas().msg[cat] || frmIdeas().msg.wed;
   return `
-    <div class="frm-occs">${['wed','henna','bday','baby','grad','save'].map(k =>
+    <div class="frm-occs">${frmOccs().map(k =>
       `<button type="button" class="frm-occ ${cat === k ? 'on' : ''}"
         onclick="frmSetOcc('${k}')">${esc(T.rdCats[k])}</button>`).join('')}</div>
 
