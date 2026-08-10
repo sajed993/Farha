@@ -3838,3 +3838,50 @@ html[data-theme=dark] .hero-grain{mix-blend-mode:overlay;opacity:.16}
 .edi-ph.film video{opacity:0;transition:opacity .5s ease}
 .edi-ph.film video.on{opacity:1}
 @media(prefers-reduced-motion:reduce){.edi-ph.film video{transition:none}}
+
+/* ══════════ نافذة الطائرة ══════════
+   The seventh opening. A cabin wall, a porthole, and a shade that lifts on
+   three views before the invitation arrives. Everything except the views is
+   drawn, so it costs one gradient per part and scales to any screen. */
+.wenv.es-window{background:radial-gradient(120% 80% at 50% 4%,#1A212C 0%,#0D131B 46%,#070A0F 100%)}
+.es-window .wenv-wax{display:none}
+.es-window .wenv-env{background:none;box-shadow:none;border:0;aspect-ratio:auto;
+ width:min(78vw,330px);margin-inline:auto}
+.wn-wall{position:absolute;inset:-14% -22%;z-index:0;border-radius:26px;
+ background:linear-gradient(158deg,#1B222C 0%,#111821 44%,#0A0F15 100%);
+ box-shadow:inset 0 2px 0 rgba(255,255,255,.05)}
+.wn-port{position:relative;z-index:2;display:block;width:100%;aspect-ratio:1/1.42;
+ cursor:pointer}
+.wn-bezel{position:absolute;inset:0;border-radius:48% 48% 46% 46%/40% 40% 52% 52%;
+ background:linear-gradient(150deg,#59636F,#2A323C 42%,#414B57 70%,#1E252E);
+ box-shadow:0 22px 48px -18px rgba(0,0,0,.85),inset 0 2px 7px rgba(255,255,255,.16)}
+.wn-glass{position:absolute;inset:7.5%;border-radius:48% 48% 46% 46%/40% 40% 52% 52%;
+ overflow:hidden;background:#05080D;
+ box-shadow:inset 0 0 0 2px rgba(8,12,18,.92),inset 0 10px 26px rgba(0,0,0,.6)}
+.wn-view{position:absolute;inset:0;opacity:0;transition:opacity .55s ease;
+ background-size:cover;background-position:center;font-style:normal}
+.wn-view.on{opacity:1}
+.wn-view b{position:absolute;inset-inline:0;bottom:7%;text-align:center;font-weight:500;
+ font-size:.74rem;letter-spacing:.12em;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.85)}
+.wn-glare{position:absolute;inset:0;pointer-events:none;
+ background:linear-gradient(112deg,rgba(255,255,255,.18) 0 15%,transparent 33%)}
+.wn-shade{position:absolute;left:0;right:0;top:0;height:100%;
+ background:linear-gradient(180deg,#69737F,#525C68 68%,#454E59);
+ border-bottom:2px solid #2E3640;
+ transform:translateY(0);transition:transform 1.05s cubic-bezier(.3,.85,.25,1)}
+.wn-shade::after{content:"";position:absolute;left:50%;bottom:6px;transform:translateX(-50%);
+ width:34%;height:5px;border-radius:99px;background:rgba(18,24,30,.72)}
+.wn-port.open .wn-shade{transform:translateY(-101%)}
+.wn-note{position:relative;z-index:3;text-align:center;margin-top:clamp(16px,3.4vh,26px)}
+.wn-note span{display:block;font-size:.72rem;letter-spacing:.2em;color:var(--gold-hi,#E3C685);
+ margin-bottom:.5em}
+.wn-note b{display:block;font-family:var(--disp);font-weight:700;color:#F4ECDB;
+ font-size:clamp(1.25rem,5.4vw,1.8rem);line-height:1.4}
+@media(prefers-reduced-motion:reduce){.wn-shade,.wn-view{transition:none}}
+
+/* The hint is told to fade when the envelope opens by setting its opacity
+   inline — but it also carries a pulsing animation, and an animation beats an
+   inline style. So it never faded, in any of the seven opening styles: it sat
+   over the whole sequence, still pulsing, telling the guest to press a seal
+   they had already pressed. Killing the animation is what actually hides it. */
+.wenv-hint.hid{animation:none;opacity:0}

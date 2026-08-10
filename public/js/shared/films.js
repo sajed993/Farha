@@ -178,7 +178,10 @@ const FILMS_BUILTIN=[
     Two for a travel agency and two for any opening. These do not use the
     envelope: an agency is announced from behind a curtain, not posted in a
     letter — see envStyle 'curtain'. */
- {id:'takeoff',cat:'open',layout:'sticky',icon:'compass',font:'kufi',v:'/media/inv/takeoff.mp4',p:'/media/inv/takeoff.jpg',env:'curtain',
+ /* The footage this film used had the word TRAVEL burnt into it at a size
+    that landed straight under the agency's Arabic name — flagged twice and
+    never fixable in CSS. This clip carries no text at all. */
+ {id:'takeoff',cat:'open',layout:'sticky',icon:'compass',font:'kufi',v:'/media/inv/skyline.mp4',p:'/media/inv/skyline.jpg',env:'window',
   name:{ar:'إقلاع',fr:'Décollage',en:'Take Off'},
   blurb:{ar:'مدينة تلمع من فوق، وأبراج تطلع من الضوء — السفر كما يُحكى',
    fr:'Une ville qui brille vue d’en haut et des tours qui montent dans la lumière',

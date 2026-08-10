@@ -896,6 +896,10 @@ function ediClockGive(v){
 function ediStartMusic(root){
  try{
   if(!S.c.music||!S.c.autoplay)return;
+  /* the window opening starts the song on the first lift of the shade, six
+     seconds before the invitation mounts — starting it again here would cut
+     the track back to its beginning just as the guest arrives */
+  if(S.__musicOn){S.__musicOn=false;return;}
   const v=root&&root.querySelector('.edi-hero video, .edi-ph.film video');
   let done=false;
   const go=()=>{ if(done)return; done=true;
