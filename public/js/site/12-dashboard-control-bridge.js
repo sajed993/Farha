@@ -342,24 +342,6 @@ function scrollSec(id){
 function toggleLang(){S.lang=S.lang==='ar'?'fr':S.lang==='fr'?'en':'ar';
  document.documentElement.dir=T[S.lang].dir;document.documentElement.lang=S.lang;
  render();}
-/* ── الوضع الليلي ──
-   The choice lives on <html> so the CSS can see it, and in localStorage so it
-   survives a reload. It is deliberately not in CFG: this is the viewer's
-   preference for their own screen, not a setting the owner publishes to
-   everyone from the dashboard. Nothing here re-renders — flipping tokens is
-   the browser's job, and a render() would tear down any open film. */
-function currentTheme(){
- return document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';}
-function setTheme(t){
- t=(t==='light')?'light':'dark';
- document.documentElement.setAttribute('data-theme',t);
- try{localStorage.setItem('farha-theme',t);}catch(e){}
- document.querySelectorAll('.theme-btn').forEach(function(b){
-  b.setAttribute('aria-pressed',t==='dark'?'true':'false');
-  b.setAttribute('aria-label',t==='dark'?T[S.lang].themeToLight:T[S.lang].themeToDark);
-  b.setAttribute('title',t==='dark'?T[S.lang].themeToLight:T[S.lang].themeToDark);});}
-function toggleTheme(){setTheme(currentTheme()==='dark'?'light':'dark');}
-
 function setC(k,v){S.c[k]=v;render();}
 function addEmoji(e){S.c.m=(S.c.m?S.c.m+' ':'')+e;render();}
 function addDay(){S.c.program.push({time:'19:00',title:'',place:'',map:'',music:0,photos:[]});render();}
