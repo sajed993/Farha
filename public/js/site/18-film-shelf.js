@@ -85,9 +85,13 @@ function openReady(id){
  const f=readyFilm(id);
  demoBackup={c:JSON.parse(JSON.stringify(S.c))};
  const when=new Date(Date.now()+37*864e5+5*36e5);
- S.c={...S.c,...readyDef(f,S.lang),font:0,pal:0,anim:'edi',music:1,autoplay:true,musicStart:'open',
+ /* The printed date and the countdown used to disagree: the date was text
+    from the defaults and the countdown was always 37 days from today. A film
+    that names its own day now counts down to that day. */
+ const dd=readyDef(f,S.lang);
+ S.c={...S.c,...dd,font:0,pal:0,anim:'edi',music:1,autoplay:true,musicStart:'open',
   qr:false,maps:'https://maps.google.com',story:[],guest:'',
-  when:when.toISOString().slice(0,16),
+  when:dd.when||when.toISOString().slice(0,16),
   film:f.id,films:{hero:f.v,hall:f.v,detail:f.v,date:f.v,venue:f.p},
   ediPal:f._custom?'':f.id, ediSw:f._custom?f.sw:null,
   /* whatever the dashboard set for this film, else the scope default */
@@ -108,7 +112,7 @@ function openReady(id){
   trackTo:+readyCfg(f.id).snd1||0,
   dir:f.cat==='wed'?ediDemoNote('dir'):null,
   stay:f.cat==='wed'?ediDemoNote('stay'):null,
-  program:ediDemoProgram(f.cat)};
+  program:ediDemoProgram(f.cat,f)};
 
  /* anything typed in the dashboard wins over the shipped copy */
  const x=readyTxt(f.id), pick=(v,fb)=>(v&&String(v).trim())?v:fb;

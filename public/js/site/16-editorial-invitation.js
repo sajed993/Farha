@@ -639,7 +639,13 @@ function editorialDemo(){
   when:when.toISOString().slice(0,16),program:ediDemoProgram()};
  editorialOpen();}
 
-function ediDemoProgram(cat){
+function ediDemoProgram(cat,f){
+ /* A wedding that carries its own running order uses it; everything else
+    falls back to the one shared by its occasion. */
+ if(typeof readyProgDemo==='function'){
+  const own=readyProgDemo(f,S.lang);
+  if(own)return own.map(function(r){
+   return {time:r[0],title:r[1],place:r[2],map:'',music:0,photos:[]};});}
  const P={
   wed:{ar:[['16:00','استقبال الضيوف','بهو القصر'],['17:00','عقد القران','قاعة الياسمين'],
     ['18:30','كوكتيل وصور','الشرفة المطلّة على البحر'],['20:00','العشاء','القاعة الكبرى'],

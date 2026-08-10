@@ -269,11 +269,199 @@ const RD_DEF = {
    fr:{t:'Réservez la date',n:'Nour & Karim',d:'14 · 09 · 2026',p:'Détails à suivre',m:'Réservez la date — les détails suivront'},
    en:{t:'Save the Date',n:'Nour & Karim',d:'14 · 09 · 2026',p:'Details to follow',m:'Save the date — details to follow'}}
 };
-/* the placeholder text a film opens with */
+/* ═══ كل عرس بأهله ═══
+   Every wedding on the shelf used to open on the same couple, the same hall
+   and the same five lines of programme, because all ten fell back to
+   RD_DEF.wed. Ten films, one wedding — which is the first thing a visitor
+   notices after tapping through two of them.
+
+   Each film has its own now, chosen against what is actually in its footage:
+   the mosaic floor is married in the medina, the wisteria in a spring garden,
+   the record player in a small house in Sidi Bou Said. The dates run across
+   two seasons and every one of them is still ahead, so the countdown never
+   opens on a wedding that has already happened. Anything written in the
+   dashboard still wins over all of it. */
+const WED_DEMO = {
+ marble:{when:'2026-09-14T17:00',
+  ar:{n:'نور & كريم',d:'14 سبتمبر 2026',p:'قصر الأنوار، قمرت',
+      m:'يتشرّفان بدعوتكم لمشاركتهما فرحة زفافهما'},
+  fr:{n:'Nour & Karim',d:'14 · 09 · 2026',p:'Palais El Anouar, Gammarth',
+      m:'Nous serions honorés de partager notre bonheur avec vous'},
+  en:{n:'Nour & Karim',d:'14 · 09 · 2026',p:'El Anouar Palace, Gammarth',
+      m:'We would be honoured to share our joy with you'},
+  prog:{ar:[['17:00','استقبال الضيوف','بهو الأعمدة'],['18:00','عقد القران','القاعة الرخامية'],
+        ['19:30','الصور على الدرج','الدرج الكبير'],['20:30','العشاء','القاعة الكبرى'],
+        ['22:30','السهرة','الشرفة']],
+   fr:[['17:00','Accueil des invités','Hall des colonnes'],['18:00','Cérémonie','Salle de marbre'],
+       ['19:30','Photos sur l’escalier','Le grand escalier'],['20:30','Dîner','Grande salle'],
+       ['22:30','Soirée','La terrasse']],
+   en:[['17:00','Guest welcome','The colonnade'],['18:00','Ceremony','The marble hall'],
+       ['19:30','Photographs on the stairs','The grand staircase'],['20:30','Dinner','The great hall'],
+       ['22:30','Party','The terrace']]}},
+
+ oneday:{when:'2026-10-03T18:00',
+  ar:{n:'سارة & مهدي',d:'3 أكتوبر 2026',p:'الفيلا البيضاء، سيدي بوسعيد',
+      m:'قرّرنا أن نبدأ من هنا — وأحببنا أن تكونوا معنا'},
+  fr:{n:'Sarra & Mehdi',d:'03 · 10 · 2026',p:'La Villa Blanche, Sidi Bou Saïd',
+      m:'Nous commençons ici — et nous vous voulons avec nous'},
+  en:{n:'Sarra & Mehdi',d:'03 · 10 · 2026',p:'The White Villa, Sidi Bou Said',
+      m:'We are starting here — and we want you with us'},
+  prog:{ar:[['18:00','الاستقبال','الفناء الأبيض'],['19:00','التوقيع','الصالون'],
+        ['20:00','الصور','السطح'],['21:00','العشاء','القاعة'],['23:00','السهرة','المسبح']],
+   fr:[['18:00','Accueil','La cour blanche'],['19:00','Signature','Le salon'],
+       ['20:00','Photos','Le toit'],['21:00','Dîner','La salle'],['23:00','Soirée','La piscine']],
+   en:[['18:00','Welcome','The white courtyard'],['19:00','The signing','The salon'],
+       ['20:00','Photographs','The roof'],['21:00','Dinner','The hall'],['23:00','Party','Poolside']]}},
+
+ wisteria:{when:'2027-05-15T16:30',
+  ar:{n:'ليلى & أنيس',d:'15 ماي 2027',p:'دار الجلّولي، الحمّامات',
+      m:'في أوّل أيام الوستارية — ندعوكم لفرحنا'},
+  fr:{n:'Leila & Anis',d:'15 · 05 · 2027',p:'Dar Jelloulli, Hammamet',
+      m:'Aux premiers jours des glycines — venez fêter avec nous'},
+  en:{n:'Leila & Anis',d:'15 · 05 · 2027',p:'Dar Jelloulli, Hammamet',
+      m:'In the first days of the wisteria — come and celebrate with us'},
+  prog:{ar:[['16:30','استقبال في الحديقة','تحت الوستارية'],['17:30','عقد القران','الباب العاجي'],
+        ['19:00','الشاي والصور','البرغولا'],['20:30','العشاء','حديقة الليمون'],
+        ['22:30','السهرة','الفناء']],
+   fr:[['16:30','Accueil au jardin','Sous les glycines'],['17:30','Cérémonie','La porte ivoire'],
+       ['19:00','Thé & photos','La pergola'],['20:30','Dîner','Jardin des citronniers'],
+       ['22:30','Soirée','La cour']],
+   en:[['16:30','Welcome in the garden','Under the wisteria'],['17:30','Ceremony','The ivory door'],
+       ['19:00','Tea & photographs','The pergola'],['20:30','Dinner','The lemon garden'],
+       ['22:30','Party','The courtyard']]}},
+
+ rings:{when:'2027-06-20T17:30',
+  ar:{n:'إيناس & زياد',d:'20 جوان 2027',p:'دار البحر، المرسى',
+      m:'خاتمان، وبيتٌ يطلّ على البحر — كونوا هناك'},
+  fr:{n:'Ines & Ziad',d:'20 · 06 · 2027',p:'Dar El Bahr, La Marsa',
+      m:'Deux anneaux et une maison face à la mer — soyez-y'},
+  en:{n:'Ines & Ziad',d:'20 · 06 · 2027',p:'Dar El Bahr, La Marsa',
+      m:'Two rings and a house facing the sea — be there'},
+  prog:{ar:[['17:30','الاستقبال','الشرفة الزرقاء'],['18:30','تبادل الخواتم','القاعة المقوّسة'],
+        ['20:00','الصور عند الغروب','رصيف البحر'],['21:00','العشاء','القاعة'],
+        ['23:00','السهرة','السطح']],
+   fr:[['17:30','Accueil','La terrasse bleue'],['18:30','Échange des anneaux','La salle en arche'],
+       ['20:00','Photos au coucher','Le front de mer'],['21:00','Dîner','La salle'],
+       ['23:00','Soirée','Le toit']],
+   en:[['17:30','Welcome','The blue terrace'],['18:30','Exchange of rings','The arched hall'],
+       ['20:00','Photographs at sunset','The seafront'],['21:00','Dinner','The hall'],
+       ['23:00','Party','The roof']]}},
+
+ zellij:{when:'2026-09-26T18:00',
+  ar:{n:'ريم & حمزة',d:'26 سبتمبر 2026',p:'دار الباشا، المدينة العتيقة، تونس',
+      m:'في دارٍ قديمة وأرضٍ من زليج — ندعوكم'},
+  fr:{n:'Rym & Hamza',d:'26 · 09 · 2026',p:'Dar El Bacha, Médina de Tunis',
+      m:'Dans une vieille demeure, sur un sol de zellige — nous vous invitons'},
+  en:{n:'Rym & Hamza',d:'26 · 09 · 2026',p:'Dar El Bacha, Tunis Medina',
+      m:'In an old house, on a floor of zellij — we invite you'},
+  prog:{ar:[['18:00','استقبال الضيوف','السقيفة'],['19:00','عقد القران','وسط الدار'],
+        ['20:00','الصور من فوق الدرج','الدرابزين'],['21:00','العشاء','القاعة المقبّبة'],
+        ['23:00','المزود','وسط الدار']],
+   fr:[['18:00','Accueil des invités','La skifa'],['19:00','Cérémonie','Le patio'],
+       ['20:00','Photos depuis l’escalier','La rampe'],['21:00','Dîner','La salle voûtée'],
+       ['23:00','Mezoued','Le patio']],
+   en:[['18:00','Guest welcome','The entrance hall'],['19:00','Ceremony','The courtyard'],
+       ['20:00','Photographs from the stairs','The iron rail'],['21:00','Dinner','The vaulted room'],
+       ['23:00','Mezoued','The courtyard']]}},
+
+ ray:{when:'2026-10-10T16:00',
+  ar:{n:'مريم & يوسف',d:'10 أكتوبر 2026',p:'قاعة النور، الكرم',
+      m:'ضوءٌ من نافذة عالية، ووعدٌ نقوله أمامكم'},
+  fr:{n:'Meriem & Youssef',d:'10 · 10 · 2026',p:'Salle Ennour, Le Kram',
+      m:'La lumière d’une haute fenêtre, et une promesse devant vous'},
+  en:{n:'Meriem & Youssef',d:'10 · 10 · 2026',p:'Ennour Hall, Le Kram',
+      m:'Light from a high window, and a promise said in front of you'},
+  prog:{ar:[['16:00','الاستقبال','البهو'],['17:00','عقد القران','القاعة العالية'],
+        ['18:30','الصور في الضوء','النوافذ الشمالية'],['20:00','العشاء','القاعة'],
+        ['22:00','السهرة','الفناء']],
+   fr:[['16:00','Accueil','Le hall'],['17:00','Cérémonie','La haute salle'],
+       ['18:30','Photos dans la lumière','Les fenêtres nord'],['20:00','Dîner','La salle'],
+       ['22:00','Soirée','La cour']],
+   en:[['16:00','Welcome','The hall'],['17:00','Ceremony','The high room'],
+       ['18:30','Photographs in the light','The north windows'],['20:00','Dinner','The hall'],
+       ['22:00','Party','The courtyard']]}},
+
+ vow:{when:'2027-06-05T17:00',
+  ar:{n:'هالة & سيف',d:'5 جوان 2027',p:'دار الضيافة، قرطاج',
+      m:'يدٌ في يد، بلا ضجيج — نحبّكم معنا'},
+  fr:{n:'Hala & Seif',d:'05 · 06 · 2027',p:'Dar Edhiafa, Carthage',
+      m:'Main dans la main, sans bruit — nous vous voulons près de nous'},
+  en:{n:'Hala & Seif',d:'05 · 06 · 2027',p:'Dar Edhiafa, Carthage',
+      m:'Hand in hand, without noise — we would like you near'},
+  prog:{ar:[['17:00','الاستقبال','الحديقة'],['18:00','العهد','تحت الأقواس'],
+        ['19:30','الصور','ممرّ الزيتون'],['20:30','العشاء','الرواق'],['22:30','السهرة','الحديقة']],
+   fr:[['17:00','Accueil','Le jardin'],['18:00','Les vœux','Sous les arches'],
+       ['19:30','Photos','L’allée des oliviers'],['20:30','Dîner','La galerie'],
+       ['22:30','Soirée','Le jardin']],
+   en:[['17:00','Welcome','The garden'],['18:00','The vows','Under the arches'],
+       ['19:30','Photographs','The olive walk'],['20:30','Dinner','The gallery'],
+       ['22:30','Party','The garden']]}},
+
+ stair:{when:'2026-10-24T18:30',
+  ar:{n:'أسماء & طارق',d:'24 أكتوبر 2026',p:'قصر السرايا، الحمّامات',
+      m:'هي تنزل، وهو ينتظر — وأنتم تحت الدرج'},
+  fr:{n:'Asma & Tarek',d:'24 · 10 · 2026',p:'Palais Essaraya, Hammamet',
+      m:'Elle descend, il attend — et vous êtes en bas'},
+  en:{n:'Asma & Tarek',d:'24 · 10 · 2026',p:'Essaraya Palace, Hammamet',
+      m:'She comes down, he waits — and you are at the foot of the stairs'},
+  prog:{ar:[['18:30','استقبال الضيوف','البهو'],['19:30','النزول','الدرج الكبير'],
+        ['20:00','عقد القران','القاعة الكبرى'],['21:00','العشاء','قاعة المرايا'],
+        ['23:00','السهرة','الحديقة']],
+   fr:[['18:30','Accueil des invités','Le hall'],['19:30','La descente','Le grand escalier'],
+       ['20:00','Cérémonie','Grande salle'],['21:00','Dîner','Salle des miroirs'],
+       ['23:00','Soirée','Le jardin']],
+   en:[['18:30','Guest welcome','The hall'],['19:30','The descent','The grand staircase'],
+       ['20:00','Ceremony','The great hall'],['21:00','Dinner','The mirror room'],
+       ['23:00','Party','The garden']]}},
+
+ record:{when:'2026-09-12T19:00',
+  ar:{n:'دنيا & بلال',d:'12 سبتمبر 2026',p:'دار الوليدة، سيدي بوسعيد',
+      m:'عندنا أغنية أولى — تعالوا نسمعها معكم'},
+  fr:{n:'Donia & Bilel',d:'12 · 09 · 2026',p:'Dar El Oualida, Sidi Bou Saïd',
+      m:'Nous avons une première chanson — venez l’écouter avec nous'},
+  en:{n:'Donia & Bilel',d:'12 · 09 · 2026',p:'Dar El Oualida, Sidi Bou Said',
+      m:'We have a first song — come and hear it with us'},
+  prog:{ar:[['19:00','الاستقبال','الفناء'],['19:45','الأغنية الأولى','الصالون'],
+        ['20:30','الصور','السطح الأزرق'],['21:30','العشاء','الرواق'],['23:30','السهرة','الفناء']],
+   fr:[['19:00','Accueil','Le patio'],['19:45','La première chanson','Le salon'],
+       ['20:30','Photos','La terrasse bleue'],['21:30','Dîner','La galerie'],
+       ['23:30','Soirée','Le patio']],
+   en:[['19:00','Welcome','The courtyard'],['19:45','The first song','The salon'],
+       ['20:30','Photographs','The blue terrace'],['21:30','Dinner','The gallery'],
+       ['23:30','Party','The courtyard']]}},
+
+ blanc:{when:'2027-05-30T16:00',
+  ar:{n:'آية & أمين',d:'30 ماي 2027',p:'بيت العائلة، نابل',
+      m:'بلا زخرفة — يدها في يده، وأنتم شهود'},
+  fr:{n:'Aya & Amine',d:'30 · 05 · 2027',p:'Maison de famille, Nabeul',
+      m:'Sans ornement — sa main dans la sienne, et vous témoins'},
+  en:{n:'Aya & Amine',d:'30 · 05 · 2027',p:'The family house, Nabeul',
+      m:'Without ornament — her hand in his, and you as witnesses'},
+  prog:{ar:[['16:00','الاستقبال','باب الدار'],['17:00','العقد','الصالة'],
+        ['18:00','الصور','الحديقة البيضاء'],['19:30','العشاء','السطح'],['21:30','السهرة','الحديقة']],
+   fr:[['16:00','Accueil','La porte'],['17:00','La cérémonie','Le salon'],
+       ['18:00','Photos','Le jardin blanc'],['19:30','Dîner','La terrasse'],
+       ['21:30','Soirée','Le jardin']],
+   en:[['16:00','Welcome','The doorway'],['17:00','The ceremony','The lounge'],
+       ['18:00','Photographs','The white garden'],['19:30','Dinner','The terrace'],
+       ['21:30','Party','The garden']]}}
+};
+
+/* the placeholder text a film opens with — its own, when it has its own */
 function readyDef(f, lang){
  const cat = (f && f.cat) || 'wed';
  const set = RD_DEF[cat] || RD_DEF.wed;
- return set[lang] || set.ar;
+ const base = set[lang] || set.ar;
+ const own = f && WED_DEMO[f.id];
+ if(!own) return base;
+ const mine = own[lang] || own.ar;
+ return Object.assign({}, base, mine, own.when ? {when:own.when} : {});
+}
+/* the running order that belongs to this wedding, when it has one */
+function readyProgDemo(f, lang){
+ const own = f && WED_DEMO[f.id];
+ if(!own || !own.prog) return null;
+ return own.prog[lang] || own.prog.ar;
 }
 
 /* The whole shelf: what ships, plus what was added, in that order. */
