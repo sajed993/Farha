@@ -74,6 +74,153 @@ function ediPlate(k,cls){
  const on=ediImgOK[k];
  return `<div class="edi-ph p-${k} ${on?'has':''} ${cls||''}"${on?` style="background-image:url('${EDI_IMG_BASE}${k}.jpg')"`:''}></div>`;}
 
+/* ═══ كلمات كل مناسبة ═══
+   Every label inside the invitation came from one flat set — رسالة العروسين,
+   باقٍ لبداية الفرح, ننتظركم بكل الشوق — so a travel agency's opening invited
+   you to a couple's wedding in its own words. The weddings read correctly and
+   are left exactly as they are; every other occasion overrides only the lines
+   that are actually about a bride and groom.
+
+   Two layers: the occasion, then the film. الإقلاع and البوّابة are travel
+   agencies, so their words are about journeys rather than about a new office —
+   the same category, a different room. */
+
+const EDI_WORDS = {
+ henna:{
+  ar:{msgL:'كلمة العروس',msgS:'ليلةٌ تُحفظ في القلب',
+   msgBody:'ليلة الحنّة ليست تفصيلًا صغيرًا قبل العرس — هي ليلتنا نحن. نحبّ أن نراكم فيها، ونسمع زغاريدكم قبل كلّ شيء.',
+   dateHint:'اكشطوا الختم لتعرفوا ليلتنا',cdL:'باقٍ على ليلة الحنّة',
+   thanks:'ننتظركم بالزغاريد',progTitle:'برنامج الليلة',dressL:'اللباس'},
+  fr:{msgL:'Mot de la mariée',msgS:'Une nuit qu’on garde',
+   msgBody:'La nuit du henné n’est pas un détail avant le mariage — c’est notre nuit. Nous aimerions vous y voir, et entendre vos youyous avant tout le reste.',
+   dateHint:'Grattez le sceau pour découvrir notre nuit',cdL:'Avant la nuit du henné',
+   thanks:'Nous vous attendons',progTitle:'Programme de la nuit',dressL:'Tenue'},
+  en:{msgL:'A word from the bride',msgS:'A night we keep',
+   msgBody:'The henna night is not a small thing before the wedding — it is our own night. We would like you in it, and to hear you before anything else.',
+   dateHint:'Scratch the seal to find our night',cdL:'Until the henna night',
+   thanks:'We are waiting for you',progTitle:'The night’s programme',dressL:'What to wear'}},
+
+ bday:{
+  ar:{msgL:'كلمة من القلب',msgS:'سنةٌ أخرى… ومازلنا نحتفل',
+   msgBody:'ما نحبّ أن نحتفل وحدنا. عام آخر مرّ، وأجمل ما فيه أنّكم كنتم فيه — تعالوا نطفئ الشمعة معًا.',
+   dateL:'اكشفوا الموعد',dateHint:'اكشطوا الختم لتعرفوا يوم الحفل',
+   cdL:'باقٍ على الحفل',thanks:'وجودكم هو الهديّة',dressL:'اللباس'},
+  fr:{msgL:'Un mot du cœur',msgS:'Une année de plus… et on fête encore',
+   msgBody:'Nous n’aimons pas fêter seuls. Une année est passée, et le plus beau, c’est que vous y étiez — venez souffler la bougie avec nous.',
+   dateL:'Découvrez la date',dateHint:'Grattez le sceau pour découvrir le jour',
+   cdL:'Avant la fête',thanks:'Votre présence est le cadeau',dressL:'Tenue'},
+  en:{msgL:'A word from the heart',msgS:'One more year, and still celebrating',
+   msgBody:'We do not like celebrating alone. Another year has gone, and the best of it is that you were in it — come and blow out the candle with us.',
+   dateL:'Reveal the date',dateHint:'Scratch the seal to find the day',
+   cdL:'Until the party',thanks:'Your being there is the gift',dressL:'What to wear'}},
+
+ baby:{
+  ar:{msgL:'كلمة العائلة',msgS:'صرنا ثلاثة',
+   msgBody:'انتظرناه طويلًا، ووصل. نحبّ أن نراكم حوله في أوّل أيامه، وأن يعرف وجوهكم قبل أن يعرف الكلام.',
+   dateL:'اكشفوا الموعد',dateHint:'اكشطوا الختم لتعرفوا يوم الاستقبال',
+   cdL:'باقٍ على الاستقبال',venueL:'المكان',thanks:'ننتظركم لتباركوا لنا',
+   progTitle:'برنامج اليوم',dressL:'اللباس'},
+  fr:{msgL:'Mot de la famille',msgS:'Nous voilà trois',
+   msgBody:'Nous l’avons longtemps attendu, et il est arrivé. Nous aimerions vous voir autour de lui dès ses premiers jours, qu’il connaisse vos visages avant les mots.',
+   dateL:'Découvrez la date',dateHint:'Grattez le sceau pour découvrir le jour',
+   cdL:'Avant la réception',venueL:'Le lieu',thanks:'Venez nous féliciter',
+   progTitle:'Programme du jour',dressL:'Tenue'},
+  en:{msgL:'A word from the family',msgS:'There are three of us now',
+   msgBody:'We waited a long time, and he arrived. We would like you around him in his first days, so he knows your faces before he knows any words.',
+   dateL:'Reveal the date',dateHint:'Scratch the seal to find the day',
+   cdL:'Until the welcome',venueL:'The place',thanks:'Come and wish us well',
+   progTitle:'The day’s programme',dressL:'What to wear'}},
+
+ grad:{
+  ar:{msgL:'كلمة هذا اليوم',msgS:'سنواتٌ من التعب… ويومٌ واحد',
+   msgBody:'هذا اليوم ليس نهاية سنوات فقط — هو أيضًا شكرٌ لكلّ من وقف معنا فيها. تعالوا نُنهيها كما بدأناها: معًا.',
+   dateL:'اكشفوا الموعد',dateHint:'اكشطوا الختم لتعرفوا يوم التخرّج',
+   cdL:'باقٍ على التخرّج',thanks:'فرحتنا لا تكتمل من دونكم',
+   progTitle:'برنامج اليوم',dressL:'اللباس'},
+  fr:{msgL:'Le mot de ce jour',msgS:'Des années d’efforts… et un seul jour',
+   msgBody:'Ce jour n’est pas seulement la fin de longues années — c’est aussi un merci à ceux qui les ont traversées avec nous. Finissons-les comme nous les avons commencées : ensemble.',
+   dateL:'Découvrez la date',dateHint:'Grattez le sceau pour découvrir le jour',
+   cdL:'Avant la remise',thanks:'Notre joie n’est rien sans vous',
+   progTitle:'Programme du jour',dressL:'Tenue'},
+  en:{msgL:'A word for the day',msgS:'Years of work, and one day',
+   msgBody:'This day is not only the end of long years — it is also a thank you to everyone who went through them with us. Let us finish them the way we started: together.',
+   dateL:'Reveal the date',dateHint:'Scratch the seal to find the day',
+   cdL:'Until the ceremony',thanks:'Our joy is nothing without you',
+   progTitle:'The day’s programme',dressL:'What to wear'}},
+
+ open:{
+  ar:{msgL:'كلمة الإدارة',msgS:'بابٌ جديد… ونحبّ أن تفتحوه معنا',
+   msgBody:'اشتغلنا على هذا المكان طويلًا، واليوم صار جاهزًا. حضوركم في أوّل يوم يعني لنا أكثر ممّا يعني أيّ يوم بعده.',
+   dateL:'اكشفوا الموعد',dateHint:'اكشطوا الختم لتعرفوا يوم الافتتاح',
+   venueL:'العنوان',cdL:'باقٍ على الافتتاح',thanks:'يشرّفنا حضوركم',
+   progTitle:'برنامج الافتتاح',dressL:'اللباس',
+   rsvpL:'تأكيد الحضور',attend:'هل تشرّفوننا؟',yes:'سأكون هناك',no:'أعتذر'},
+  fr:{msgL:'Mot de la direction',msgS:'Une porte de plus — ouvrez-la avec nous',
+   msgBody:'Nous avons travaillé longtemps sur ce lieu, et il est prêt. Votre présence le premier jour compte plus que tous les jours qui suivront.',
+   dateL:'Découvrez la date',dateHint:'Grattez le sceau pour découvrir l’ouverture',
+   venueL:'L’adresse',cdL:'Avant l’ouverture',thanks:'Votre présence nous honore',
+   progTitle:'Programme de l’inauguration',dressL:'Tenue',
+   rsvpL:'Confirmation',attend:'Nous ferez-vous l’honneur ?',yes:'J’y serai',no:'Je m’excuse'},
+  en:{msgL:'A word from the management',msgS:'A new door — open it with us',
+   msgBody:'We worked on this place for a long time, and it is ready. Your being here on the first day matters more to us than any day after it.',
+   dateL:'Reveal the date',dateHint:'Scratch the seal to find the opening',
+   venueL:'The address',cdL:'Until the opening',thanks:'We would be honoured',
+   progTitle:'Opening programme',dressL:'What to wear',
+   rsvpL:'Confirm attendance',attend:'Will you join us?',yes:'I will be there',no:'I am sorry'}},
+
+ save:{
+  ar:{cdL:'باقٍ على اليوم',thanks:'التفاصيل تصلكم قريبًا',
+   msgS:'الموعد أوّلًا… والتفاصيل بعده',
+   msgBody:'لم نُنهِ كلّ التفاصيل بعد، لكنّ اليوم صار معروفًا. احفظوه الآن، والباقي يصلكم في وقته.'},
+  fr:{cdL:'Avant le jour',thanks:'Les détails suivront',
+   msgS:'La date d’abord, les détails ensuite',
+   msgBody:'Tout n’est pas encore arrêté, mais le jour, lui, est fixé. Notez-le dès maintenant, le reste vous parviendra en temps voulu.'},
+  en:{cdL:'Until the day',thanks:'The details will follow',
+   msgS:'The date first, the details after',
+   msgBody:'Not everything is settled yet, but the day is. Keep it now, and the rest will reach you in time.'}}
+};
+
+/* One film can want different words from the rest of its occasion. Both travel
+   agencies are openings, but an opening that sells journeys does not talk
+   about a room. */
+const EDI_WORDS_FILM = {
+ takeoff:{
+  ar:{msgS:'من هنا تبدأ الرحلات',
+   msgBody:'فتحنا هذا المكان لسببٍ واحد: أن تكون كلّ رحلة تبدأ منه أسهل ممّا كانت. تعالوا في أوّل يوم — ومنه نبدأ.',
+   thanks:'نراكم عند الإقلاع',progTitle:'برنامج الافتتاح'},
+  fr:{msgS:'C’est d’ici que partent les voyages',
+   msgBody:'Nous avons ouvert ce lieu pour une seule raison : que chaque voyage qui en part soit plus simple qu’avant. Venez le premier jour — et partons de là.',
+   thanks:'Rendez-vous au décollage',progTitle:'Programme de l’inauguration'},
+  en:{msgS:'The journeys start here',
+   msgBody:'We opened this place for one reason: so that every journey leaving it is easier than it used to be. Come on the first day — and we start from there.',
+   thanks:'See you at takeoff',progTitle:'Opening programme'}},
+ boarding:{
+  ar:{msgS:'بوّابةٌ تُفتح… ووجهةٌ تنتظر',
+   msgBody:'كلّ سفرة تبدأ ببوّابة. هذه بوّابتنا، ونحبّ أن يكون أوّل من يعبرها أنتم.',
+   thanks:'نراكم عند البوّابة',progTitle:'برنامج الافتتاح'},
+  fr:{msgS:'Une porte s’ouvre, une destination attend',
+   msgBody:'Chaque voyage commence à une porte. Voici la nôtre, et nous aimerions que vous soyez les premiers à la franchir.',
+   thanks:'Rendez-vous à la porte',progTitle:'Programme de l’inauguration'},
+  en:{msgS:'A gate opens, a destination waits',
+   msgBody:'Every journey begins at a gate. This is ours, and we would like you to be the first through it.',
+   thanks:'See you at the gate',progTitle:'Opening programme'}}
+};
+
+/* The words this invitation is written in: the shared set, then its occasion,
+   then its film. A wedding matches nothing here and keeps every default, which
+   is the point — they already read correctly. */
+function ediWords(){
+ const base=Object.assign({},t().edi,{
+  progTitle:t().progTitle,rsvpL:t().uRsvp,attend:t().uAttend,
+  yes:t().uYes,no:t().uNo});
+ const L=S.lang;
+ const cat=S.c&&S.c.ediCat;
+ const byCat=cat&&EDI_WORDS[cat]&&(EDI_WORDS[cat][L]||EDI_WORDS[cat].ar);
+ const byFilm=S.c&&S.c.film&&EDI_WORDS_FILM[S.c.film]
+   &&(EDI_WORDS_FILM[S.c.film][L]||EDI_WORDS_FILM[S.c.film].ar);
+ return Object.assign(base,byCat||{},byFilm||{});
+}
+
 /* ---- ornament ---- */
 const EDI_CART='<svg viewBox="0 0 120 150" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">'
  +'<ellipse cx="60" cy="75" rx="52" ry="68"/><ellipse cx="60" cy="75" rx="46" ry="62" opacity=".5"/>'
@@ -273,7 +420,7 @@ function ediWax(cv,initials){
    Four engraved cells separated by hairlines, with a drawn dial in the label.
    Classic stationery treatment rather than a digital timer. */
 function ediCountHTML(){
- const c=S.c,E=t().edi;
+ const c=S.c,E=ediWords();
  if(!c.when||!ediSecOn('cd'))return '';
  return `<section class="edi-s edi-count">
    ${S.c.films?ediPlate('venue','soft'):''}${S.c.films?'<div class="edi-wash deep"></div>':''}
@@ -304,7 +451,7 @@ function ediStartClock(){
 
 /* ---- dress code ---- */
 function ediDressHTML(){
- const d=S.c.dress,E=t().edi;
+ const d=S.c.dress,E=ediWords();
  if(!d||!(d.t||d.d)||!ediSecOn('dress'))return '';
  const sw=(d.sw&&d.sw.length?d.sw:['var(--ink)','var(--blush)','var(--cream-hi)'])
   .map(c=>`<span class="sw" style="background:${c}"></span>`).join('');
@@ -349,7 +496,7 @@ function ediSecOn(k){
 
 /* ---- sections ---- */
 function ediHTML(){
- const c=S.c,E=t().edi,ini=inInitials(c.n),dp=ediDateParts();
+ const c=S.c,E=ediWords(),ini=inInitials(c.n),dp=ediDateParts();
  const mono=ini.length>=2
   ? `<b>${esc(ini[0])}</b><i>${S.lang==='ar'?'و':'&'}</i><b>${esc(ini[1])}</b>`
   : `<b class="solo">${esc(ini[0]||'✦')}</b>`;
@@ -449,7 +596,7 @@ function ediHTML(){
   ${prog.length?`<section class="edi-s edi-prog">
    ${ediTint(2)}${ediFrame()}
    <div class="edi-in rv">
-    <p class="edi-lbl">${esc(t().progTitle)}</p>
+    <p class="edi-lbl">${esc(E.progTitle)}</p>
     <div class="edi-rule sm">${EDI_RULE}</div>
     <div class="edi-tl">${prog.map((p,i)=>`<div class="edi-tli">
       <span class="edi-med">${EDI_ICONS[i%EDI_ICONS.length]}</span>
@@ -471,12 +618,12 @@ function ediHTML(){
   ${ediSecOn('rsvp')?`<section class="edi-s edi-rsvp light">
    ${ediTint(0)}${ediFlora(58,'bl')}${ediFrame()}
    <div class="edi-in rv">
-    <p class="edi-lbl dk">${t().uRsvp}</p>
+    <p class="edi-lbl dk">${esc(E.rsvpL)}</p>
     <div class="edi-rule sm dk">${EDI_RULE}</div>
-    <p class="edi-q">${t().uAttend}</p>
+    <p class="edi-q">${esc(E.attend)}</p>
     <div class="edi-yn">
-     <button class="edi-btn" onclick="rsvp(1)">${t().uYes}</button>
-     <button class="edi-btn ghost" onclick="rsvp(0)">${t().uNo}</button>
+     <button class="edi-btn" onclick="rsvp(1)">${esc(E.yes)}</button>
+     <button class="edi-btn ghost" onclick="rsvp(0)">${esc(E.no)}</button>
     </div>
     <p class="edi-thx">${esc(E.thanks)}</p>
    </div>
