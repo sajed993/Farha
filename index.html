@@ -3,8 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="only light">
-<meta name="supported-color-schemes" content="light">
+<meta name="color-scheme" content="dark light">
+<!-- The theme is stamped on <html> here, before the stylesheet is even
+     requested, because doing it from a script at the bottom of the page means
+     a full cream flash on every load — worse on a slow phone, which is most
+     of them. Dark is the default; only an explicit choice moves it. -->
+<script>
+(function(){var t,d;
+ try{t=localStorage.getItem('farha-theme');d=localStorage.getItem('farha-theme-def');}catch(e){}
+ if(t!=='light'&&t!=='dark'){          /* no choice of their own: the shop's default */
+  t=(d==='system')
+    ? (window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')
+    : (d==='light'?'light':'dark');}
+ document.documentElement.setAttribute('data-theme',t);})();
+</script>
 <title>فرحة Far7a — دعوات رقمية فاخرة</title>
 <meta name="description" content="دعوات زفاف ومناسبات رقمية فاخرة — صمّموا دعوتكم وأرسلوها بلمسة واحدة.">
 <!-- OG:START (edge function swaps these per invitation) -->

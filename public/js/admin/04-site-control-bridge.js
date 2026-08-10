@@ -2,7 +2,7 @@
 const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'farha_meta'};
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-const CFG_DEF={sec:{sites:0,datef:0,wishes:0,ready:1,offers:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,signPrice:249,signWas:0,signRevs:5,signDays:7,ribbonOn:1,noteOn:1,txt:{}},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},vid:{site:'full',customer:'full'},price:{site:149,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},media:{films:{},customFilms:[],hideShows:[],readyFilms:[]}};
+const CFG_DEF={sec:{sites:0,datef:0,wishes:0,ready:1,offers:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,signPrice:249,signWas:0,signRevs:5,signDays:7,ribbonOn:1,noteOn:1,txt:{}},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},theme:{def:'dark'},vid:{site:'full',customer:'full'},price:{site:149,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},media:{films:{},customFilms:[],hideShows:[],readyFilms:[]}};
 /* Fill out a stored config into a whole one, whatever it came from. */
 function cfgFrom(cc){cc=cc||{};const o=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(o.sec,cc.sec||{});Object.assign(o.price,cc.price||{});o.wa=cc.wa||CFG_DEF.wa;o.d17=cc.d17||CFG_DEF.d17;
@@ -10,7 +10,7 @@ function cfgFrom(cc){cc=cc||{};const o=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(o.edi,cc.edi||{});o.films=cc.films||{};
  Object.assign(o.offers,cc.offers||{});
  if(cc.envStyle)o.envStyle=cc.envStyle;Object.assign(o.env,cc.env||{});
- Object.assign(o.vid,cc.vid||{});
+ Object.assign(o.vid,cc.vid||{});Object.assign(o.theme,cc.theme||{});
  o.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),cc.media||{});return o;}
 function loadCFG(){return cfgFrom(lsGet(LSK.cfg,{}));}
 let CFG=loadCFG();
@@ -525,6 +525,24 @@ function readyView(){
     <span class="sw-toggle ${E[k]===0?'':'on'}" onclick="ctlEdi('${k}',${E[k]===0});renderContent()"></span>
    </div>`).join(''));}
 
+/* Which theme a guest who has never chosen one sees. Their own choice, once
+   they make it, always wins over this — it is the default, not a lock. */
+function ctlTheme(v){CFG.theme=CFG.theme||{};CFG.theme.def=v;saveCFG();}
+function themeView(){
+ const cur=(CFG.theme&&CFG.theme.def)||'dark';
+ const O=[['dark','🌙 ليلي','خلفية داكنة — الأفلام والذهب يظهران أقوى عليها'],
+          ['light','☀️ نهاري','الورقة الكريمية الأصلية'],
+          ['system','📱 حسب الهاتف','يتبع إعداد الجهاز نفسه']];
+ return ctlCard('🌗 الوضع الافتراضي','ما يفتح عليه الموقع والدعوات لزائر لأول مرة. من غيّره بنفسه من الشريط العلوي يبقى على اختياره.',
+  O.map(([k,nm,ds])=>`<div class="ctlrow" style="align-items:flex-start;gap:10px">
+   <span style="flex:1">
+    <b style="display:block;font-size:.9rem">${nm}${cur===k?' <span style="color:#2F6B3A">· الفعّال ✓</span>':''}</b>
+    <span class="cmut" style="font-size:.78rem">${ds}</span>
+   </span>
+   <button class="act ${cur===k?'gold':''}" style="padding:6px 12px;font-size:.78rem"
+    onclick="ctlTheme('${k}');renderContent()">تفعيل</button>
+  </div>`).join(''));}
+
 function envView(){
  const E=CFG.env||{},cur=CFG.envStyle||'classic';
  return ctlCard('✉️ شاشة الظرف','ما يراه الضيف قبل الدعوة. اختاروا واحدًا ليكون الفعّال، وأطفئوا ما لا يناسبكم.',
@@ -717,7 +735,7 @@ function txtView(){
 }
 function mediaView(){
  const M=CFG.media;const cloud=window.__dbMode?'':`<p class="cmut" style="color:#A33">⚠️ لرفع الفيديوهات سجّلوا الدخول السحابي أولًا (الأزرار الأخرى تعمل).</p>`;
- return `<div class="cgrid">`+envView()+vidView()+readyView()+
+ return `<div class="cgrid">`+themeView()+envView()+vidView()+readyView()+
   ctlCard('🎬 أفلام سينما AI — فيديوهاتها','ولّدوا الفيديو بأزرار «نسخ البرومبت» في الموقع، ثم ارفعوه هنا ليظهر فورًا لكل الزوّار'+(cloud?'':''),
    cloud+AIN.map((n,i)=>{const has=M.films[i]&&M.films[i].url;
     return `<div class="ctlrow"><span>${AIE[i]} ${n} ${has?'<b style="color:#2F6B3A">· سحابي ✓</b>':''}</span>

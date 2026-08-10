@@ -16,7 +16,7 @@ const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,
  edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},
  offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,
          signPrice:249,signWas:0,signRevs:5,signDays:7,ribbonOn:1,noteOn:1,txt:{}},
- envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},
+ envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1},theme:{def:'dark'},
  vid:{site:'full',customer:'full'},
  tiers:[
   {id:'ess',em:'🌱',name:{ar:'Essentiel — أساسي',fr:'Essentiel',en:'Essential'},price:29,feats:{ar:['تصميم واحد','الأسماء والتاريخ والمكان','افتتاح بسيط'],fr:['Un design','Noms, date, lieu','Ouverture simple'],en:['One design','Names, date, place','Simple opening']}},
@@ -59,6 +59,7 @@ function loadCFG(){
   offers:own('offers'),
   envStyle:(pub?fc.envStyle:0)||lc.envStyle||fc.envStyle||'',
   env:own('env'),
+  theme:own('theme'),
   vid:own('vid')};
  CFG=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(CFG.sec,cc.sec||{});Object.assign(CFG.price,cc.price||{});
@@ -66,7 +67,8 @@ function loadCFG(){
  Object.assign(CFG.edi,cc.edi||{});CFG.films=cc.films||{};
  Object.assign(CFG.offers,cc.offers||{});
  if(cc.envStyle)CFG.envStyle=cc.envStyle;Object.assign(CFG.env,cc.env||{});
- Object.assign(CFG.vid,cc.vid||{});
+ Object.assign(CFG.vid,cc.vid||{});Object.assign(CFG.theme,cc.theme||{});
+ try{themeAdoptDefault();}catch(e){}
  CFG.media=Object.assign(JSON.parse(JSON.stringify(CFG_DEF.media)),(fc.media||{}),(pub?{}:(lc.media||{})));
  const P={uOrder:CFG.price.ultra,aiOrderB:CFG.price.ai,stOrder:CFG.price.site};
  ['ar','fr','en'].forEach(L=>{for(const k in P){if(T0[k][L])T[L][k]=T0[k][L].replace(/\d+/,P[k]);}});
@@ -342,6 +344,45 @@ function scrollSec(id){
 function toggleLang(){S.lang=S.lang==='ar'?'fr':S.lang==='fr'?'en':'ar';
  document.documentElement.dir=T[S.lang].dir;document.documentElement.lang=S.lang;
  render();}
+/* ── الوضع الليلي ──
+   The choice lives on <html> so the CSS can see it, and in localStorage so it
+   survives a reload. It is deliberately not in CFG: this is the viewer's
+   preference for their own screen, not a setting the owner publishes to
+   everyone from the dashboard. Nothing here re-renders — flipping tokens is
+   the browser's job, and a render() would tear down any open film. */
+/* The dashboard's default reaches a first-time visitor through a tiny mirror
+   in localStorage, because the theme has to be on <html> before the stylesheet
+   is fetched and CFG does not exist that early. So: the head script reads the
+   mirror, and this refreshes the mirror once the real config has landed.
+   A guest who has chosen for themselves is never overridden. */
+function themeAdoptDefault(){
+ const def=(CFG.theme&&CFG.theme.def)||'dark';
+ try{localStorage.setItem('farha-theme-def',def);}catch(e){}
+ let mine=null; try{mine=localStorage.getItem('farha-theme');}catch(e){}
+ if(mine==='light'||mine==='dark')return;              /* their choice stands */
+ const want=(def==='system')
+   ? (window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')
+   : def;
+ if(document.documentElement.getAttribute('data-theme')!==want)
+  document.documentElement.setAttribute('data-theme',want);
+ themeMarkButtons();}
+
+function themeMarkButtons(){
+ const t=currentTheme();
+ document.querySelectorAll('.theme-btn').forEach(function(b){
+  b.setAttribute('aria-pressed',t==='dark'?'true':'false');
+  b.setAttribute('aria-label',t==='dark'?T[S.lang].themeToLight:T[S.lang].themeToDark);
+  b.setAttribute('title',t==='dark'?T[S.lang].themeToLight:T[S.lang].themeToDark);});}
+
+function currentTheme(){
+ return document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';}
+function setTheme(t){
+ t=(t==='light')?'light':'dark';
+ document.documentElement.setAttribute('data-theme',t);
+ try{localStorage.setItem('farha-theme',t);}catch(e){}
+ themeMarkButtons();}
+function toggleTheme(){setTheme(currentTheme()==='dark'?'light':'dark');}
+
 function setC(k,v){S.c[k]=v;render();}
 function addEmoji(e){S.c.m=(S.c.m?S.c.m+' ':'')+e;render();}
 function addDay(){S.c.program.push({time:'19:00',title:'',place:'',map:'',music:0,photos:[]});render();}

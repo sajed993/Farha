@@ -6,6 +6,10 @@
     site moves together when the palette changes. */
  --ink:#2C2318;--ink2:#5A4A38;--taupe:#8B7A64;
  --cream:#FAF5EC;--cream2:#F1E4CC;--paper:#FFFBF3;
+ /* --paper is the light ink used on the dark bands; --card is a raised
+    surface. They are the same colour on paper and opposites in the dark. */
+ --card:#FFFBF3;--inv-bg:#2C2318;--inv-ink:#FFFBF3;
+ --glass:rgba(250,246,239,.62);--glass2:rgba(255,255,255,.7);--stage:#E8DAC0;
  --gold:#C2994A;--gold2:#A9803A;--gold3:#7E5F26;--champ:#E6CE96;--goldPale:#F2E4C4;
  /* one accent per occasion, each taken from that film's own footage */
  --acc-wed:#AE7E70;    /* قصر الرخام — dried rose off the garlands */
@@ -37,7 +41,52 @@
  --disp:var(--dispA);--body:var(--bodyA);--serif:var(--serifA);
 }
 html[dir=ltr]{--disp:var(--dispL);--body:var(--bodyL);--serif:var(--dispL)}
-:root{color-scheme:only light}
+:root{color-scheme:light}
+
+/* ── الوضع الليلي ──
+   The site is written almost entirely through the tokens above — 876 var()
+   references — so the dark theme is a second set of values, not a second
+   stylesheet. Two things deliberately do NOT flip:
+
+   · The invitation. .edi-veil-root declares its own --cream/--ink/--gold per
+     film, so it is insulated by construction. An invitation is the product;
+     its palette was measured off its own footage and is not the viewer's to
+     change.
+   · The deep golds invert. --gold3 is the darkest gold on paper, so on ink it
+     becomes the lightest — a token named for its role, not its brightness.
+
+   The neutrals are warm rather than grey: the whole brand sits in the amber
+   family, and a neutral grey ground next to it reads as a different site. */
+html[data-theme=dark]{
+ color-scheme:dark;
+ /* The grounds are sampled off the reference rather than picked: #1D100B and
+    #251E10 for the page, #430105 for the fills, #3C0B05 where a film's own
+    colour backs it. Warm brown-black, not grey — the whole brand sits in the
+    amber family and a neutral ground beside it reads as a different site. */
+ --ink:#F4EBD9;--ink2:#C6B69C;--taupe:#948671;
+ --cream:#19110B;--cream2:#251A11;--paper:#221710;
+ --gold:#CFA657;--gold2:#DFBB72;--gold3:#EEDBAC;--champ:#F2E0B6;--goldPale:#3C3019;
+ --acc-wed:#C99C8D;--acc-bday:#DC5B4C;--acc-baby:#E29D7B;
+ --acc-grad:#DD8AA6;--acc-save:#AA97BE;--acc-cool:#7DA5C6;
+ /* the fills go deep and rich rather than pale — #430105 is the reference's */
+ --brand:#A2454F;--brand-d:#E5A6AE;--brand-l:#5E1219;--brand-pale:#37181C;
+ --brandFoil:linear-gradient(105deg,#5E1219,#E5A6AE 24%,#A2454F 46%,#F0C0C5 70%,#7A2630);
+ --rose:#C99C8D;--roseS:#3C2721;--sage:#ABB294;--blue:#7DA5C6;--emerald:#7FBFA8;
+ --line:rgba(238,219,172,.19);--line2:rgba(238,219,172,.095);
+ --foil:linear-gradient(105deg,#8E6B28,#F0DDB0 28%,#CDA455 52%,#FBF2DC 76%,#B08A3E);
+ --foilD:linear-gradient(160deg,#EBD7A6 0%,#CDA455 34%,#9A742C 68%,#D8B368 100%);
+ --shadow:0 24px 70px -28px rgba(0,0,0,.72);
+ --shadowSm:0 10px 26px -12px rgba(0,0,0,.66);
+ /* --paper stays light: it is the ink on the bands that are dark in both
+    themes (#open, .footer, the timeline), not a surface. */
+ --paper:#F8F2E6;--card:#221710;--inv-bg:#F4EBD9;--inv-ink:#19110B;
+ --glass:rgba(25,17,11,.72);--glass2:rgba(244,235,217,.085);--stage:#2A1C12;
+}
+/* --brand-d is the deep rose that white sits on; in the dark it is the pale
+   one that text is drawn in, so the two rules that use it as a fill name the
+   deep one instead. */
+html[data-theme=dark] #ready .chip.on{background:var(--brand-l);border-color:var(--brand-l)}
+html[data-theme=dark] .btn-line:hover{background:var(--brand-l);box-shadow:inset 0 0 0 1px var(--brand-l)}
 html{background:var(--cream)}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -59,7 +108,7 @@ img{display:block}
 
 /* ============ NAV ============ */
 .nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
- padding:14px min(4.5vw,54px);background:rgba(250,246,239,.62);backdrop-filter:blur(14px);
+ padding:14px min(4.5vw,54px);background:var(--glass);backdrop-filter:blur(14px);
  border-bottom:1px solid var(--line)}
 .logo{font-family:var(--dispA);font-size:1.8rem;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;gap:10px}
 .logo b{background:var(--brandFoil);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -237,12 +286,12 @@ html[dir=rtl] .cat .go{align-self:flex-end}
 @media(max-width:900px){.cats{grid-template-columns:1fr}.cat{min-height:300px}}
 
 /* gallery */
-#gallery{background:linear-gradient(180deg,var(--cream),var(--paper) 30%,var(--cream))}
+#gallery{background:linear-gradient(180deg,var(--cream),var(--card) 30%,var(--cream))}
 .filters{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:44px}
 .chip{border:1.5px solid var(--line);border-radius:999px;padding:10px 22px;font-weight:700;font-size:.88rem;
- transition:.25s;background:rgba(255,255,255,.7);color:var(--ink2)}
+ transition:.25s;background:var(--glass2);color:var(--ink2)}
 .chip:hover{border-color:var(--gold2);color:var(--gold3)}
-.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.on{background:var(--inv-bg);color:var(--inv-ink);border-color:var(--inv-bg)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:34px;max-width:1240px;margin:0 auto}
 .tcard{background:#fff;border-radius:22px;padding:16px 16px 20px;box-shadow:0 12px 36px -18px rgba(42,33,24,.28);
  transition:.45s cubic-bezier(.2,.8,.2,1);position:relative;cursor:pointer}
@@ -257,7 +306,7 @@ html[dir=rtl] .cat .go{align-self:flex-end}
 .t-meta b{font-family:var(--serif);font-size:1.12rem;display:block}
 .t-meta span{color:var(--taupe);font-size:.8rem;font-weight:600;letter-spacing:.02em}
 .t-cta{width:100%;margin-top:12px;background:var(--cream2);border-radius:13px;padding:12px;font-weight:700;transition:.25s}
-.tcard:hover .t-cta{background:var(--ink);color:var(--paper)}
+.tcard:hover .t-cta{background:var(--inv-bg);color:var(--inv-ink)}
 .tcard.scratchc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;
  border:2px dashed var(--gold2);background:rgba(255,249,236,.6);box-shadow:none;min-height:380px;font-weight:700}
 .tcard.scratchc:hover{background:#fff;transform:translateY(-11px)}
@@ -422,7 +471,7 @@ html[dir=rtl] .footer .fs{font-family:var(--dispA)}
 .opt-row{display:flex;gap:8px;flex-wrap:wrap}
 .opt{border:1.5px solid rgba(92,79,62,.2);border-radius:12px;padding:10px 15px;font-weight:600;font-size:.86rem;transition:.2s;background:#fff}
 .opt:hover{border-color:var(--gold)}
-.opt.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.opt.on{background:var(--inv-bg);color:var(--inv-ink);border-color:var(--inv-bg)}
 .swatches{display:flex;gap:10px;flex-wrap:wrap}
 .sw{width:42px;height:42px;border-radius:999px;border:3px solid #fff;box-shadow:0 0 0 1.5px rgba(92,79,62,.25);transition:.2s}
 .sw:hover{transform:scale(1.15)}
@@ -434,9 +483,9 @@ input[type=color]{width:100%;height:46px;border:1.5px solid rgba(92,79,62,.2);bo
  padding:16px;font-weight:700;font-size:1.02rem;box-shadow:0 14px 34px -12px rgba(138,106,43,.8);transition:.28s}
 .btn-hero:hover{transform:translateY(-2px);box-shadow:0 20px 44px -12px rgba(138,106,43,.95)}
 .btn-ghost{border:1.5px solid var(--ink);border-radius:15px;padding:14px;font-weight:700;transition:.25s}
-.btn-ghost:hover{background:var(--ink);color:var(--paper)}
+.btn-ghost:hover{background:var(--inv-bg);color:var(--inv-ink)}
 /* program builder */
-.prog-item{border:1.5px solid rgba(138,106,43,.22);border-radius:16px;padding:16px;margin-bottom:12px;background:var(--paper);position:relative}
+.prog-item{border:1.5px solid rgba(138,106,43,.22);border-radius:16px;padding:16px;margin-bottom:12px;background:var(--card);position:relative}
 .prog-item .del{position:absolute;top:10px;inset-inline-end:12px;color:#A5482F;font-weight:700;font-size:.85rem}
 .prog-item .del:hover{transform:scale(1.2)}
 .add-day{width:100%;border:2px dashed var(--gold2);border-radius:14px;padding:13px;font-weight:700;color:var(--gold3);transition:.25s;background:rgba(255,249,236,.5)}
@@ -457,7 +506,7 @@ input[type=color]{width:100%;height:46px;border:1.5px solid rgba(92,79,62,.2);bo
 .toggle.on .tgl{background:var(--gold2)}
 .toggle.on .tgl::after{transform:translateX(-20px)}
 html[dir=ltr] .toggle.on .tgl::after{transform:translateX(20px)}
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--inv-bg);color:var(--inv-ink);
  padding:15px 28px;border-radius:999px;font-weight:700;z-index:200;box-shadow:var(--shadow);animation:toastin .4s}
 @keyframes toastin{from{transform:translate(-50%,22px);opacity:0}}
 
@@ -1128,7 +1177,7 @@ html[dir=rtl] .pm-titles .ttl{letter-spacing:.14em}
 
 
 /* ============ V9: event-websites product ============ */
-#sites{background:linear-gradient(180deg,var(--paper),#FBEFE7 45%,var(--cream));position:relative}
+#sites{background:linear-gradient(180deg,var(--card),#FBEFE7 45%,var(--cream));position:relative}
 #sites .kicker{border-color:rgba(196,130,122,.5);color:var(--acc-wed);background:rgba(244,220,212,.4)}
 #sites .pm-tag{font-family:var(--serif);color:var(--acc-wed);font-size:clamp(1rem,1.9vw,1.3rem);margin:-2px 0 12px}
 .occ-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:6px 0 34px}
@@ -2575,7 +2624,7 @@ html[dir=rtl] .wenv-hint{font-family:var(--bodyA);letter-spacing:.02em;text-tran
 /* the stage: blurred bleed + phone on top */
 .rd-stage{position:relative;border-radius:26px;overflow:hidden;cursor:pointer;
  padding:clamp(26px,5vw,42px) clamp(20px,4vw,34px);display:grid;place-items:center;
- background:#E8DAC0;box-shadow:0 26px 60px -30px rgba(90,68,36,.5),inset 0 0 0 1px rgba(176,128,31,.2);
+ background:var(--stage);box-shadow:0 26px 60px -30px rgba(90,68,36,.5),inset 0 0 0 1px rgba(176,128,31,.2);
  transition:transform .55s cubic-bezier(.2,.8,.2,1),box-shadow .55s}
 .rd-card:hover .rd-stage{transform:translateY(-8px);box-shadow:0 40px 80px -32px rgba(90,68,36,.6),inset 0 0 0 1px rgba(176,128,31,.35)}
 /* The colour wash behind each card. This used to be a 32px blur of the
@@ -2826,7 +2875,7 @@ html[dir=ltr] .edi-pos{font-family:'Cormorant Garamond',serif;font-style:italic;
 /* ── category chips + tag on the shelf ── */
 .rd-filters{margin-bottom:clamp(24px,4vw,38px)}
 #ready .chip{border-color:color-mix(in srgb,var(--brand) 30%,transparent);color:var(--brand-d);
- background:rgba(255,255,255,.66)}
+ background:var(--glass2)}
 #ready .chip:hover{border-color:var(--brand)}
 #ready .chip.on{background:var(--brand-d);border-color:var(--brand-d);color:#FFF6F3}
 .rd-cat{display:block;font-family:'Reem Kufi',var(--bodyA);font-size:.66rem;letter-spacing:.14em;
@@ -3080,7 +3129,7 @@ html.is-preview .edi::-webkit-scrollbar{display:none}
  animation:frmIn .22s ease}
 @keyframes frmIn{from{opacity:0}to{opacity:1}}
 .frm-sheet{position:relative;width:min(100%,30rem);max-height:92vh;overflow-y:auto;
- background:var(--paper);border-radius:18px;padding:24px 20px 20px;
+ background:var(--card);border-radius:18px;padding:24px 20px 20px;
  box-shadow:0 30px 70px -24px rgba(44,35,24,.6),inset 0 0 0 1px color-mix(in srgb,var(--brand) 14%,transparent);
  animation:frmUp .26s cubic-bezier(.2,.8,.3,1)}
 @keyframes frmUp{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
@@ -3159,7 +3208,7 @@ html.is-preview .edi::-webkit-scrollbar{display:none}
 .gl-nums b{display:block;font-family:var(--num);font-size:1.7rem;font-weight:700;color:var(--brand-d)}
 .gl-nums span{font-size:.78rem;color:var(--ink2)}
 .gl-list{list-style:none;display:grid;gap:10px}
-.gl-row{padding:13px 15px;border-radius:13px;background:var(--paper);
+.gl-row{padding:13px 15px;border-radius:13px;background:var(--card);
  box-shadow:0 1px 0 var(--line),0 8px 20px -16px rgba(44,35,24,.5)}
 .gl-row.yes{border-inline-start:3px solid #2F6B3A}
 .gl-row.no{border-inline-start:3px solid var(--brand-l);opacity:.82}
@@ -3193,7 +3242,7 @@ html.is-preview .edi::-webkit-scrollbar{display:none}
 .off-card:hover{transform:translateY(-4px)}
 
 /* ── the Collection: paper ── */
-.off-ready{background:var(--paper);color:var(--ink);
+.off-ready{background:var(--card);color:var(--ink);
  box-shadow:var(--shadowSm),inset 0 0 0 1px var(--line2)}
 .off-ready:hover{box-shadow:var(--shadow),inset 0 0 0 1px color-mix(in srgb,var(--brand) 30%,transparent)}
 /* a whisper of the brand in the top corner, like a watermark in the stock */
@@ -3390,7 +3439,7 @@ html[dir=rtl] .off-flour{transform:scaleX(-1)}
     over a fade so the text scrolling beneath it stays legible. */
  .frm-act{position:sticky;bottom:0;z-index:2;
   margin:6px -15px 0;padding:10px 15px calc(12px + env(safe-area-inset-bottom));
-  background:linear-gradient(to top,var(--paper) 68%,transparent)}
+  background:linear-gradient(to top,var(--card) 68%,transparent)}
  .frm-act .frm-go{margin-top:0;padding:14px}
  .frm-act .frm-alt{margin-top:7px;padding:11px}
  .frm-note{margin-top:6px;font-size:.74rem}
@@ -3561,6 +3610,7 @@ html[lang=fr] .font-kufi .edi-n,html[lang=en] .font-kufi .edi-n{
 html[lang=fr] .font-amiri .edi-n,html[lang=en] .font-amiri .edi-n,
 html[lang=fr] .font-cairo .edi-n,html[lang=en] .font-cairo .edi-n{
  font-family:'Cormorant Garamond',serif!important}
+
 /* ═══════════ فيلم واحد خلف الدعوة كلها ═══════════
    The travel invitations use this. Instead of four windows onto the same
    clip, one film is pinned behind the whole invitation and the text scrolls
@@ -3654,3 +3704,95 @@ html[lang=fr] .font-cairo .edi-n,html[lang=en] .font-cairo .edi-n{
 /* the cloud follows the text wherever the text lives, not only in .edi-in */
 .lay-sticky .edi-s .edi-in::after{inset:-7% -10%}
 
+/* the night/day switch, beside the language button it matches */
+.theme-btn{display:grid;place-items:center;width:38px;height:38px;flex:0 0 auto;
+ border:1.5px solid var(--gold2);border-radius:999px;background:transparent;
+ color:var(--gold2);cursor:pointer;transition:background .25s,color .25s,border-color .25s}
+.theme-btn:hover{background:var(--gold2);color:var(--cream)}
+.theme-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.theme-btn svg{width:19px;height:19px;display:block}
+/* the button shows what it will do, not what is on: in the dark you are
+   offered the sun */
+.theme-btn .th-moon{display:none}
+html[data-theme=dark] .theme-btn .th-moon{display:none}
+html[data-theme=dark] .theme-btn .th-sun{display:block}
+html[data-theme=light] .theme-btn .th-sun{display:none}
+html[data-theme=light] .theme-btn .th-moon{display:block}
+@media(prefers-reduced-motion:reduce){.theme-btn{transition:none}}
+
+/* ── the shelf, at night ──
+   #ready is the one section written entirely in literals rather than tokens —
+   its ground, its kicker and its heading — so it stayed daylight while the
+   rest of the page went dark. It was not caught by the contrast audit either,
+   because that audit reads background-color and this is a gradient. Found by
+   measuring the brightness of every gradient on the page instead. */
+html[data-theme=dark] #ready{background:
+ radial-gradient(70% 46% at 18% 8%,rgba(194,117,127,.16),transparent 62%),
+ radial-gradient(64% 44% at 84% 22%,rgba(235,215,166,.12),transparent 64%),
+ linear-gradient(180deg,#17130D,#1B160F 46%,#141009)}
+html[data-theme=dark] #ready .kicker{border-color:rgba(220,184,110,.42);
+ color:var(--gold3);background:rgba(242,234,217,.07)}
+html[data-theme=dark] #ready .sec-head h2{color:var(--ink)}
+/* the glare on the phone stage is lit for a pale backdrop; on a dark one it
+   only washes the film out */
+html[data-theme=dark] .rd-glow{opacity:.45}
+
+/* ══════════════ الدعوة في الوضع الليلي ══════════════
+   The invitation used to be excluded from the theme on the argument that its
+   palette was measured off its own film and was not the viewer's to change.
+   That was the wrong line to draw: what was measured off the film is the
+   gold, the blush and the plum — the paper was never in the footage. So the
+   paper turns over and the film's own colours stay exactly as they were.
+
+   [class] rather than a bare class: every palette is .edi-veil-root.pal-x,
+   which outranks a plain descendant selector. Matching the attribute as well
+   puts this one point ahead of all twenty of them without naming any. */
+html[data-theme=dark] .edi-veil-root[class]{
+ --cream:#15120C;--cream-hi:#1E1913;--beige:#272016;--beige-dp:#31291C;
+ --ink:#F4ECDB;--ink-soft:#DACDB6;--ink-mute:#AE9F86;
+ /* The gold ramp is named for depth on paper, so it reads upside down on ink:
+    --gold-lo is the deepest gold and it is what the headlines are set in.
+    Every palette declares --gold-hi as a literal light value, so pointing the
+    deep one at it inverts the ramp for all twenty without touching any. */
+ --gold-lo:var(--gold-hi);
+ --gold-pale:color-mix(in srgb,var(--gold) 20%,#13100A);
+}
+/* The scrim over a film plate is a near-white veil — it exists to lift cream
+   paper over moving footage. On ink it has to do the opposite job. */
+html[data-theme=dark] .edi-wash{background:
+ radial-gradient(112% 78% at 50% 40%,rgba(10,8,5,.34) 0%,rgba(10,8,5,.52) 60%,rgba(8,6,4,.72) 100%)}
+html[data-theme=dark] .edi-ph.film ~ .edi-wash{background:
+ radial-gradient(96% 62% at 50% 50%,rgba(8,6,4,.30) 0%,rgba(8,6,4,.58) 62%,rgba(6,5,3,.78) 100%)}
+/* the film itself settles back a little, the way it does on the reference —
+   on the container, not the <video>, so the per-film grade survives */
+html[data-theme=dark] .edi-ph.film{filter:brightness(.86) saturate(1.04)}
+html[data-theme=dark] .edi-ph.has{filter:brightness(.8)}
+
+/* The sticky layout pins its controls to the light ink family, because there
+   the film is behind everything and the buttons are the only paper on screen.
+   In the dark the buttons are ink too, so pinning them light leaves the label
+   invisible — measured at 1.47:1 on وكالة الأفق. They follow the theme here. */
+html[data-theme=dark] .lay-sticky .edi-s button,
+html[data-theme=dark] .lay-sticky .edi-s input,
+html[data-theme=dark] .lay-sticky .edi-s select,
+html[data-theme=dark] .lay-sticky .edi-s textarea,
+html[data-theme=dark] .lay-sticky .edi-s .edi-btn,
+html[data-theme=dark] .lay-sticky .edi-s .edi-card{
+ --ink:#F4ECDB;--ink-soft:#DACDB6;--ink-mute:#AE9F86;
+ --gold:#CFA657;--gold-lo:#EEDBAC;--gold-hi:#F2E0B6;--gold-pale:#2A2214}
+/* the close pill is a white frosted lozenge; on ink it should be the ink,
+   frosted */
+html[data-theme=dark] .edi-x{background:rgba(14,11,7,.55)}
+html[data-theme=dark] .veil .close-x{background:rgba(14,11,7,.5)}
+
+/* Each poster's backdrop is mixed from that film's own two swatch colours, and
+   those were measured off cream footage, so on ink they sit as pale blocks —
+   the one place the page still looked patchy. On the reference the same
+   backdrops go deep and saturated instead: قصر الرخام's rose becomes wine,
+   شمعة العام's red becomes #3C0B05. Darkening and saturating the mix gets
+   there without giving up the per-film colour that makes the shelf readable
+   at a glance. */
+html[data-theme=dark] .rd-bleed{filter:brightness(.40) saturate(1.5)}
+html[data-theme=dark] .rd-glow{opacity:.32}
+html[data-theme=dark] .rd-stage{box-shadow:0 26px 60px -30px rgba(0,0,0,.8),
+ inset 0 0 0 1px rgba(238,219,172,.14)}
