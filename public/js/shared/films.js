@@ -178,7 +178,7 @@ const FILMS_BUILTIN=[
     Two for a travel agency and two for any opening. These do not use the
     envelope: an agency is announced from behind a curtain, not posted in a
     letter — see envStyle 'curtain'. */
- {id:'takeoff',cat:'open',icon:'compass',font:'kufi',v:'/media/inv/takeoff.mp4',p:'/media/inv/takeoff.jpg',env:'curtain',
+ {id:'takeoff',cat:'open',layout:'sticky',icon:'compass',font:'kufi',v:'/media/inv/takeoff.mp4',p:'/media/inv/takeoff.jpg',env:'curtain',
   name:{ar:'إقلاع',fr:'Décollage',en:'Take Off'},
   blurb:{ar:'مدينة تلمع من فوق، وأبراج تطلع من الضوء — السفر كما يُحكى',
    fr:'Une ville qui brille vue d’en haut et des tours qui montent dans la lumière',
@@ -186,7 +186,7 @@ const FILMS_BUILTIN=[
   dress:{ar:['لباس أنيق','أزرق وذهبي'],fr:['Tenue élégante','Bleu et or'],en:['Smart dress','Blue and gold']},
   sw:['#05070C','#1E7C86','#EDF3F6'],
   snd:'/media/snd/takeoff.webm',sndN:'صوت الفيلم نفسه'},
- {id:'boarding',cat:'open',icon:'gate',font:'kufi',v:'/media/inv/boarding.mp4',p:'/media/inv/boarding.jpg',env:'curtain',
+ {id:'boarding',cat:'open',layout:'sticky',icon:'gate',font:'kufi',v:'/media/inv/boarding.mp4',p:'/media/inv/boarding.jpg',env:'curtain',
   name:{ar:'بوّابة السفر',fr:'La Porte',en:'The Gate'},
   blurb:{ar:'مطار عند الغروب، وطائرة تنتظر عند البوّابة',
    fr:'Un aéroport au crépuscule et un avion qui attend à la porte',

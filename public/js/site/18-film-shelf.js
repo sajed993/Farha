@@ -97,6 +97,7 @@ function openReady(id){
   /* The mark and the typeface. Weddings are deliberately left alone — they
      are most of the catalogue and they already read well. Everything else
      takes what its film declares, and the dashboard overrides either. */
+  ediLayout:readyCfg(f.id).layout||f.layout||'',
   ediIcon:readyCfg(f.id).icon||f.icon||'',
   ediFont:readyCfg(f.id).font||f.font||'',
   dress:f.dress?{t:(f.dress[S.lang]||[])[0]||'',d:(f.dress[S.lang]||[])[1]||'',sw:f.sw||null}:null,

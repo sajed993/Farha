@@ -40,8 +40,20 @@ function ediVidStyle(){
 /* The fixed per-plate cues that used to live here are gone. They gave each
    plate a different moment of the film, which looked varied standing still and
    jumped every time a guest scrolled. One clock now — see ediClockGive. */
+/* Is this invitation running the one-film-behind-everything layout? Asked in
+   two places — by the backdrop that builds the film, and by the plates that
+   must then not build anything at all. */
+function ediStickyOn(){
+ return S.c.ediLayout==='sticky' && !!(S.c.films&&S.c.films.hero)
+        && /\.mp4$/i.test(S.c.films.hero);}
+
 /* A plate is a film when one is assigned, else a photograph, else the CSS wash. */
 function ediPlate(k,cls){
+ /* Under the sticky layout there are no plates. Hiding them in CSS was not
+    enough: a display:none <video> is still in the document and still fetches
+    its file, so a guest was pulling the same film five times over to look at
+    one of them. Nothing is built, so nothing is downloaded. */
+ if(ediStickyOn())return '';
  const film=S.c.films&&S.c.films[k];
  if(film&&/\.mp4$/i.test(film)){
   const poster=film.replace(/\.mp4$/,'.jpg');
@@ -345,7 +357,22 @@ function ediHTML(){
  const cart=n=>`<div class="edi-mono ${n||''}">${mark}<span class="mg">${mono}</span></div>`;
  const prog=ediSecOn('prog')?(c.program&&c.program.length?c.program:[]).slice(0,6):[];
 
+ /* ═══ one film behind everything ═══
+    In this layout the invitation has no separate plates: a single film is
+    pinned behind the whole thing and the text scrolls over it. It is
+    continuous by construction — nothing is seeked, nothing is handed over,
+    so there is no seam to get wrong and no cost in stutter. It is a direct
+    child of .edi rather than of a section, so no section's overflow can clip
+    it, and it carries .edi-ph.film so the existing playback watcher picks it
+    up without being told about it. */
+ const stick = ediStickyOn()
+   ? `<div class="edi-ph film edi-sticky"><video src="${c.films.hero}"
+        poster="${c.films.hero.replace(/\.mp4$/,'.jpg')}"
+        muted loop playsinline preload="auto"></video></div>
+      <div class="edi-sticky-wash"></div>` : '';
+
  return `<div class="edi" id="edi" data-vid="${ediVidStyle()}">
+  ${stick}
   <div class="edi-bar"><i id="ediBar"></i></div>
   <button class="edi-x" onclick="closeVeil()">${t().closePrev}</button>
 
@@ -520,7 +547,7 @@ function editorialOpen(){
     the invitation asks for its own */
  try{lazyvReleaseAll()}catch(e){}
  veil=document.createElement('div');
- veil.className='veil edi-veil-root'+(S.c.ediPal?' pal-'+S.c.ediPal:'')+(S.c.ediFont?' font-'+S.c.ediFont:'');
+ veil.className='veil edi-veil-root'+(S.c.ediPal?' pal-'+S.c.ediPal:'')+(S.c.ediFont?' font-'+S.c.ediFont:'')+(S.c.ediLayout?' lay-'+S.c.ediLayout:'');
  /* a film added from the dashboard carries its colours rather than a class */
  if(S.c.ediSw){const v=ediPaletteVars(S.c.ediSw);if(v)veil.setAttribute('style',v);}
  document.body.appendChild(veil);scrollSync();
