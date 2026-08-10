@@ -94,8 +94,11 @@ function openReady(id){
   /* the dashboard's choice first, then the film's own — an agency opening
      ships with the curtain because a letter is the wrong object for it */
   envStyle:readyCfg(f.id).env||f.env||'',vidStyle:readyCfg(f.id).vid||'',
-  /* a different face for a different kind of occasion */
-  ediFont:f.cat==='open'?'kufi':'',
+  /* The mark and the typeface. Weddings are deliberately left alone — they
+     are most of the catalogue and they already read well. Everything else
+     takes what its film declares, and the dashboard overrides either. */
+  ediIcon:readyCfg(f.id).icon||f.icon||'',
+  ediFont:readyCfg(f.id).font||f.font||'',
   dress:f.dress?{t:(f.dress[S.lang]||[])[0]||'',d:(f.dress[S.lang]||[])[1]||'',sw:f.sw||null}:null,
   trackUrl:readyCfg(f.id).snd||f.snd||'',
   trackName:readyCfg(f.id).sndN||f.sndN||'',

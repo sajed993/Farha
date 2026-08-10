@@ -120,6 +120,11 @@ const EDISECL=[['cd','ساعة العدّ التنازلي'],['prog','برنام
  ['dir','الوصول وصفّ السيارات'],['stay','الإقامة'],['rsvp','تأكيد الحضور']];
 function ctlEdi(k,v){CFG.edi[k]=v?1:0;saveCFG();}
 /* the five envelope styles: one is active, any can be switched off */
+/* Weddings stay on Aref Ruqaa; these are for everything else. */
+const FONTL=[['','الافتراضي — عرف رقعة (الأعراس)'],
+ ['kufi','ريم كوفي — حديث ومؤسّسي'],
+ ['amiri','أميري — نسخيّ وتراثي'],
+ ['cairo','القاهرة — مدوّر وغير رسمي']];
 const ENVL=[['full','الظرف الكامل','الشاشة كلها ظرف، وكل طيّة يتبعها خيط ذهبي'],
  ['macro','اللقطة القريبة','كاميرا قريبة جدًا من الشمع — الأجرأ'],
  ['silk','جيب الحرير','حرير منسوج بلون الفيلم، والبطاقة ترتفع منه'],
@@ -448,6 +453,17 @@ function readyView(){
    `<option value="${k}" ${cur===k?'selected':''}>${n}</option>`).join('');
  const vidOpt=(cur)=>VIDL.map(([k,n])=>
    `<option value="${k}" ${cur===k?'selected':''}>${n}</option>`).join('');
+ /* The mark in the middle of the invitation and the face it is set in. Both
+    ship with the film and both are overridable here, per film. An empty value
+    means «as it was» — which for every wedding is the oval cartouche and Aref
+    Ruqaa, deliberately left alone. */
+ const iconOpt=(cur)=>{
+  const names=(typeof EDI_MARK_NAMES!=='undefined')?EDI_MARK_NAMES:{};
+  let h=`<option value="" ${cur?'':'selected'}>الافتراضي — بيضاوي</option>`;
+  for(const k in names) h+=`<option value="${k}" ${cur===k?'selected':''}>${names[k]}</option>`;
+  return h;};
+ const fontOpt=(cur)=>FONTL.map(([k,n])=>
+   `<option value="${k}" ${cur===k?'selected':''}>${n}</option>`).join('');
  return newFilmsView()
  + ctlCard('💰 سعر الدعوات الجاهزة',
   'السعر المعروض والسعر المشطوب فوقه. اجعلوا المشطوب صفرًا لإخفاء الخصم.',
@@ -480,6 +496,10 @@ function readyView(){
       <option value="">الافتراضي</option>${envOpt(o.env||'')}</select></label>
      <label>عرض الفيلم<select onchange="ctlFilm('${id}','vid',this.value)">
       <option value="">الافتراضي</option>${vidOpt(o.vid||'')}</select></label>
+     <label>الرمز داخل الدعوة<select onchange="ctlFilm('${id}','icon',this.value)">
+      ${iconOpt(o.icon!==undefined?o.icon:(shipped.icon||''))}</select></label>
+     <label>خطّ الدعوة<select onchange="ctlFilm('${id}','font',this.value)">
+      ${fontOpt(o.font!==undefined?o.font:(shipped.font||''))}</select></label>
      <label>اسم الأغنية<input placeholder="${escA(shipped.sndN||'الفنّان — العنوان')}"
       value="${escA(o.sndN||'')}" onchange="ctlFilm('${id}','sndN',this.value)"></label>
      <div class="sndnow">${o.snd

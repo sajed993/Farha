@@ -37,18 +37,13 @@ function ediVidStyle(){
  const w=V[scope];
  return (w&&EDI_VID.indexOf(w)>=0)?w:'full';}
 
-const EDI_CUE={hero:0,hall:.28,detail:.52,date:.74,venue:.88};
-/* Seconds into each clip, so a #t= fragment can be baked into the src. Seeking
-   in JS after load stalls the decoder and shows as a freeze; the fragment lets
-   the browser begin decoding at the cue instead. */
-const EDI_DUR={'/media/inv/inv-1.mp4':16.3,'/media/inv/inv-2.mp4':8.4,
- '/media/inv/inv-3.mp4':9.9,'/media/inv/inv-4.mp4':12.2};
+/* The fixed per-plate cues that used to live here are gone. They gave each
+   plate a different moment of the film, which looked varied standing still and
+   jumped every time a guest scrolled. One clock now — see ediClockGive. */
 /* A plate is a film when one is assigned, else a photograph, else the CSS wash. */
 function ediPlate(k,cls){
  const film=S.c.films&&S.c.films[k];
  if(film&&/\.mp4$/i.test(film)){
-  const cue=EDI_CUE[k]||0, dur=EDI_DUR[film]||0;
-  const at=(cue>0&&dur)?+(dur*cue).toFixed(1):0;
   const poster=film.replace(/\.mp4$/,'.jpg');
   /* The cue used to be baked into the src as a #t= fragment. It reads well —
      the browser starts decoding at the cue instead of being seeked afterwards
@@ -58,7 +53,7 @@ function ediPlate(k,cls){
      The cue is carried as data now and applied once the metadata is in, so all
      four plates share one file and one download. */
   return `<div class="edi-ph film ${cls||''}"><video src="${film}" poster="${poster}"
-    ${at?`data-at="${at}"`:''} muted loop playsinline preload="${k==='hero'?'auto':'metadata'}"></video></div>`;}
+    muted loop playsinline preload="${k==='hero'?'auto':'metadata'}"></video></div>`;}
  if(film)
   return `<div class="edi-ph has ${cls||''}" style="background-image:url('${film}')"></div>`;
  const on=ediImgOK[k];
@@ -343,7 +338,11 @@ function ediHTML(){
  const mono=ini.length>=2
   ? `<b>${esc(ini[0])}</b><i>${S.lang==='ar'?'و':'&'}</i><b>${esc(ini[1])}</b>`
   : `<b class="solo">${esc(ini[0]||'✦')}</b>`;
- const cart=n=>`<div class="edi-mono ${n||''}">${EDI_CART}<span class="mg">${mono}</span></div>`;
+ /* The mark in the middle. Weddings keep the cartouche they have always had;
+    anything else uses the one chosen for it, in the film or in the dashboard. */
+ const mark=(typeof ediMarkSVG==='function' && S.c.ediIcon)
+   ? ediMarkSVG(S.c.ediIcon) : EDI_CART;
+ const cart=n=>`<div class="edi-mono ${n||''}">${mark}<span class="mg">${mono}</span></div>`;
  const prog=ediSecOn('prog')?(c.program&&c.program.length?c.program:[]).slice(0,6):[];
 
  return `<div class="edi" id="edi" data-vid="${ediVidStyle()}">
@@ -472,13 +471,16 @@ function mountEditorial(stage){
  const vids=[...root.querySelectorAll('.edi-ph.film video')];
  if(vids.length){
   const hero=vids[0];
+  ediClockReset();
   if(hero)hero.play().catch(()=>{});
   if('IntersectionObserver' in window){
    const vo=new IntersectionObserver(es=>es.forEach(e=>{
     const v=e.target;
-    if(e.isIntersecting){if(v.preload!=='auto')v.preload='auto';v.play().catch(()=>{});}
-    else if(!v.paused)v.pause();}),{threshold:.15});
-   vids.forEach(v=>vo.observe(v));
+    if(e.isIntersecting){
+     if(v.preload!=='auto')v.preload='auto';
+     ediClockGive(v);
+    } else if(!v.paused){ ediClockTake(v); v.pause(); }}),{threshold:.15});
+   vids.forEach(v=>{ ediClockFollow(v); vo.observe(v); });
   } else vids.forEach(v=>v.play().catch(()=>{}));}
 
  ediStartClock();
@@ -529,7 +531,7 @@ function editorialOpen(){
  waxEnvelope(stage,()=>{
   if(!veil)return;
   const inner=veil.querySelector('.edi-stage');
-  if(inner){ mountEditorial(inner); ediCuePlates(inner); ediStartMusic(inner); }});
+  if(inner){ mountEditorial(inner); ediStartMusic(inner); }});
  ediPreload(()=>{});}
 
 /* The music used to start here, at the moment the invitation mounted —
@@ -542,20 +544,42 @@ function editorialOpen(){
    It starts with the film now. The first frame and the first note together,
    which is also the only arrangement a browser reliably allows — pressing the
    seal is the gesture that earns the right to make sound. */
-/* Put each plate at its own moment of the film. Applied after the metadata
-   arrives, because a seek before that is silently dropped. */
-function ediCuePlates(root){
- try{
-  (root||document).querySelectorAll('video[data-at]').forEach(function(v){
-   const at=parseFloat(v.dataset.at)||0;
-   if(!at) return;
-   const put=function(){ try{ if(Math.abs(v.currentTime-at)>0.25) v.currentTime=at; }catch(e){} };
-   if(v.readyState>=1) put(); else v.addEventListener('loadedmetadata',put,{once:true});
-   /* a looping clip returns to zero, not to its cue */
-   v.addEventListener('seeked',function(){ v.dataset.cued='1'; },{once:true});
-   v.addEventListener('ended',put);
-  });
- }catch(e){}
+/* ═══ one clock for the whole invitation ═══
+   Each plate used to start at a fixed point in the film — the hero at zero,
+   the next at 4.6s, the next at 8.5s. Scrolling from one to the next therefore
+   jumped, because the second plate had been waiting at its own mark rather
+   than carrying on.
+
+   There is one clock now. A plate leaving the screen records where it got to;
+   the next one to arrive starts from exactly there. The film reads as one
+   continuous take that happens to be shown through several windows. */
+let EDI_CLOCK = 0;
+function ediClockReset(){ EDI_CLOCK = 0; }
+function ediClockTake(v){
+ try{ if(v && !isNaN(v.currentTime)) EDI_CLOCK = v.currentTime; }catch(e){}
+}
+/* The clock is kept current by whatever is playing, not only by whatever has
+   just left. During a scroll both plates are briefly on screen at once, so the
+   arriving one would otherwise read a value from before the outgoing one had
+   moved — and appear to jump backwards. */
+function ediClockFollow(v){
+ v.addEventListener('timeupdate', function(){
+  if(!v.paused && !isNaN(v.currentTime)) EDI_CLOCK = v.currentTime;
+ });
+}
+function ediClockGive(v){
+ const t = EDI_CLOCK;
+ const put = function(){
+  try{
+   const d = v.duration || 0;
+   /* a plate that would start past the end wraps, rather than sitting frozen
+      on the last frame */
+   const want = (d && t >= d - 0.15) ? 0 : t;
+   if(Math.abs(v.currentTime - want) > 0.2) v.currentTime = want;
+  }catch(e){}
+  v.play().catch(function(){});
+ };
+ if(v.readyState >= 1) put(); else v.addEventListener('loadedmetadata', put, {once:true});
 }
 
 function ediStartMusic(root){

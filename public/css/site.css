@@ -3545,3 +3545,19 @@ html[lang=fr] .font-kufi .edi-n,html[lang=en] .font-kufi .edi-n{
  font-family:'Cinzel',serif!important;letter-spacing:.06em}
 /* a touch more air between lines — Kufi sets tighter than Ruqaa */
 .font-kufi .edi-n{line-height:1.5}
+
+/* ═══ أصوات الخطّ داخل الدعوة ═══
+   Weddings keep Aref Ruqaa and are not touched by any of this. The other
+   occasions take a face that suits them: Amiri reads as written by hand for
+   heritage nights, Cairo is rounded and unceremonious for babies and
+   birthdays, Reem Kufi is geometric for anything corporate. */
+.font-amiri .edi-t,.font-amiri .edi-n,.font-amiri .edi-big,
+.font-amiri .edi-sec h3,.font-amiri .wenv-note b,.font-amiri .cu-note b{
+ font-family:'Amiri',var(--serifA)!important;font-weight:700}
+.font-cairo .edi-t,.font-cairo .edi-n,.font-cairo .edi-big,
+.font-cairo .edi-sec h3,.font-cairo .wenv-note b,.font-cairo .cu-note b{
+ font-family:'Cairo',var(--bodyA)!important;font-weight:700;letter-spacing:0}
+.font-cairo .edi-n{line-height:1.5}
+html[lang=fr] .font-amiri .edi-n,html[lang=en] .font-amiri .edi-n,
+html[lang=fr] .font-cairo .edi-n,html[lang=en] .font-cairo .edi-n{
+ font-family:'Cormorant Garamond',serif!important}

@@ -54,14 +54,14 @@ const FILMS_BUILTIN=[
   snd:'/media/snd/rings.webm',sndN:'Ludovico Einaudi — Nuvole Bianche'},
 
  /* ── birthdays ── */
- {id:'bdaycake',cat:'bday',v:'/media/inv/bday-cake.mp4',p:'/media/inv/bday-cake.jpg',design:7,
+ {id:'bdaycake',cat:'bday',icon:'candle',font:'cairo',v:'/media/inv/bday-cake.mp4',p:'/media/inv/bday-cake.jpg',design:7,
   name:{ar:'شمعة العام',fr:'La Bougie',en:'One Candle'},
   blurb:{ar:'شمعةٌ واحدة فوق كعكة، وورودٌ داكنة حولها، والضوء وحده يحتفل',
    fr:'Une seule bougie sur le gâteau, des fleurs sombres autour, et la lumière qui fête toute seule',
    en:'A single candle on the cake, dark blooms around it, and only the light celebrating'},
   dress:{ar:['أحمر وأسود','لمسة جريئة تكفي'],fr:['Rouge et noir','Une touche audacieuse suffit'],en:['Red and black','One bold touch is enough']},
   sw:['#3A2018','#BE3325','#E9DDCB']},
- {id:'bdayballoons',cat:'bday',v:'/media/inv/bday-balloons.mp4',p:'/media/inv/bday-balloons.jpg',design:7,
+ {id:'bdayballoons',cat:'bday',icon:'candle',font:'cairo',v:'/media/inv/bday-balloons.mp4',p:'/media/inv/bday-balloons.jpg',design:7,
   name:{ar:'بالونات وردية',fr:'Ballons Poudrés',en:'Blush Balloons'},
   blurb:{ar:'بالوناتٌ وردية وهدايا وباقةٌ صغيرة — فرحٌ خفيف بلا ضجيج',
    fr:'Ballons poudrés, cadeaux et un petit bouquet — une joie légère, sans bruit',
@@ -70,13 +70,13 @@ const FILMS_BUILTIN=[
   sw:['#4A2E2A','#D48CA0','#EEDDD8']},
 
  /* ── newborns ── */
- {id:'babybasket',cat:'baby',v:'/media/inv/baby-basket.mp4',p:'/media/inv/baby-basket.jpg',design:8,
+ {id:'babybasket',cat:'baby',icon:'crib',font:'cairo',v:'/media/inv/baby-basket.mp4',p:'/media/inv/baby-basket.jpg',design:8,
   name:{ar:'قدمان صغيرتان',fr:'Deux Petits Pieds',en:'Two Small Feet'},
   blurb:{ar:'قدمان صغيرتان في سلّةٍ من القشّ — أهدأ إعلانٍ يمكن أن ترسلوه',
    fr:"Deux petits pieds dans un couffin d'osier — l'annonce la plus douce qui soit",
    en:'Two small feet in a woven basket — the gentlest announcement there is'},
   sw:['#4A4036','#D1815E','#EEDCCB']},
- {id:'babycake',cat:'baby',v:'/media/inv/baby-cake.mp4',p:'/media/inv/baby-cake.jpg',design:8,
+ {id:'babycake',cat:'baby',icon:'crib',font:'cairo',v:'/media/inv/baby-cake.mp4',p:'/media/inv/baby-cake.jpg',design:8,
   name:{ar:'أهلًا يا صغير',fr:'Oh Baby',en:'Oh Baby'},
   blurb:{ar:'كعكةٌ بيضاء على لحافٍ ناعم، وكلمتان مكتوبتان بالكريمة',
    fr:'Un gâteau blanc sur une couverture douce, et deux mots écrits à la crème',
@@ -84,7 +84,7 @@ const FILMS_BUILTIN=[
   sw:['#3F3E3D','#8E8578','#E2E0D8']},
 
  /* ── graduation ── */
- {id:'grad',cat:'grad',v:'/media/inv/grad.mp4',p:'/media/inv/grad.jpg',design:6,
+ {id:'grad',cat:'grad',icon:'cap',font:'cairo',v:'/media/inv/grad.mp4',p:'/media/inv/grad.jpg',design:6,
   name:{ar:'قبّعة وورد',fr:'Toque et Roses',en:'Cap and Roses'},
   blurb:{ar:'قبّعة التخرّج وباقةٌ من الورد الوردي تحت سماءٍ صافية',
    fr:'La toque et un bouquet de roses sous un ciel clair',
@@ -94,7 +94,7 @@ const FILMS_BUILTIN=[
   snd:'/media/snd/grad.webm',sndN:'بيانو التخرّج'},
 
  /* ── henna night ── */
- {id:'henna',cat:'henna',v:'/media/inv/henna.mp4',p:'/media/inv/henna.jpg',design:10,
+ {id:'henna',cat:'henna',icon:'henna',font:'amiri',v:'/media/inv/henna.mp4',p:'/media/inv/henna.jpg',design:10,
   name:{ar:'ليلة الحنّة',fr:'Nuit du Henné',en:'Henna Night'},
   blurb:{ar:'ورد قرمزي في جرارٍ من فخّار، وضوءٌ دافئ على الجدار — ليلة الحنّة كما هي',
    fr:'Des fleurs carmin dans des jarres de terre cuite et une lumière chaude sur le mur — la nuit du henné',
@@ -178,7 +178,7 @@ const FILMS_BUILTIN=[
     Two for a travel agency and two for any opening. These do not use the
     envelope: an agency is announced from behind a curtain, not posted in a
     letter — see envStyle 'curtain'. */
- {id:'takeoff',cat:'open',v:'/media/inv/takeoff.mp4',p:'/media/inv/takeoff.jpg',env:'curtain',
+ {id:'takeoff',cat:'open',icon:'compass',font:'kufi',v:'/media/inv/takeoff.mp4',p:'/media/inv/takeoff.jpg',env:'curtain',
   name:{ar:'إقلاع',fr:'Décollage',en:'Take Off'},
   blurb:{ar:'مدينة تلمع من فوق، وأبراج تطلع من الضوء — السفر كما يُحكى',
    fr:'Une ville qui brille vue d’en haut et des tours qui montent dans la lumière',
@@ -186,7 +186,7 @@ const FILMS_BUILTIN=[
   dress:{ar:['لباس أنيق','أزرق وذهبي'],fr:['Tenue élégante','Bleu et or'],en:['Smart dress','Blue and gold']},
   sw:['#05070C','#1E7C86','#EDF3F6'],
   snd:'/media/snd/takeoff.webm',sndN:'صوت الفيلم نفسه'},
- {id:'boarding',cat:'open',v:'/media/inv/boarding.mp4',p:'/media/inv/boarding.jpg',env:'curtain',
+ {id:'boarding',cat:'open',icon:'gate',font:'kufi',v:'/media/inv/boarding.mp4',p:'/media/inv/boarding.jpg',env:'curtain',
   name:{ar:'بوّابة السفر',fr:'La Porte',en:'The Gate'},
   blurb:{ar:'مطار عند الغروب، وطائرة تنتظر عند البوّابة',
    fr:'Un aéroport au crépuscule et un avion qui attend à la porte',
@@ -194,7 +194,7 @@ const FILMS_BUILTIN=[
   dress:{ar:['لباس عمل أنيق','رمادي وكحلي'],fr:['Business chic','Gris et marine'],en:['Business smart','Grey and navy']},
   sw:['#0A0B0E','#4A3E2D','#EFF3F8'],
   snd:'/media/snd/boarding.webm',sndN:'صوت الفيلم نفسه'},
- {id:'grandopen',cat:'open',v:'/media/inv/grandopen.mp4',p:'/media/inv/grandopen.jpg',env:'curtain',
+ {id:'grandopen',cat:'open',icon:'bow',font:'kufi',v:'/media/inv/grandopen.mp4',p:'/media/inv/grandopen.jpg',env:'curtain',
   name:{ar:'قريبًا نفتح',fr:'Bientôt',en:'Opening Soon'},
   blurb:{ar:'حرير يتحرّك ببطء، وسطران يقولان إنّ شيئًا جميلًا قادم',
    fr:'De la soie qui bouge lentement, et deux lignes qui annoncent quelque chose de beau',
@@ -202,7 +202,7 @@ const FILMS_BUILTIN=[
   dress:{ar:['أنيق وهادئ','بيج وعاجي'],fr:['Chic et calme','Beige et ivoire'],en:['Quietly smart','Beige and ivory']},
   sw:['#141110','#8A7461','#F1EDE9'],
   snd:'/media/snd/grandopen.webm',sndN:'موسيقى افتتاح ١'},
- {id:'newdoors',cat:'open',v:'/media/inv/newdoors.mp4',p:'/media/inv/newdoors.jpg',env:'curtain',
+ {id:'newdoors',cat:'open',icon:'gate',font:'kufi',v:'/media/inv/newdoors.mp4',p:'/media/inv/newdoors.jpg',env:'curtain',
   name:{ar:'أبواب جديدة',fr:'Portes Ouvertes',en:'New Doors'},
   blurb:{ar:'مقرّ جديد تحت سماء المساء، وماء هادئ وزيتونة',
    fr:'Un nouveau siège sous le ciel du soir, une eau calme et un olivier',
@@ -210,7 +210,7 @@ const FILMS_BUILTIN=[
   dress:{ar:['لباس عمل','ألوان هادئة'],fr:['Tenue de travail','Tons sobres'],en:['Business dress','Quiet tones']},
   sw:['#080A0D','#1E7C86','#F4F1EE'],
   snd:'/media/snd/newdoors.webm',sndN:'موسيقى افتتاح ٢'},
- {id:'soon',cat:'save',v:'/media/inv/soon.mp4',p:'/media/inv/soon.jpg',design:3,
+ {id:'soon',cat:'save',icon:'date',font:'kufi',v:'/media/inv/soon.mp4',p:'/media/inv/soon.jpg',design:3,
   name:{ar:'قريبًا',fr:'Bientôt',en:'Coming Soon'},
   blurb:{ar:'حريرٌ عاجي وظلٌّ يتحرك، وسطرٌ واحد: شيءٌ جميل قادم',
    fr:"Soie ivoire, une ombre qui bouge, et une seule ligne : quelque chose de beau arrive",
