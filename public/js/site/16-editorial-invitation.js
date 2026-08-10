@@ -241,6 +241,77 @@ const EDI_ICONS=[
  '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="16" cy="16" r="9"/><circle cx="16" cy="16" r="4.4" opacity=".55"/></svg>',
  '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="11" cy="23" r="4"/><path d="M15 23V7l10-2v14"/><circle cx="21" cy="19" r="4"/></svg>'];
 
+/* ═══ ميداليات البرنامج ═══
+   The five medallions beside the programme rows were one fixed set, and the
+   second of them is two interlocking rings. Every occasion was therefore
+   wearing a wedding symbol on every second line — an agency opening included.
+
+   Weddings keep EDI_ICONS exactly as they are. Everything else draws from the
+   marks library, which already has a candle, a crib, a cap, a henna hand, a
+   compass and a gate in it. Nothing new is invented; the right ones are
+   pointed at. */
+const EDI_MEDS = {
+ henna:['henna','bloom','hands','record','star'],
+ bday:['candle','bloom','star','record','hands'],
+ baby:['crib','bloom','hands','star','candle'],
+ grad:['cap','star','bloom','record','hands'],
+ open:['bow','gate','star','hands','record']
+};
+/* a travel agency navigates rather than cuts ribbons */
+const EDI_MEDS_FILM = {
+ takeoff:['compass','gate','star','bow','hands'],
+ boarding:['gate','compass','star','bow','hands']
+};
+/* Marks are drawn on a 100 viewBox at stroke 1.5; the medallions were drawn on
+   a 32 viewBox at 1.3, which is 4% of the box rather than 1.5%. Without the
+   heavier weight they arrive as hairlines beside the wedding ones. */
+function ediMeds(){
+ const keys = (S.c&&S.c.film&&EDI_MEDS_FILM[S.c.film])
+   || (S.c&&S.c.ediCat&&EDI_MEDS[S.c.ediCat]);
+ if(!keys || typeof ediMarkSVG!=='function') return EDI_ICONS;
+ return keys.map(function(k){ return ediMarkSVG(k,3.8); });
+}
+
+/* ═══ برنامج كل مناسبة ═══
+   ediDemoProgram fell through to the wedding programme for anything it had no
+   entry for, so an agency opening ran عقد القران in قاعة الياسمين at five.
+   These are the two that were missing. */
+const EDI_PROG_EXTRA = {
+ open:{
+  ar:[['16:30','استقبال المدعوين','مدخل الوكالة'],['17:00','كلمة الافتتاح','القاعة'],
+      ['17:30','قصّ الشريط','الباب الرئيسي'],['18:00','جولة في المكان','الطوابق'],
+      ['19:00','لقاء وتعارف','الشرفة']],
+  fr:[['16:30','Accueil des invités','Entrée de l’agence'],['17:00','Discours d’ouverture','La salle'],
+      ['17:30','Coupure du ruban','La porte principale'],['18:00','Visite des lieux','Les étages'],
+      ['19:00','Rencontre','La terrasse']],
+  en:[['16:30','Welcoming the guests','The agency entrance'],['17:00','Opening address','The hall'],
+      ['17:30','Cutting the ribbon','The main door'],['18:00','A walk through','The floors'],
+      ['19:00','Meeting the team','The terrace']]}
+};
+/* and the two travel agencies, which do not open a room so much as a route */
+const EDI_PROG_FILM = {
+ takeoff:{
+  ar:[['16:30','استقبال الضيوف والشركاء','مدخل الوكالة'],['17:00','كلمة الافتتاح','القاعة'],
+      ['17:30','قصّ الشريط','الباب الرئيسي'],['18:00','وجهات أوّل موسم','ركن العرض'],
+      ['19:00','أوّل حجز من هذا الباب','مكتب الحجوزات']],
+  fr:[['16:30','Accueil des invités et partenaires','Entrée de l’agence'],['17:00','Discours d’ouverture','La salle'],
+      ['17:30','Coupure du ruban','La porte principale'],['18:00','Les premières destinations','L’espace expo'],
+      ['19:00','La première réservation','Le comptoir']],
+  en:[['16:30','Welcoming guests and partners','The agency entrance'],['17:00','Opening address','The hall'],
+      ['17:30','Cutting the ribbon','The main door'],['18:00','The first destinations','The display corner'],
+      ['19:00','The first booking through this door','The counter']]},
+ boarding:{
+  ar:[['17:00','فتح البوّابة','المدخل'],['17:30','كلمة الافتتاح','القاعة'],
+      ['18:00','قصّ الشريط','الباب الرئيسي'],['18:30','وجهات هذا الموسم','ركن العرض'],
+      ['19:30','لقاء وتعارف','الشرفة']],
+  fr:[['17:00','Ouverture de la porte','L’entrée'],['17:30','Discours d’ouverture','La salle'],
+      ['18:00','Coupure du ruban','La porte principale'],['18:30','Les destinations de la saison','L’espace expo'],
+      ['19:30','Rencontre','La terrasse']],
+  en:[['17:00','Opening the gate','The entrance'],['17:30','Opening address','The hall'],
+      ['18:00','Cutting the ribbon','The main door'],['18:30','This season’s destinations','The display corner'],
+      ['19:30','Meeting the team','The terrace']]}
+};
+
 /* ---- gold frame + floral corners, drawn ----
    The reference plates put a cream panel inside an ornate gold frame with
    blooms crowding two opposite corners. Both are SVG so they scale with the
@@ -506,6 +577,7 @@ function ediHTML(){
    ? ediMarkSVG(S.c.ediIcon) : EDI_CART;
  const cart=n=>`<div class="edi-mono ${n||''}">${mark}<span class="mg">${mono}</span></div>`;
  const prog=ediSecOn('prog')?(c.program&&c.program.length?c.program:[]).slice(0,6):[];
+ const MEDS=ediMeds();
 
  /* ═══ one film behind everything ═══
     In this layout the invitation has no separate plates: a single film is
@@ -599,7 +671,7 @@ function ediHTML(){
     <p class="edi-lbl">${esc(E.progTitle)}</p>
     <div class="edi-rule sm">${EDI_RULE}</div>
     <div class="edi-tl">${prog.map((p,i)=>`<div class="edi-tli">
-      <span class="edi-med">${EDI_ICONS[i%EDI_ICONS.length]}</span>
+      <span class="edi-med">${MEDS[i%MEDS.length]}</span>
       <span class="edi-tlw">
        <span class="edi-tlt">${esc(p.title)||'—'}</span>
        ${p.place?`<span class="edi-pos"><i>${EDI_PIN}</i>${p.map
@@ -802,12 +874,20 @@ function editorialDemo(){
  editorialOpen();}
 
 function ediDemoProgram(cat,f){
+ const row=function(r){return {time:r[0],title:r[1],place:r[2],map:'',music:0,photos:[]};};
  /* A wedding that carries its own running order uses it; everything else
     falls back to the one shared by its occasion. */
  if(typeof readyProgDemo==='function'){
   const own=readyProgDemo(f,S.lang);
-  if(own)return own.map(function(r){
-   return {time:r[0],title:r[1],place:r[2],map:'',music:0,photos:[]};});}
+  if(own)return own.map(row);}
+ /* This film's own, then its occasion's — both added because falling through
+    to the wedding programme had an agency opening running عقد القران. */
+ const fid=f&&f.id;
+ if(fid&&EDI_PROG_FILM[fid])return (EDI_PROG_FILM[fid][S.lang]||EDI_PROG_FILM[fid].ar).map(row);
+ if(EDI_PROG_EXTRA[cat])return (EDI_PROG_EXTRA[cat][S.lang]||EDI_PROG_EXTRA[cat].ar).map(row);
+ /* A save-the-date has no programme by definition — the whole point is that
+    the details are not settled yet. An empty one hides the section. */
+ if(cat==='save')return [];
  const P={
   wed:{ar:[['16:00','استقبال الضيوف','بهو القصر'],['17:00','عقد القران','قاعة الياسمين'],
     ['18:30','كوكتيل وصور','الشرفة المطلّة على البحر'],['20:00','العشاء','القاعة الكبرى'],

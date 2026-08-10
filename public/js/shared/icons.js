@@ -78,9 +78,16 @@ const EDI_MARK_NAMES = {
   date: 'تقويم', compass: 'بوصلة', gate: 'بوّابة', bow: 'شريطة',
 };
 
-/* the SVG for one key, sized by whatever contains it */
-function ediMarkSVG(key) {
+/* The SVG for one key, sized by whatever contains it. `weight` is for the
+   programme medallions: those were drawn on a 32 viewBox at stroke 1.3, which
+   is 4% of the box, and these are drawn on 100 at 1.5, which is 1.5%. Used at
+   medallion size without it, a mark arrives as a hairline next to the ones it
+   is standing in for. */
+function ediMarkSVG(key, weight) {
   const body = EDI_MARKS[key] || EDI_MARKS.cartouche;
+  const stroke = weight
+    ? EDI_MARK_STROKE.replace("stroke-width='1.5'", "stroke-width='" + weight + "'")
+    : EDI_MARK_STROKE;
   return "<svg viewBox='0 0 100 100' aria-hidden='true' focusable='false'>"
-       + body.split(' S').join(' ' + EDI_MARK_STROKE) + "</svg>";
+       + body.split(' S').join(' ' + stroke) + "</svg>";
 }
