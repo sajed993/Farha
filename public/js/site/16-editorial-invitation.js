@@ -64,7 +64,10 @@ function ediPlate(k,cls){
      downloads. Measured on قصر الرخام, a guest transferred 16MB of a 4MB film.
      The cue is carried as data now and applied once the metadata is in, so all
      four plates share one file and one download. */
-  return `<div class="edi-ph film ${cls||''}"><video src="${film}" poster="${poster}"
+  /* the poster is the plate's own ground, not only the video's poster
+     attribute: a <video> with no data draws nothing, and the section behind
+     showed through for the half second it took to arrive. */
+  return `<div class="edi-ph film ${cls||''}" style="background-image:url('${poster}')"><video src="${film}" poster="${poster}"
     muted loop playsinline preload="${k==='hero'?'auto':'metadata'}"></video></div>`;}
  if(film)
   return `<div class="edi-ph has ${cls||''}" style="background-image:url('${film}')"></div>`;
@@ -366,7 +369,8 @@ function ediHTML(){
     it, and it carries .edi-ph.film so the existing playback watcher picks it
     up without being told about it. */
  const stick = ediStickyOn()
-   ? `<div class="edi-ph film edi-sticky"><video src="${c.films.hero}"
+   ? `<div class="edi-ph film edi-sticky"
+        style="background-image:url('${c.films.hero.replace(/\.mp4$/,'.jpg')}')"><video src="${c.films.hero}"
         poster="${c.films.hero.replace(/\.mp4$/,'.jpg')}"
         muted loop playsinline preload="auto"></video></div>
       <div class="edi-sticky-wash"></div>` : '';
@@ -507,7 +511,18 @@ function mountEditorial(stage){
      if(v.preload!=='auto')v.preload='auto';
      ediClockGive(v);
     } else if(!v.paused){ ediClockTake(v); v.pause(); }}),{threshold:.15});
-   vids.forEach(v=>{ ediClockFollow(v); vo.observe(v); });
+   vids.forEach(v=>{
+  /* show it only when there is something to show — until then the poster
+     underneath is what the guest sees, which is the same picture */
+  const reveal=function(){ v.classList.add('on'); };
+  if(v.readyState>=2) reveal(); else v.addEventListener('loadeddata',reveal,{once:true});
+  ediClockFollow(v); vo.observe(v); });
+ /* All the plates are the same file, so once the first has it the rest are
+    reading from cache. Escalating them a moment after the invitation opens
+    costs one request, not four, and removes the wait on arrival. */
+ setTimeout(function(){
+  vids.forEach(function(v){ if(v.preload!=='auto') v.preload='auto'; });
+ },700);
   } else vids.forEach(v=>v.play().catch(()=>{}));}
 
  ediStartClock();
