@@ -11,18 +11,24 @@
 const ENV_STYLES=['classic','full','macro','silk','press','curtain','window'];
 
 /* ═══ نافذة الطائرة ═══
-   A travel agency has no envelope to open — it has a window. The shade lifts
-   on a view, drops, and lifts on another, and the last one dissolves into the
-   invitation. The frame, the shade and the glare are all drawn; only the
-   views are photographs, and each is 40 KB.
+   A travel agency has no envelope to open — it has a window.
 
-   The gesture is the same one the wax seal asks for, which matters for more
-   than consistency: a browser only lets a page make sound after the guest has
-   touched it, so the lift is what earns the song. */
+   The first version drew the window: a bezel, a glass, a shade, and scenery
+   inside them. Drawn, it was a grey oval, and it lifted and dropped three
+   times over six seconds. It was neither beautiful nor quick.
+
+   These are photographs of real windows — frame, cabin and glass in one
+   image — so nothing is drawn any more. And the shade lifts once rather than
+   three times: one gesture, then the views cross-fade behind it while the
+   invitation loads underneath. Five seconds became three and a half, and a
+   tap anywhere skips the rest.
+
+   The lift is still what earns the sound: a browser will not let a page make
+   noise until the guest has touched it, which is what the wax seal was always
+   really for. */
 const WIN_VIEWS=[
- {img:'/media/win/sky.webp',   ar:'فوق السحاب',      fr:'Au-dessus des nuages', en:'Above the clouds'},
- {img:'/media/win/sea.webp',   ar:'الشمس على الماء', fr:'Le soleil sur l’eau',  en:'Sun on the water'},
- {img:'/media/win/shore.webp', ar:'وصلنا',           fr:'Nous y sommes',        en:'We have arrived'}
+ {img:'/media/win/night-moon.webp', ar:'فوق السحاب',        fr:'Au-dessus des nuages', en:'Above the clouds'},
+ {img:'/media/win/night-city.webp', ar:'نقترب من المدينة',  fr:'On approche',          en:'Coming in to land'}
 ];
 function winViewLabel(v){return v[S.lang]||v.ar;}
 /* Fall back to classic when the chosen style has been switched off, so the
@@ -196,17 +202,13 @@ function envBody(style,c){
    <span class="es-deboss"><span>${esc(inInitials(c.n).join(' '))}</span></span>
    <span class="es-ring"></span><span class="es-rule"></span>${NAMES}`;
  if(style==='window')return `
-   <span class="wn-wall"></span>
    <span class="wn-port">
-    <span class="wn-bezel"></span>
-    <span class="wn-glass">
-     ${WIN_VIEWS.map((v,i)=>`<i class="wn-view${i?'':' on'}"
-       style="background-image:url('${v.img}')"><b>${esc(winViewLabel(v))}</b></i>`).join('')}
-     <span class="wn-glare"></span>
-     <span class="wn-shade"></span>
-    </span>
-   </span>
-   <div class="wn-note"><span>${kick}</span><b>${nm}</b></div>`;
+    ${WIN_VIEWS.map((v,i)=>`<i class="wn-view${i?'':' on'}"
+      style="background-image:url('${v.img}')"></i>`).join('')}
+    <span class="wn-scrim"></span>
+    <div class="wn-note"><span>${kick}</span><b>${nm}</b></div>
+    <span class="wn-shade"><i></i></span>
+   </span>`;
  if(style==='curtain')return `
    <span class="cu-rod"><i class="cu-fin l"></i><i class="cu-fin r"></i></span>
    <span class="cu-pan l"><i></i></span>
@@ -271,15 +273,10 @@ function waxEnvelope(host,after){
    /* the lift is the gesture that earns the sound */
    try{ if(S.c.music&&S.c.autoplay){ playMusic(S.c.music); S.__musicOn=true; } }catch(e){}
    const show=function(n){views.forEach(function(v,k){v.classList.toggle('on',k===n);});};
-   const lift=function(){port.classList.add('open');};
-   const drop=function(){port.classList.remove('open');};
-   lift();
-   at(1500,drop);
-   at(2250,function(){vi=1;show(vi);lift();});
-   at(3750,drop);
-   at(4500,function(){vi=2;show(vi);lift();});
-   at(6100,function(){const w=host.querySelector('#wenv');if(w)w.classList.add('gone');});
-   at(6250,function(){if(after)after();});
+   port.classList.add('open');                     /* the shade lifts, once */
+   at(2000,function(){ show(1); });                /* and the view changes under it */
+   at(3400,function(){const w=host.querySelector('#wenv');if(w)w.classList.add('gone');});
+   at(3550,function(){if(after)after();});
   };
   /* touching it again while it runs skips to the invitation */
   const skip=function(){
