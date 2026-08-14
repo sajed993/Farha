@@ -188,7 +188,8 @@ function invViewReal(){
    <td style="font-family:var(--num)">${fmtN(cnt(i.slug,'reveal'))}</td>
    <td><span class="bdg b-yes">${fmtN(yes)}</span> <span class="bdg b-no">${fmtN(no)}</span></td>
    <td style="white-space:nowrap"><button class="act" onclick="dbCopyLink('${escA(i.slug)}')">🔗 رابط</button>
-    <button class="act" onclick="dbEditFull('${escA(i.slug)}')">🎨 تعديل</button></td>
+    <button class="act" onclick="dbEditFull('${escA(i.slug)}')">🎨 تعديل</button>
+    <button class="act" onclick="dbShareCard('${escA(i.slug)}')" title="يعيد رسم البطاقة التي تظهر في واتساب">🖼️ بطاقة</button></td>
   </tr>`;}).join('')}</tbody></table></div>`;}
 function guestsViewReal(){
  const R=window.__dbRows;let list=(R.rsvps||[]).slice();

@@ -487,11 +487,45 @@ function enterDb() {
       await sb.from('orders').update({ inv_slug: slug, status: 'مدفوع' }).eq('id', o.id)
       o.inv_slug = slug
     }
+    /* The card a chat draws when the couple pastes this link. Built once, here,
+       rather than at the edge on every crawl: it needs the film's still, the
+       names and a font, and the dashboard already has all three. If it cannot
+       be built the delivery is unaffected — the edge falls back to the poster
+       exactly as before. */
+    try {
+      if (typeof window.ogcBuild === 'function') {
+        const og = await window.ogcBuild(config, siteRoot().replace(/\/$/, ''))
+        if (og) {
+          config.og = og
+          await sb.from('invitations').update({ config }).eq('slug', slug)
+        }
+      }
+    } catch (e) {}
     const link = siteRoot() + '?i=' + slug
     try { await navigator.clipboard.writeText(link) } catch (e) {}
     toast('🎁 أُنشئ التسليم ونُسخ الرابط ✓')
     if (o.phone) dbWaLink(o.phone, link)
     fetchAll()
+  }
+
+  /* Rebuild the little card a chat draws for a link that is already out. Also
+     what runs after the names are edited: a card carrying the old names would
+     go on being the first thing every guest saw. */
+  window.dbShareCard = async (slug) => {
+    if (!slug || typeof window.ogcBuild !== 'function') return ''
+    try {
+      const { data } = await sb.from('invitations').select('config').eq('slug', slug).maybeSingle()
+      const cfg = data && data.config
+      if (!cfg) { toast('لم نجد هذه الدعوة'); return '' }
+      toast('🖼️ نرسم البطاقة…')
+      const og = await window.ogcBuild(cfg, siteRoot().replace(/\/$/, ''))
+      if (!og) { toast('تعذّر رسم البطاقة'); return '' }
+      cfg.og = og
+      const { error } = await sb.from('invitations').update({ config: cfg }).eq('slug', slug)
+      if (error) { toast('تعذّر الحفظ'); return '' }
+      toast('🖼️ جُدّدت بطاقة المشاركة ✓')
+      return og
+    } catch (e) { toast('تعذّر رسم البطاقة'); return '' }
   }
 
   /* the couple's own guest-list page — slug and key, and nothing else works */
@@ -555,6 +589,8 @@ function enterDb() {
       if (error) { toast('تعذّر التعديل'); return }
       if (o.payload) { o.payload.c = Object.assign({}, o.payload.c || {}, { n: cfg.c.n }) }
       toast('✏️ حُدّثت الأسماء — تظهر فورًا للضيوف')
+      /* the card in every chat still carries the old ones until it is redrawn */
+      try { await window.dbShareCard(o.inv_slug) } catch (e) {}
     } catch (e) { toast('تعذّر التعديل') }
   }
   window.dbSendLink = (id) => {

@@ -16,6 +16,17 @@ function esc (s) {
 // The poster of whichever film the invitation was built on. config.films.venue
 // already holds it for a ready-made film; a customer's own video keeps its
 // poster beside it under the same name.
+/* The card built for this invitation when it was delivered — the couple's own
+   names on their own film, at the size a chat actually draws. Falls back to
+   the film's poster, which is what every invitation used to share: the same
+   picture for every couple who chose that film, and a portrait one at that. */
+function shareImage (cfg, origin) {
+  const og = cfg && cfg.og
+  if (og && /^https?:\/\//i.test(String(og))) return { url: String(og), w: 1200, h: 630 }
+  const p = posterFrom(cfg, origin)
+  return p ? { url: p, w: 720, h: 1280 } : null
+}
+
 function posterFrom (cfg, origin) {
   try {
     const f = cfg && cfg.films
@@ -47,7 +58,12 @@ export default async function handler (request, context) {
   // one. It needs the whole URL, which only the edge knows.
   let title = 'فرحة — دعوات رقمية تُفتح كفيلم'
   let desc = 'أعراس، حنّة، أعياد ميلاد ومواليد — دعوة تُفتح بلمسة على الهاتف 💛'
+  /* og-default.png really is 1200×630. It was declared 720×1280 — the size of
+     a film poster, not of this file — so every share of the homepage told the
+     chat the wrong shape. */
   let image = url.origin + '/og-default.png'
+  let imgW = 1200, imgH = 630
+  let alt = 'فرحة — دعوات رقمية'
 
   if (slug) try {
     // through the same function the site uses; the table itself is no longer
@@ -67,8 +83,10 @@ export default async function handler (request, context) {
       if (cfg && cfg.c && cfg.c.n) {
         title = String(cfg.c.n) + ' — دعوتكم 💛'
         desc = (cfg.c.t ? String(cfg.c.t) + ' · ' : '') + 'المسوا الختم لفتح الدعوة ✨'
-        const p = posterFrom(cfg, url.origin)
-        if (p) image = p
+        const pick = shareImage(cfg, url.origin)
+        if (pick) { image = pick.url; imgW = pick.w; imgH = pick.h }
+        alt = String(cfg.c.n) + (cfg.c.d ? ' — ' + String(cfg.c.d) : '')
+        if (cfg.c.d) desc = (cfg.c.t ? String(cfg.c.t) + ' · ' : '') + String(cfg.c.d)
       }
     }
   } catch (e) { /* fall back to the defaults above */ }
@@ -80,13 +98,16 @@ export default async function handler (request, context) {
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${esc(url.href)}">
 <meta property="og:image" content="${esc(image)}">
-<meta property="og:image:width" content="720">
-<meta property="og:image:height" content="1280">
+<meta property="og:image:secure_url" content="${esc(image)}">
+<meta property="og:image:width" content="${imgW}">
+<meta property="og:image:height" content="${imgH}">
+<meta property="og:image:alt" content="${esc(alt)}">
 <meta property="og:locale" content="ar_AR">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(desc)}">
 <meta name="twitter:image" content="${esc(image)}">
+<meta name="twitter:image:alt" content="${esc(alt)}">
 <!-- OG:END -->`
 
   let html = await res.text()
