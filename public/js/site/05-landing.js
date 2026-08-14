@@ -175,9 +175,10 @@ function landView(){
    <h1>${t().h1a}<br><span class="foil">${t().h1b}</span></h1>
    <p class="sub">${t().heroSub}</p>
    <div class="hero-ctas">
-    <button class="${CFG.sec.design?'btn-line':'btn-gold'}"
-     onclick="scrollSec('${CFG.sec.gallery?'gallery':'ready'}')">${
-      CFG.sec.gallery?t().ctaExplore:t().rdNav}</button>
+    <!-- was pointed at #gallery when CFG.sec.gallery was on; there is no
+        gallery section, so the hero's main button led nowhere. -->
+   <button class="${CFG.sec.design?'btn-line':'btn-gold'}"
+     onclick="scrollSec('ready')">${t().rdNav}</button>
    </div>
   </div>
  </header>

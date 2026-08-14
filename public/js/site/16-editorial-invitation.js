@@ -221,6 +221,111 @@ function ediWords(){
  return Object.assign(base,byCat||{},byFilm||{});
 }
 
+
+/* ═══ أضيفوها إلى التقويم ═══
+   The strings for this were written a long time ago and never used —
+   t().uCal and t().uCalOk exist in all three languages and no code referenced
+   them. A guest who saves the date to their phone is a guest who turns up,
+   which is the whole point of sending an invitation at all.
+
+   The config has a start and no end. When a programme exists the last row is
+   the honest end of the evening, so the event runs to an hour past it;
+   otherwise four hours, which is a Tunisian wedding rounded down. */
+function ediIcsStamp(d){
+ const p=n=>String(n).padStart(2,'0');
+ return d.getUTCFullYear()+p(d.getUTCMonth()+1)+p(d.getUTCDate())+'T'
+      + p(d.getUTCHours())+p(d.getUTCMinutes())+p(d.getUTCSeconds())+'Z';}
+/* RFC 5545 escaping: a venue with a comma in it breaks the field otherwise */
+function ediIcsText(v){
+ /* Built with split/join and a named backslash rather than regex literals:
+    the rules here are all about backslashes, and writing them as escaped
+    regexes is exactly how this got mangled the first time. */
+ var B=String.fromCharCode(92);
+ return String(v||'')
+  .split(B).join(B+B)
+  .split(';').join(B+';')
+  .split(',').join(B+',')
+  .split(String.fromCharCode(13)).join('')
+  .split(String.fromCharCode(10)).join(B+'n');}
+function ediEventEnd(start){
+ const prog=(S.c&&S.c.program)||[];
+ for(let i=prog.length-1;i>=0;i--){
+  const m=/^(\d{1,2}):(\d{2})$/.exec((prog[i].time||'').trim());
+  if(!m)continue;
+  const e=new Date(start);
+  e.setHours(+m[1],+m[2],0,0);
+  if(e<=start)e.setDate(e.getDate()+1);      /* a programme that runs past midnight */
+  return new Date(e.getTime()+36e5);
+ }
+ return new Date(start.getTime()+4*36e5);}
+function ediIcs(){
+ const c=S.c; if(!c.when)return '';
+ const start=new Date(c.when); if(isNaN(start))return '';
+ const end=ediEventEnd(start);
+ const title=[c.t,c.n].filter(Boolean).join(' — ');
+ const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Farha//Invitation//AR','CALSCALE:GREGORIAN',
+  'BEGIN:VEVENT',
+  'UID:'+encodeURIComponent((c.film||'farha')+'-'+start.getTime())+'@farha',
+  'DTSTAMP:'+ediIcsStamp(new Date()),
+  'DTSTART:'+ediIcsStamp(start),
+  'DTEND:'+ediIcsStamp(end),
+  'SUMMARY:'+ediIcsText(title),
+  'LOCATION:'+ediIcsText(c.p),
+  'DESCRIPTION:'+ediIcsText(c.m||''),
+  'END:VEVENT','END:VCALENDAR'];
+ return L.join('\r\n');}
+function ediAddCal(){
+ const ics=ediIcs(); if(!ics)return;
+ try{
+  const b=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  const u=URL.createObjectURL(b);
+  const a=document.createElement('a');
+  a.href=u; a.download=((S.c.n||'farha').replace(/[^\p{L}\p{N}]+/gu,'-'))+'.ics';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){URL.revokeObjectURL(u);},4000);
+  toast(t().uCalOk);
+ }catch(e){}}
+/* Some in-app browsers will not act on a downloaded file; Google's own link
+   always works, so it is offered beside it rather than instead of it. */
+function ediCalGoogle(){
+ const c=S.c; if(!c.when)return '';
+ const start=new Date(c.when); if(isNaN(start))return '';
+ const end=ediEventEnd(start);
+ const q=['action=TEMPLATE',
+  'text='+encodeURIComponent([c.t,c.n].filter(Boolean).join(' — ')),
+  'dates='+ediIcsStamp(start)+'/'+ediIcsStamp(end),
+  'location='+encodeURIComponent(c.p||''),
+  'details='+encodeURIComponent(c.m||'')].join('&');
+ return 'https://calendar.google.com/calendar/render?'+q;}
+
+/* ═══ مشاركة الدعوة ═══
+   The whole product is a link somebody sends, and there was no way to send it
+   from inside the invitation — shareLink() was a stub that toasted «الإرسال
+   الحقيقي قريبًا». A guest forwarding it to the rest of the family is how
+   these actually travel. */
+function ediShareURL(){
+ try{
+  const q=new URLSearchParams(location.search);
+  if(q.get('i'))return location.href;
+ }catch(e){}
+ return location.origin+location.pathname;}
+function ediShareText(){
+ const c=S.c;
+ return [c.n,c.t].filter(Boolean).join(' — ');}
+function ediShare(){
+ const url=ediShareURL(), txt=ediShareText();
+ if(navigator.share){
+  navigator.share({title:txt,text:txt,url:url}).catch(function(){});
+  return;}
+ try{
+  navigator.clipboard.writeText(url);
+  toast(t().linkCopied);
+ }catch(e){
+  window.open('https://wa.me/?text='+encodeURIComponent(txt+'\n'+url),'_blank');}}
+function ediShareWa(){
+ window.open('https://wa.me/?text='+encodeURIComponent(ediShareText()+'\n'+ediShareURL()),
+  '_blank','noopener');}
+
 /* ---- ornament ---- */
 const EDI_CART='<svg viewBox="0 0 120 150" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">'
  +'<ellipse cx="60" cy="75" rx="52" ry="68"/><ellipse cx="60" cy="75" rx="46" ry="62" opacity=".5"/>'
@@ -570,6 +675,58 @@ function ediStartClock(){
    Math.floor(diff/6e4)%60,Math.floor(diff/1e3)%60]);};
  tick();ediCdT=setInterval(tick,1000);}
 
+/* ---- صندوق التهاني ----
+   The table, the moderation, the realtime and the Arabic strings for this
+   have existed since the beginning; what never existed was anywhere for a
+   guest to type. The dashboard even carried a switch for it that turned on
+   nothing. Written here in the editorial idiom rather than restored from the
+   old build, whose markup belongs to a layout that is gone.
+
+   A wish is held until the owner approves it, so nobody can write on somebody
+   else's invitation in public. */
+function ediWishHTML(){
+ if(!ediSecOn('wish'))return '';
+ const E=ediWords();
+ return `<section class="edi-s edi-wish">
+   ${ediTint(2)}${ediFlora(46,'tr')}${ediFrame()}
+   <div class="edi-in rv">
+    <p class="edi-lbl">${esc(t().congrats)}</p>
+    <div class="edi-rule sm">${EDI_RULE}</div>
+    <div class="edi-wishbox">
+     <textarea id="ediWishTxt" rows="3" maxlength="200"
+       placeholder="${esc(t().congratsPh)}"></textarea>
+     <button class="edi-btn" type="button" onclick="ediSendWish()">${esc(t().send)}</button>
+    </div>
+    <div class="edi-wishlist" id="ediWishList">${ediWishesHTML()}</div>
+   </div>
+  </section>`;}
+/* Only what the owner has approved, and only for this invitation. */
+function ediWishesHTML(){
+ const list=(typeof window!=='undefined'&&window.__dbWishes)||[];
+ const mine=(S.__wishes||[]);
+ const all=mine.concat(list.map(function(w){return {who:w.name,txt:w.body};}));
+ if(!all.length)return '';
+ return `<p class="edi-wish-t">${esc(t().wishesTitle)}</p>`
+  + all.slice(0,12).map(function(w){
+      return `<div class="edi-wish-i">“${esc(w.txt)}” <b>${esc(w.who||'')}</b></div>`;
+    }).join('');}
+function ediSendWish(){
+ const el=document.getElementById('ediWishTxt');
+ if(!el)return;
+ const txt=(el.value||'').trim().slice(0,200);
+ if(!txt)return;
+ const who=(S.c&&S.c.guest)||'ضيف';
+ /* shown to this guest straight away; everyone else sees it once approved */
+ S.__wishes=(S.__wishes||[]);
+ S.__wishes.unshift({who:who,txt:txt});
+ el.value='';
+ const box=document.getElementById('ediWishList');
+ if(box)box.innerHTML=ediWishesHTML();
+ try{ if(typeof dbHook==='function')dbHook('wish',{name:who,body:txt,
+   inv_slug:(typeof window!=='undefined'&&window.__inviteSlug)||null}); }catch(e){}
+ try{ toast(t().congratsSent); }catch(e){}
+ try{ if(typeof burst==='function')burst(['💛','💌']); }catch(e){}}
+
 /* ---- dress code ---- */
 function ediDressHTML(){
  const d=S.c.dress,E=ediWords();
@@ -708,7 +865,11 @@ function ediHTML(){
     <p class="edi-lbl dk">${esc(E.venueL)}</p>
     <div class="edi-rule sm dk">${EDI_RULE}</div>
     <h3 class="edi-venue-n">${esc(c.p)}</h3>
-    ${c.maps?`<a class="edi-btn" href="${esc(c.maps)}" target="_blank" rel="noopener">${t().uMaps}</a>`:''}
+    <div class="edi-acts">
+     ${c.maps?`<a class="edi-btn" href="${esc(c.maps)}" target="_blank" rel="noopener">${t().uMaps}</a>`:''}
+     ${(c.when&&ediSecOn('cal'))?`<button class="edi-btn" type="button" onclick="ediAddCal()">${esc(t().uCal)}</button>`:''}
+    </div>
+    ${(c.when&&ediSecOn('cal'))?`<a class="edi-sub-link" href="${esc(ediCalGoogle())}" target="_blank" rel="noopener">Google Calendar</a>`:''}
    </div>
    ${ediPlate('venue','frame')}
   </section>
@@ -737,6 +898,8 @@ function ediHTML(){
   ${ediNoteHTML('dir',EDI_COMPASS,t().edi.dirL,'light')}
   ${ediNoteHTML('stay',EDI_KEY,t().edi.stayL)}
 
+  ${ediWishHTML()}
+
   ${ediSecOn('rsvp')?`<section class="edi-s edi-rsvp light">
    ${ediTint(0)}${ediFlora(58,'bl')}${ediFrame()}
    <div class="edi-in rv">
@@ -748,6 +911,13 @@ function ediHTML(){
      <button class="edi-btn ghost" onclick="rsvp(0)">${esc(E.no)}</button>
     </div>
     <p class="edi-thx">${esc(E.thanks)}</p>
+    ${ediSecOn('share')?`<div class="edi-share">
+     <button class="edi-btn ghost" type="button" onclick="ediShare()">${esc(t().getLink)}</button>
+     <button class="edi-wa" type="button" onclick="ediShareWa()" aria-label="WhatsApp">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor">
+       <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-5.8c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.7.9-.3.2-.5.1a6.5 6.5 0 0 1-1.9-1.2 7.3 7.3 0 0 1-1.4-1.7c-.1-.2 0-.4.1-.5l.4-.4.2-.4v-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8 5 5 0 0 0 3 .6 2.5 2.5 0 0 0 1.7-1.2 2 2 0 0 0 .1-1.2z"/>
+      </svg></button>
+    </div>`:''}
    </div>
   </section>`:''}
  </div>`;}

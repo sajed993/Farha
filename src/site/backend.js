@@ -10,7 +10,14 @@ function rowFor(kind, d) {
   if (kind === 'order')
     return { item: String(d.item || '').slice(0, 120), price: +d.price || 0, phone: d.phone ? String(d.phone).slice(0, 20) : null, customer_name: d.customer_name ? String(d.customer_name).slice(0, 60) : null, ref: d.ref ? String(d.ref).slice(0,12) : null, method: d.method ? String(d.method).slice(0,10) : 'd17', payload: d.payload || null }
   if (kind === 'wish')
-    return { name: String(d.name || 'ضيف').slice(0, 40), body: String(d.body || '').slice(0, 200) }
+    // inv_slug the same way rsvps carry it. Without it every couple's wall
+    // would show every other couple's messages — the table had no notion of
+    // which invitation a wish belonged to.
+    return {
+      inv_slug: d.inv_slug ? String(d.inv_slug).slice(0, 64) : (window.__inviteSlug || null),
+      name: String(d.name || 'ضيف').slice(0, 40),
+      body: String(d.body || '').slice(0, 200)
+    }
   if (kind === 'rsvp')
     return {
       inv_slug: d.inv_slug ? String(d.inv_slug).slice(0, 64) : (window.__inviteSlug || null),
@@ -81,14 +88,19 @@ async function loadCloudConfig() {
   } catch (e) {}
 }
 
-// approved wishes appear on every guest's congratulations wall
+// The approved wishes for THIS invitation. Scoped by slug for the same reason
+// the insert is: a wall that showed everyone's messages would be a privacy
+// leak, not a feature. With no slug (the shelf demo) there is nothing to show.
 async function loadCloudWishes() {
   if (!sb) return
+  const slug = window.__inviteSlug
+  if (!slug) { window.__dbWishes = []; return }
   try {
     const { data, error } = await sb
       .from('wishes')
       .select('name,body')
       .eq('approved', true)
+      .eq('inv_slug', slug)
       .order('created_at', { ascending: false })
       .limit(12)
     if (!error && Array.isArray(data)) window.__dbWishes = data

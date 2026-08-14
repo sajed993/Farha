@@ -368,7 +368,6 @@ function ordersHTML () {
     h += `<div class="ctlcard" style="margin-bottom:16px"><h3>💌 ردود الحضور (${dbRsvps.length})</h3>` +
       dbRsvps.slice(0, 30).map((r) => `<div class="ctlrow"><span>
         ${r.attending ? '💛 سيحضرون' : '🙏 اعتذار'} · ${r.guests || 1}
-        ${(r.allergies && r.allergies.length) ? '<br><small>⚠️ ' + E(r.allergies.join('، ')) + '</small>' : ''}
         ${r.message ? '<br><small>“' + E(r.message) + '”</small>' : ''}</span>
         <small style="color:#8A7A63">${new Date(r.created_at).toLocaleDateString('ar-TN')}</small></div>`).join('') + `</div>`
   }
@@ -579,8 +578,11 @@ function enterDb() {
   window.dbGuestCsv = (slug) => {
     const rs = dbRsvps.filter((r) => r.inv_slug === slug)
     const esc = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'
-    let csv = '\uFEFFالاسم,سيحضر,عدد الضيوف,الحساسيات,ملاحظات,التاريخ\n'
-    rs.forEach((r) => { csv += [esc(r.name), r.attending === false ? 'لا' : 'نعم', r.guests || 1, esc(r.allergies), esc(r.message || r.other), esc((r.created_at || '').slice(0, 10))].join(',') + '\n' })
+    // The allergies column was always empty: nothing in the invitation has
+    // ever asked for it, so every row exported '[]'. Dropped rather than
+    // filled — invitations deliberately carry no food or allergy content.
+    let csv = '\uFEFFالاسم,سيحضر,عدد الضيوف,ملاحظات,التاريخ\n'
+    rs.forEach((r) => { csv += [esc(r.name), r.attending === false ? 'لا' : 'نعم', r.guests || 1, esc(r.message || ''), esc((r.created_at || '').slice(0, 10))].join(',') + '\n' })
     const a = document.createElement('a')
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
     a.download = 'farha-rsvps-' + slug + '.csv'

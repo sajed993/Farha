@@ -10,10 +10,12 @@ function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 /* Everything except the newest section is off for now; each is one switch
    away in the dashboard. */
-const CFG_DEF={sec:{ultra:0,premium:0,ai:0,sites:0,datef:0,open:0,wishes:0,
-  cats:0,gallery:0,design:0,ready:1,offers:1},
+/* Five flags were dropped from here — ultra, premium, ai, open, cats — each
+   the switch for a section that no longer exists anywhere in the codebase.
+   wishes moved to CFG.edi, where the invitation's own sections live. */
+const CFG_DEF={sec:{sites:0,datef:0,gallery:0,design:0,ready:1,offers:1},
  price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},
- edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},
+ edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1,cal:1,share:1,wish:1},films:{},
  offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,
          signPrice:249,signWas:0,signRevs:5,signDays:7,ribbonOn:1,noteOn:1,txt:{}},
  envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1,curtain:1,window:1},theme:{def:'dark'},

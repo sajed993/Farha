@@ -13,6 +13,14 @@
 const FRM_K = { orders: 'farha_reqs', rsvp: 'farha_rsvp' };
 
 function frmGet(k) { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return []; } }
+/* The local half of frmPush, for a reply that has no invitation to belong to.
+   Keeping it on the device means the guest still sees their own answer and the
+   cloud never receives a row nothing can look up. */
+function frmLocal(k, row) {
+  const a = frmGet(k);
+  a.push(row);
+  try { localStorage.setItem(k, JSON.stringify(a)); } catch (e) {}
+}
 function frmPush(k, row) {
   const a = frmGet(k);
   a.push(row);
@@ -556,15 +564,19 @@ function submitRsvp(coming) {
        slug and nothing else: the guest list is looked up by it, and falling
        back to the couple's name filed every reply somewhere the list could
        never find it. */
-    invite: (typeof window !== 'undefined' && window.__inviteSlug)
-            || (S.c && S.c.film) || (S.c && S.c.n) || '',
+    invite: (typeof window !== 'undefined' && window.__inviteSlug) || '',
     host: (S.c && S.c.n) || '',
     name: name,
     coming: coming ? 1 : 0,
     count: coming ? (parseInt(frmVal('rvCount'), 10) || 1) : 0,
     msg: frmVal('rvMsg')
   };
-  frmPush(FRM_K.rsvp, row);
+  /* A reply sent from a preview has no invitation to belong to. It used to be
+     filed under the film id or the couple's name, which the guest list looks
+     for by slug and can therefore never find — so it went to the cloud and
+     was lost there. It stays on this device instead. */
+  if (row.invite) frmPush(FRM_K.rsvp, row);
+  else { try { frmLocal(FRM_K.rsvp, row); } catch (e) {} }
   closeRsvp();
   toast(t().rvOk);
   if (coming && typeof burst === 'function') burst(['🎉', '💛']);

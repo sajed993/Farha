@@ -260,6 +260,13 @@ function waxEnvelope(host,after){
   const at=(ms,fn)=>setTimeout(fn,ms);
   cv.__open=function(){
    if(ran)return; ran=true;
+   /* The moment a guest actually opens the invitation, as distinct from
+      loading the page. The dashboard has read this event since it was built —
+      the «فُتحت» column, the «شاهدوا الافتتاح» step of the funnel and the
+      «فُتحت دعوة X لأوّل مرّة» notification — and nothing has ever emitted it,
+      so all three have sat at zero. track() dedupes per kind and slug per page
+      load, which is what we want: one reveal per guest, not one per tap. */
+   try{ if(window.__track) window.__track('reveal',{inv_slug:window.__inviteSlug||null}); }catch(e){}
    if(hint){hint.classList.add('hid');hint.style.opacity='0';}
    /* the lift is the gesture that earns the sound */
    try{ if(S.c.music&&S.c.autoplay){ playMusic(S.c.music); S.__musicOn=true; } }catch(e){}
@@ -287,6 +294,13 @@ function waxEnvelope(host,after){
 
  cv.__open=function(){
   if(opened)return;opened=true;
+   /* The moment a guest actually opens the invitation, as distinct from
+     loading the page. The dashboard has read this event since it was built —
+     the «فُتحت» column, the «شاهدوا الافتتاح» step of the funnel and the
+     «فُتحت دعوة X لأوّل مرّة» notification — and nothing has ever emitted it,
+     so all three have sat at zero. track() dedupes per kind and slug per page
+     load, which is what we want: one reveal per guest, not one per tap. */
+  try{ if(window.__track) window.__track('reveal',{inv_slug:window.__inviteSlug||null}); }catch(e){}
   if(hint){hint.classList.add('hid');hint.style.opacity='0';}
   cv.style.transition='opacity .55s ease,transform .55s ease';
   cv.style.opacity='0';cv.style.transform='scale(.82) translateY(6%)';

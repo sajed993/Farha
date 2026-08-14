@@ -2,7 +2,7 @@
 const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'farha_meta'};
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
-const CFG_DEF={sec:{sites:0,datef:0,wishes:0,ready:1,offers:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1},films:{},offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,signPrice:249,signWas:0,signRevs:5,signDays:7,ribbonOn:1,noteOn:1,txt:{}},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1,curtain:1,window:1},theme:{def:'dark'},vid:{site:'full',customer:'full'},price:{site:149,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},media:{films:{},customFilms:[],hideShows:[],readyFilms:[]}};
+const CFG_DEF={sec:{sites:0,datef:0,ready:1,offers:1},edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1,cal:1,share:1,wish:1},films:{},offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,signPrice:249,signWas:0,signRevs:5,signDays:7,ribbonOn:1,noteOn:1,txt:{}},envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1,curtain:1,window:1},theme:{def:'dark'},vid:{site:'full',customer:'full'},price:{site:149,ready:99,readyWas:110},wa:'21655787973',d17:'55787973',rib:'32016788101212289120',flouci:'',banner:{on:0,txt:'🎉 عرض افتتاحي هذا الأسبوع'},media:{films:{},customFilms:[],hideShows:[],readyFilms:[]}};
 /* Fill out a stored config into a whole one, whatever it came from. */
 function cfgFrom(cc){cc=cc||{};const o=JSON.parse(JSON.stringify(CFG_DEF));
  Object.assign(o.sec,cc.sec||{});Object.assign(o.price,cc.price||{});o.wa=cc.wa||CFG_DEF.wa;o.d17=cc.d17||CFG_DEF.d17;
@@ -117,7 +117,8 @@ function rdFilms(){return readyCatalogue().map(f=>
  [f.id, f.name.ar||f.id, RDCATNAME[f.cat]||f.cat, !!f._custom]);}
 Object.defineProperty(window,'RDFILMS',{get:rdFilms});
 const EDISECL=[['cd','ساعة العدّ التنازلي'],['prog','برنامج الحفل + مواقع الفقرات'],['dress','قواعد اللباس'],
- ['dir','الوصول وصفّ السيارات'],['stay','الإقامة'],['rsvp','تأكيد الحضور']];
+ ['dir','الوصول وصفّ السيارات'],['stay','الإقامة'],['rsvp','تأكيد الحضور'],
+ ['cal','زرّ «أضيفوها إلى التقويم»'],['share','زرّ مشاركة الدعوة'],['wish','صندوق التهاني']];
 function ctlEdi(k,v){CFG.edi[k]=v?1:0;saveCFG();}
 /* the five envelope styles: one is active, any can be switched off */
 /* Weddings stay on Aref Ruqaa; these are for everything else. */
@@ -228,8 +229,11 @@ function escA(s){return String(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&l
 const SECL=[['ready','✦ قسم «دعوات جاهزة» (الأفلام)'],
  ['offers','✦ قسم الباقتين (المجموعة / التوقيع)'],
  ['sites','مواقع المناسبات (ألبوم الصور)'],
- ['datef','دعوة أول موعد التفاعلية'],
- ['wishes','صندوق التهاني داخل الدعوات']];
+ ['datef','دعوة أول موعد التفاعلية']];
+ /* «صندوق التهاني» used to be listed here as a site section. It is a section
+    of the invitation, not of the site, and this switch was reading a flag no
+    invitation ever consulted — the owner could turn it on and nothing would
+    appear. It lives with the other invitation switches now. */
 function ctlCard(tt,ss,inner){return `<div class="ctlcard"><h3>${tt}</h3>${ss?`<p class="cmut">${ss}</p>`:''}${inner}</div>`;}
 
 /* ===== dynamic content manager ===== */
