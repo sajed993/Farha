@@ -479,6 +479,17 @@ function readyView(){
     the guest breaks open and the seal they scratch to find the date read the
     same two settings, so a film is sealed once rather than twice. Empty means
     the colour the film's own palette carries and the couple's initials. */
+ /* «الافتراضي» said nothing about what the default was, so a value stored on
+    a film's row silently overrode the opening that film ships with and there
+    was no way to see it from this screen. It names the film's own opening now,
+    and says plainly when the stored choice is overriding it. */
+ const envName=(k)=>{const r=ENVL.find(e=>e[0]===k);return r?r[1]:'';};
+ const envDefLabel=(shipped)=>{
+  const n=envName(shipped&&shipped.env);
+  return n?('الافتراضي — '+n):'الافتراضي';};
+ const envOverrides=(o,shipped)=>{
+  const mine=o&&o.env, ship=shipped&&shipped.env;
+  return (mine&&ship&&mine!==ship)?envName(ship):'';};
  const waxColOpt=(cur)=>{
   const C=(typeof WAX_COLS!=='undefined')?WAX_COLS:{};
   let h=`<option value="" ${cur?'':'selected'}>الافتراضي — لون الفيلم</option>`;
@@ -526,7 +537,9 @@ function readyView(){
      <label>السعر<input type="number" placeholder="${CFG.price.ready||99}"
       value="${o.price||''}" onchange="ctlFilm('${id}','price',this.value)"></label>
      <label>شكل الظرف<select onchange="ctlFilm('${id}','env',this.value)">
-      <option value="">الافتراضي</option>${envOpt(o.env||'')}</select></label>
+      <option value="">${escA(envDefLabel(shipped))}</option>${envOpt(o.env||'')}</select>
+      ${envOverrides(o,shipped)?`<small class="cmut" style="color:#A8762B">
+       ⚠️ هذا الاختيار يتجاوز «${escA(envOverrides(o,shipped))}» الذي يأتي مع الفيلم</small>`:''}</label>
      <label>عرض الفيلم<select onchange="ctlFilm('${id}','vid',this.value)">
       <option value="">الافتراضي</option>${vidOpt(o.vid||'')}</select></label>
      <label>الرمز داخل الدعوة<select onchange="ctlFilm('${id}','icon',this.value)">
