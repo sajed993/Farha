@@ -201,7 +201,7 @@ const FILMS_BUILTIN=[
   dress:{ar:['لباس أنيق','أزرق وذهبي'],fr:['Tenue élégante','Bleu et or'],en:['Smart dress','Blue and gold']},
   sw:['#05070C','#1E7C86','#EDF3F6'],
   snd:'/media/snd/takeoff.webm',sndN:'صوت الفيلم نفسه'},
- {id:'boarding',cat:'open',layout:'sticky',icon:'gate',font:'kufi',v:'/media/inv/boarding.mp4',p:'/media/inv/boarding.jpg',env:'curtain',
+ {id:'boarding',cat:'open',layout:'sticky',icon:'gate',font:'kufi',v:'/media/inv/boarding.mp4',p:'/media/inv/boarding.jpg',env:'window',
   name:{ar:'بوّابة السفر',fr:'La Porte',en:'The Gate'},
   blurb:{ar:'مطار عند الغروب، وطائرة تنتظر عند البوّابة',
    fr:'Un aéroport au crépuscule et un avion qui attend à la porte',
