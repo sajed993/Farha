@@ -91,7 +91,8 @@ function lazyvWatch(hosts, max){
 }
 
 function navHTML(){return `<div class="nav">
- <div class="logo" onclick="go('land')"><b>${S.lang==='ar'?'فرحة':'Far7a'}</b><small>${t().brandS}</small></div>
+ <div class="logo" role="button" tabindex="0" aria-label="${esc(t().backHome||'فرحة')}"
+  onclick="go('land')"><b>${S.lang==='ar'?'فرحة':'Far7a'}</b><small>${t().brandS}</small></div>
  <!-- Five of these pointed at sections deleted with the old designs —
       القوالب, المناسبات, لحظة الفتح, واقعي جدًا, بريميوم. They stayed visible
       and scrolled to nothing. Only what exists is listed. -->

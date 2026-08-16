@@ -327,24 +327,24 @@ function ediShareWa(){
   '_blank','noopener');}
 
 /* ---- ornament ---- */
-const EDI_CART='<svg viewBox="0 0 120 150" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">'
+const EDI_CART='<svg aria-hidden="true" focusable="false" viewBox="0 0 120 150" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">'
  +'<ellipse cx="60" cy="75" rx="52" ry="68"/><ellipse cx="60" cy="75" rx="46" ry="62" opacity=".5"/>'
  +'<path d="M60 9c-9 8-13 17-13 26M60 9c9 8 13 17 13 26" opacity=".7"/>'
  +'<path d="M60 141c-9-8-13-17-13-26M60 141c9-8 13-17 13-26" opacity=".7"/>'
  +'<circle cx="60" cy="7" r="2" fill="currentColor" stroke="none"/>'
  +'<circle cx="60" cy="143" r="2" fill="currentColor" stroke="none"/></svg>';
-const EDI_RULE='<svg viewBox="0 0 200 12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round">'
+const EDI_RULE='<svg aria-hidden="true" focusable="false" viewBox="0 0 200 12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round">'
  +'<path d="M2 6h72M126 6h72"/>'
  +'<path d="M84 6c4-4 8-4 10 0-2 4-6 4-10 0Z" fill="currentColor" fill-opacity=".3"/>'
  +'<path d="M116 6c-4-4-8-4-10 0 2 4 6 4 10 0Z" fill="currentColor" fill-opacity=".3"/>'
  +'<path d="M100 1.6l3 4.4-3 4.4-3-4.4z" fill="currentColor" stroke="none"/></svg>';
 /* programme medallions, drawn rather than emoji */
 const EDI_ICONS=[
- '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M8 27V13a8 8 0 0116 0v14"/><path d="M4 27h24"/><path d="M16 27v-7"/></svg>',
- '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12.5" cy="19" r="7"/><circle cx="19.5" cy="19" r="7"/><path d="M16 8l2.4 3.4h-4.8z"/></svg>',
- '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M8 6h16l-8 10z"/><path d="M16 16v9"/><path d="M11 25h10"/></svg>',
- '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="16" cy="16" r="9"/><circle cx="16" cy="16" r="4.4" opacity=".55"/></svg>',
- '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="11" cy="23" r="4"/><path d="M15 23V7l10-2v14"/><circle cx="21" cy="19" r="4"/></svg>'];
+ '<svg aria-hidden="true" focusable="false" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M8 27V13a8 8 0 0116 0v14"/><path d="M4 27h24"/><path d="M16 27v-7"/></svg>',
+ '<svg aria-hidden="true" focusable="false" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12.5" cy="19" r="7"/><circle cx="19.5" cy="19" r="7"/><path d="M16 8l2.4 3.4h-4.8z"/></svg>',
+ '<svg aria-hidden="true" focusable="false" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M8 6h16l-8 10z"/><path d="M16 16v9"/><path d="M11 25h10"/></svg>',
+ '<svg aria-hidden="true" focusable="false" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="16" cy="16" r="9"/><circle cx="16" cy="16" r="4.4" opacity=".55"/></svg>',
+ '<svg aria-hidden="true" focusable="false" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="11" cy="23" r="4"/><path d="M15 23V7l10-2v14"/><circle cx="21" cy="19" r="4"/></svg>'];
 
 /* ═══ ميداليات البرنامج ═══
    The five medallions beside the programme rows were one fixed set, and the
@@ -421,7 +421,7 @@ const EDI_PROG_FILM = {
    The reference plates put a cream panel inside an ornate gold frame with
    blooms crowding two opposite corners. Both are SVG so they scale with the
    section and stay crisp behind a real photograph later. */
-const EDI_FCORNER='<svg viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
+const EDI_FCORNER='<svg aria-hidden="true" focusable="false" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
  +'<path d="M2 58V20C2 10 10 2 20 2h38"/>'
  +'<path d="M8 50V23C8 15 15 8 23 8h27"/>'
  +'<path d="M8 30C8 17.8 17.8 8 30 8"/>'
@@ -430,7 +430,7 @@ const EDI_FCORNER='<svg viewBox="0 0 60 60" fill="none" stroke="currentColor" st
  +'<circle cx="5.6" cy="5.6" r="2.2" fill="currentColor" stroke="none"/>'
  +'<circle cx="30" cy="30" r="1.3" fill="currentColor" stroke="none"/></svg>';
 /* small crest that sits at the top centre of the frame */
-const EDI_CREST='<svg viewBox="0 0 80 34" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
+const EDI_CREST='<svg aria-hidden="true" focusable="false" viewBox="0 0 80 34" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
  +'<path d="M4 30h20M56 30h20"/>'
  +'<path d="M40 4c-7 6-11 12-11 18a11 11 0 0022 0c0-6-4-12-11-18Z"/>'
  +'<path d="M40 12c-3.4 3.4-5 6.6-5 9.6a5 5 0 0010 0c0-3-1.6-6.2-5-9.6Z" fill="currentColor" fill-opacity=".22"/>'
@@ -487,22 +487,22 @@ function ediFlora(seed,cls){
   +`<defs>${defs}</defs>${fol}${bud}${s}</svg>`;}
 
 /* an engraved dial, and a gown-and-tails mark for the dress code */
-const EDI_DIAL='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">'
+const EDI_DIAL='<svg aria-hidden="true" focusable="false" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">'
  +'<circle cx="20" cy="20" r="15"/><circle cx="20" cy="20" r="12" stroke-dasharray="1 3" opacity=".6"/>'
  +'<path d="M20 11.5V20l5.4 3.4"/>'
  +'<path d="M20 3.6v2.6M20 33.8v2.6M3.6 20h2.6M33.8 20h2.6"/>'
  +'<circle cx="20" cy="20" r="1.3" fill="currentColor" stroke="none"/></svg>';
-const EDI_PIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
+const EDI_PIN='<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
  +'<path d="M12 21s6.4-6.2 6.4-11A6.4 6.4 0 0 0 5.6 10c0 4.8 6.4 11 6.4 11Z"/>'
  +'<circle cx="12" cy="10" r="2.3"/></svg>';
-const EDI_COMPASS='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
+const EDI_COMPASS='<svg aria-hidden="true" focusable="false" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
  +'<circle cx="20" cy="20" r="15"/>'
  +'<path d="M25.6 14.4 17 17l-2.6 8.6L23 23z"/>'
  +'<circle cx="20" cy="20" r="1.1" fill="currentColor" stroke="none"/></svg>';
-const EDI_KEY='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
+const EDI_KEY='<svg aria-hidden="true" focusable="false" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
  +'<circle cx="14.6" cy="14.6" r="7"/><circle cx="14.6" cy="14.6" r="2.6"/>'
  +'<path d="M19.6 19.6 32 32"/><path d="M27.4 27.4 31 23.8M31 31l3.4-3.4"/></svg>';
-const EDI_DRESS='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
+const EDI_DRESS='<svg aria-hidden="true" focusable="false" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">'
  +'<path d="M14.6 5.4 20 10l5.4-4.6"/>'
  +'<path d="M14.6 5.4 12.4 12 20 15.6 27.6 12l-2.2-6.6"/>'
  +'<path d="M20 15.6 12.6 35h14.8z"/>'

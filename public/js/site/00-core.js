@@ -39,3 +39,20 @@ function toAr(n){return String(n);}
 function fallbackCopy(txt,done){try{const ta=document.createElement('textarea');ta.value=txt;
  ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();
  document.execCommand('copy');ta.remove();done();}catch(e){toast('📋');}}
+
+/* ============ a keyboard for the things that are not buttons ============
+   Two of the most-used controls on the site are clickable <div>s: the logo,
+   and the whole poster of a film on the shelf — which is how most people open
+   one. A div with onclick is unreachable by keyboard and announced as nothing.
+
+   Rather than rewrite both as buttons and fight the layout they carry, they
+   declare role="button" and tabindex, and this turns Enter and Space into the
+   click they already have. One listener, and anything added later inherits it. */
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+  var el = e.target;
+  if (!el || el.getAttribute('role') !== 'button') return;
+  if (/^(button|a|input|select|textarea)$/i.test(el.tagName)) return;  /* already works */
+  e.preventDefault();
+  el.click();
+});

@@ -3936,3 +3936,34 @@ html[data-theme=dark] .edi-wishbox textarea{
  border-color:rgba(240,228,200,.2);color:#F4ECDB}
 .lay-sticky .edi-wishbox textarea::placeholder{color:#B9AC94}
 @media(prefers-reduced-motion:reduce){.edi-wa{transition:none}}
+
+/* ══ hit areas, without changing what anything looks like ══
+   Several controls are visually right and physically small: the theme switch
+   is 38px, «اكشفوه لي» is 54×25, the calendar sub-link is 101×20. The target
+   wants 44 in both directions. Growing the box would change a design that is
+   settled, so the box stays and an invisible pseudo-element carries the extra
+   reach — the standard answer, and the only one that does not move a pixel. */
+/* .edi-x is deliberately NOT in this list: it is already position:fixed, and
+   setting it relative here — later in the file, same specificity — knocked the
+   close button 14px off the right edge of every invitation. A pseudo-element
+   only needs a positioned ancestor; an already-positioned element has one. */
+.theme-btn,.edi-skip,.edi-sub-link,.lang-btn{position:relative}
+.theme-btn::after,.edi-skip::after,.edi-sub-link::after,.edi-x::after,
+.lang-btn::after{content:"";position:absolute;top:50%;left:50%;
+ transform:translate(-50%,-50%);width:max(100%,44px);height:max(100%,44px)}
+/* the poster of a film is a control now, so it has to show focus like one */
+.rd-stage:focus-visible,.logo:focus-visible{outline:2px solid var(--gold);
+ outline-offset:4px;border-radius:14px}
+.rd-stage[role=button],.logo[role=button]{cursor:pointer}
+
+/* The occasion chips and the shelf buttons measured 43px tall — one pixel
+   under the 44 a thumb wants, which is the sort of thing only a measurement
+   finds and only a thumb notices. */
+.chip,.rd-btn{min-height:44px}
+/* the nav links and the WhatsApp button were the last two under the thumb size */
+.menu a{padding:12px 2px}
+.edi-wa{position:relative}
+.edi-wa::after{content:"";position:absolute;top:50%;left:50%;
+ transform:translate(-50%,-50%);width:44px;height:44px}
+/* the two footer links — privacy and the dashboard — were 19px tall */
+.rights a{display:inline-block;padding:13px 6px}

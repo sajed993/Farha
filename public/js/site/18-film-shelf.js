@@ -58,7 +58,9 @@ function filmShelfHTML(){
   <div class="filters rd-filters">${chips}</div>
   <div class="rd-grid">${list.map(f=>`
    <article class="rd-card">
-    <div class="rd-stage" onclick="openReady('${f.id}')">
+    <div class="rd-stage" role="button" tabindex="0"
+     aria-label="${esc(t().rdOpen)} — ${esc(readyName(f))}"
+     onclick="openReady('${f.id}')">
      <div class="rd-bleed" style="--b1:${(f.sw&&f.sw[1])||'#AE7E70'};--b2:${(f.sw&&f.sw[2])||'#EFDFC2'}"></div>
      <div class="rd-glow"></div>
      ${iphoneHTML(lazyvHTML(f.v,'rd-v'))}
