@@ -20,7 +20,10 @@ const TRACK_VOL={'marble.webm':.32,'oneday.webm':.48,'wisteria.webm':.23,
     sits at 0.1396 RMS instead of 0.169 and is brought level here instead.
     The first encode came out at peak 1.006 — Opus overshoots — so it is cut
     to 0.90 before encoding, which lands at 0.929. */
- 'record.webm':.424};
+ 'record.webm':.424,
+ /* Same story as record: the ceiling bound the gain before loudness did, so it
+    sits at 0.1579 RMS instead of 0.169 and is brought level here instead. */
+ 'horizon.webm':.374};
 function trackVol(url){return TRACK_VOL[String(url).split('/').pop()]||.6;}
 const MEL={
  2:{wave:'triangle',bpm:138,notes:[[523,1],[523,1],[659,2],[523,2],[698,2],[659,4],[523,1],[523,1],[659,2],[523,2],[784,2],[698,4],[880,2],[784,2],[698,2],[659,4]]},

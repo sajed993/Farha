@@ -3967,3 +3967,13 @@ html[data-theme=dark] .edi-wishbox textarea{
  transform:translate(-50%,-50%);width:44px;height:44px}
 /* the two footer links — privacy and the dashboard — were 19px tall */
 .rights a{display:inline-block;padding:13px 6px}
+
+/* الأفق — derived from the film's own three colours the way every other
+   palette here was measured off its footage: #141B24 the night, #5E7C9E the
+   steel of the wing, #E6D8BE the warm light on the cloud. Without it the film
+   wore the house gold, which is warm, over footage that is cold. */
+.edi-veil-root.pal-horizon{
+ --cream:#EDEFF3;--cream-hi:#FAFBFD;--beige:#DBE0E8;--beige-dp:#C2C9D4;
+ --gold:#B08F55;--gold-hi:#E2CB9C;--gold-lo:#856734;--gold-pale:#E6D8BE;
+ --ink:#141B24;--ink-soft:#33404F;--ink-mute:#63707F;
+ --blush:#5E7C9E;--plum:#243247;--sage:#8A9AA6;--wax:#243247}

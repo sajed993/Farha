@@ -182,16 +182,21 @@ const FILMS_BUILTIN=[
     footage; this is a second opening film for anyone who wants one with no
     words in the picture at all. Plates rather than a sticky film, so the two
     do not look like the same invitation twice. */
- {id:'horizon',cat:'open',icon:'compass',font:'kufi',v:'/media/inv/skyline.mp4',p:'/media/inv/skyline.jpg',env:'window',
+ /* Sticky, not plates. Four windows onto a slow aerial of one aeroplane show
+    the same picture four times, and a guest scrolling sees nothing move — this
+    is the footage the sticky layout was built for. */
+ {id:'horizon',cat:'open',layout:'sticky',icon:'compass',font:'kufi',v:'/media/inv/skyline.mp4',p:'/media/inv/skyline.jpg',env:'window',
   name:{ar:'الأفق',fr:'Horizon',en:'Horizon'},
   blurb:{ar:'طائرة فوق بحرٍ من السحاب، وخطوط ضوء تمتدّ نحو الشمس',
    fr:'Un avion au-dessus d’une mer de nuages, des traînées de lumière vers le soleil',
    en:'A plane over a sea of cloud, light trails running to the sun'},
   dress:{ar:['لباس أنيق','كحلي وذهبي'],fr:['Tenue élégante','Bleu nuit et or'],en:['Smart dress','Navy and gold']},
-  sw:['#141B24','#5E7C9E','#E6D8BE']},
-  /* No song of its own yet, so it plays the house piano. It is not given
-     الإقلاع's track: one song per film is the rule, and the check that
-     enforces it caught this before the commit did. */
+  sw:['#141B24','#5E7C9E','#E6D8BE'],
+  /* Its own sound, lifted out of its own footage — the same way بياض and أوّل
+     أغنية got theirs. It shipped on the house piano because every other track
+     was already spoken for, which made it the one film on the shelf without a
+     voice of its own. */
+  snd:'/media/snd/horizon.webm',sndN:'صوت الفيلم نفسه'},
 
  {id:'takeoff',cat:'open',layout:'sticky',icon:'compass',font:'kufi',v:'/media/inv/takeoff.mp4',p:'/media/inv/takeoff.jpg',env:'window',
   name:{ar:'إقلاع',fr:'Décollage',en:'Take Off'},
