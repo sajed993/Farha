@@ -259,7 +259,12 @@ function waxEnvelope(host,after){
   const port=host.querySelector('.wn-port');
   const views=[].slice.call(host.querySelectorAll('.wn-view'));
   let vi=0, ran=false;
-  const at=(ms,fn)=>setTimeout(fn,ms);
+  /* Every beat below is a setTimeout, and nothing used to cancel them. Close
+     the envelope while it is running — the guest taps إغلاق, or another
+     invitation is opened — and the old timers still fire, handing an
+     invitation to whatever veil happens to exist by then. A timer that wakes
+     up to find its own screen gone does nothing now. */
+  const at=(ms,fn)=>setTimeout(function(){ if(!host.isConnected)return; fn(); },ms);
   cv.__open=function(){
    if(ran)return; ran=true;
    /* The moment a guest actually opens the invitation, as distinct from
@@ -278,13 +283,23 @@ function waxEnvelope(host,after){
    at(3400,function(){const w=host.querySelector('#wenv');if(w)w.classList.add('gone');});
    at(3550,function(){if(after)after();});
   };
-  /* touching it again while it runs skips to the invitation */
+  /* One listener, on the stack, which already covers the whole screen.
+     There used to be a second one on .wn-port — and the port is inside the
+     stack, so a single tap ran this twice: the first call started the
+     sequence, the second saw that it had started and skipped to the end. One
+     touch opened and closed it in the same gesture, which is what a guest
+     reported as «it ends without even starting».
+
+     The guard is the second half of the fix. A skip is only a skip once the
+     opening has had a moment to be seen; a double tap, or two touch events
+     from one press, must not end something that began 40ms ago. */
+  let startedAt=0;
   const skip=function(){
-   if(!ran){cv.__open();return;}
+   if(!ran){ startedAt=Date.now(); cv.__open(); return; }
+   if(Date.now()-startedAt < 700) return;
    const w=host.querySelector('#wenv');
    if(w&&!w.classList.contains('gone')){w.classList.add('gone');if(after)after();}};
-  if(port){port.addEventListener('click',skip);}
-  const st=host.querySelector('.wenv-stack');
+  const st=host.querySelector('.wenv-stack') || port;
   if(st)st.addEventListener('click',skip);
   return;
  }
@@ -314,11 +329,14 @@ function waxEnvelope(host,after){
      to be whisked away while it was still rising — never once fully legible,
      before or after the retiming. It now settles and then HOLDS, a full
      second at full opacity, before the envelope fades. */
-  setTimeout(()=>env.classList.add('open'),200);      /* flap folds back */
-  setTimeout(()=>env.classList.add('lift'),450);      /* note rises out */
-  setTimeout(()=>{const w=host.querySelector('#wenv');
-   if(w){w.classList.add('gone');}},1750);            /* after a beat to read */
-  setTimeout(()=>{if(after)after();},1850);};
+  /* same guard as the window: a closed envelope's beats must not go on
+     playing into whatever screen replaced it */
+  const beat=(ms,fn)=>setTimeout(function(){ if(!host.isConnected)return; fn(); },ms);
+  beat(200,()=>env.classList.add('open'));      /* flap folds back */
+  beat(450,()=>env.classList.add('lift'));      /* note rises out */
+  beat(1750,()=>{const w=host.querySelector('#wenv');
+   if(w){w.classList.add('gone');}});           /* after a beat to read */
+  beat(1850,()=>{if(after)after();});};
 
  if(style!=='window')envWax(cv,ini);}
 ;
