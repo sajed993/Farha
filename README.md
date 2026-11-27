@@ -1,4 +1,4 @@
-# فرحة Farha — v2 (Vite + Supabase)
+# حلم Holm — v2 (Vite + Supabase)
 
 Luxury digital-invitation platform: trilingual customer site + owner dashboard,
 wired to Supabase (project `wgcalcphfitvtzsihjpn`).

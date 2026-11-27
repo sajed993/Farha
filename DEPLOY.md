@@ -1,4 +1,4 @@
-# 🚀 Farha — How to deploy (important: two paths)
+# 🚀 Holm — How to deploy (important: two paths)
 
 Your app now has an **Edge Function** for WhatsApp link previews (P1 #3).
 Edge functions ONLY run when Netlify builds your site — **not** with drag-and-drop.
@@ -17,10 +17,10 @@ So pick ONE of these:
 1. Run `npm run build` locally.
 2. Drag the **`dist`** folder into Netlify → Deploys.
 3. Everything works EXCEPT the fancy per-invitation WhatsApp preview
-   (links still work; they just show the default Farha card, which is fine).
+   (links still work; they just show the default Holm card, which is fine).
 
 ## What shows in WhatsApp when a link is shared
-- Homepage / any link → the gold "فرحة" card (`og-default.png`).
+- Homepage / any link → the gold "حلم" card (`og-default.png`).
 - An invitation link `?i=slug` (Git deploy only) → the couple's names + card.
 
 ## Files that make previews work (already in place)

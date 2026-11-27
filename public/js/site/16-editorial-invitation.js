@@ -263,7 +263,7 @@ function ediIcs(){
  const start=new Date(c.when); if(isNaN(start))return '';
  const end=ediEventEnd(start);
  const title=[c.t,c.n].filter(Boolean).join(' — ');
- const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Farha//Invitation//AR','CALSCALE:GREGORIAN',
+ const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Holm//Invitation//AR','CALSCALE:GREGORIAN',
   'BEGIN:VEVENT',
   'UID:'+encodeURIComponent((c.film||'farha')+'-'+start.getTime())+'@farha',
   'DTSTAMP:'+ediIcsStamp(new Date()),
@@ -280,7 +280,7 @@ function ediAddCal(){
   const b=new Blob([ics],{type:'text/calendar;charset=utf-8'});
   const u=URL.createObjectURL(b);
   const a=document.createElement('a');
-  a.href=u; a.download=((S.c.n||'farha').replace(/[^\p{L}\p{N}]+/gu,'-'))+'.ics';
+  a.href=u; a.download=((S.c.n||'Holm').replace(/[^\p{L}\p{N}]+/gu,'-'))+'.ics';
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(function(){URL.revokeObjectURL(u);},4000);
   toast(t().uCalOk);

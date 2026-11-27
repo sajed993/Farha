@@ -482,3 +482,5 @@ html[dir=rtl] .txl input,html[dir=rtl] .txl textarea{padding:9px 34px 9px 11px}
 .filmcard small{display:block;padding:3px 10px 7px;font-size:.68rem;color:#8A6210;font-weight:700}
 .filmcard-a{display:flex;gap:5px;padding:0 10px;flex-wrap:wrap}
 .filmcard-a .act{padding:5px 9px;font-size:.68rem}
+
+.logo-mark{width:1.5em;height:1.5em;flex:none;filter:drop-shadow(0 2px 4px rgba(44,35,24,.22))}

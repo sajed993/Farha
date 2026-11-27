@@ -17,13 +17,13 @@ function offTier() {
   const o = (typeof CFG !== 'undefined' && CFG && CFG.offers) || {};
   return {
     ready: {
-      price: +o.readyPrice || +CFG.price.ready || 99,
+      price: +o.readyPrice || +CFG.price.ready || 79,
       was: +o.readyWas || +CFG.price.readyWas || 0,
       revs: +o.readyRevs || 3,
       days: +o.readyDays || 2
     },
     sign: {
-      price: +o.signPrice || 249,
+      price: +o.signPrice || 150,
       was: +o.signWas || 0,
       revs: +o.signRevs || 5,
       days: +o.signDays || 7

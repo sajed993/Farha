@@ -56,14 +56,14 @@ export default async function handler (request, context) {
   // The homepage's own tags are rewritten too, not just an invitation's: the
   // image in the HTML is a root-relative path, and WhatsApp will not resolve
   // one. It needs the whole URL, which only the edge knows.
-  let title = 'فرحة — دعوات رقمية تُفتح كفيلم'
+  let title = 'حلم — دعوات رقمية تُفتح كفيلم'
   let desc = 'أعراس، حنّة، أعياد ميلاد ومواليد — دعوة تُفتح بلمسة على الهاتف 💛'
   /* og-default.png really is 1200×630. It was declared 720×1280 — the size of
      a film poster, not of this file — so every share of the homepage told the
      chat the wrong shape. */
   let image = url.origin + '/og-default.png'
   let imgW = 1200, imgH = 630
-  let alt = 'فرحة — دعوات رقمية'
+  let alt = 'حلم — دعوات رقمية'
 
   if (slug) try {
     // through the same function the site uses; the table itself is no longer
@@ -93,7 +93,7 @@ export default async function handler (request, context) {
 
   const block = `<!-- OG:START -->
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="فرحة · Farha">
+<meta property="og:site_name" content="حلم · Holm">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${esc(url.href)}">

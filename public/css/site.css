@@ -3977,3 +3977,6 @@ html[data-theme=dark] .edi-wishbox textarea{
  --gold:#B08F55;--gold-hi:#E2CB9C;--gold-lo:#856734;--gold-pale:#E6D8BE;
  --ink:#141B24;--ink-soft:#33404F;--ink-mute:#63707F;
  --blush:#5E7C9E;--plum:#243247;--sage:#8A9AA6;--wax:#243247}
+
+/* the brand seal beside the wordmark — /brand/mark.svg, one drawing for site, dashboard and share cards */
+.logo-mark{width:1.5em;height:1.5em;flex:none;filter:drop-shadow(0 2px 4px rgba(44,35,24,.22))}

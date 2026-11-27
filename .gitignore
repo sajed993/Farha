@@ -2,3 +2,7 @@ node_modules/
 dist/
 .env
 .DS_Store
+
+# reel renders and their intermediate frames (marketing/videos/build.mjs rebuilds both)
+marketing/videos/renders/
+marketing/videos/build/

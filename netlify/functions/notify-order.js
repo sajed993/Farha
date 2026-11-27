@@ -26,7 +26,7 @@ export const handler = async (event) => {
 
     const html = `
       <div style="font-family:sans-serif;max-width:480px;margin:auto;border:1px solid #E2CFA0;border-radius:12px;overflow:hidden">
-        <div style="background:linear-gradient(90deg,#9A7325,#C9A24B);color:#fff;padding:16px;font-size:18px;font-weight:bold">🔔 طلب جديد — فرحة</div>
+        <div style="background:linear-gradient(90deg,#9A7325,#C9A24B);color:#fff;padding:16px;font-size:18px;font-weight:bold">🔔 طلب جديد — حلم</div>
         <div style="padding:16px;color:#3A2B10;line-height:1.8">
           ${name ? `<p><b>الزبون:</b> ${name}</p>` : ''}
           <p><b>المنتج:</b> ${item}</p>
@@ -41,7 +41,7 @@ export const handler = async (event) => {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'Farha <' + from + '>', to: [to], subject: '🔔 طلب جديد' + (name ? ' من ' + name : '') + ': ' + item + ' — ' + price + ' د.ت', html }),
+      body: JSON.stringify({ from: 'Holm <' + from + '>', to: [to], subject: '🔔 طلب جديد' + (name ? ' من ' + name : '') + ': ' + item + ' — ' + price + ' د.ت', html }),
     })
     return { statusCode: r.ok ? 200 : 502, body: r.ok ? 'sent' : 'fail' }
   } catch (e) {

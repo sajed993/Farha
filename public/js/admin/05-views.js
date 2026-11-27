@@ -314,7 +314,7 @@ function dbBackup(){
   const data={exported_at:new Date().toISOString(),app:'farha',orders:R.orders||[],invitations:R.invitations||[],rsvps:R.rsvps||[],wishes:R.wishes||[]};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='farha-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  a.download='holm-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000);
   const n=document.getElementById('bkNote');if(n)n.textContent='✓ نُزّلت نسخة تحتوي '+(R.orders||[]).length+' طلب · '+(R.rsvps||[]).length+' رد · '+(R.wishes||[]).length+' تهنئة';
   toast('💾 نُزّلت النسخة الاحتياطية ✓');
@@ -326,7 +326,7 @@ function dbBackupCsv(){
   let csv='\uFEFF#,المنتج,السعر,الحالة,الهاتف,المرجع,الطريقة,رابط الدعوة,التاريخ\n';
   (R.orders||[]).forEach(o=>{csv+=[o.id,esc(o.item),o.price,esc(o.status||'جديد'),esc(o.phone),esc(o.ref),esc(o.method),esc(o.inv_slug),esc((o.created_at||'').slice(0,10))].join(',')+'\n';});
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download='farha-orders-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  a.download='holm-orders-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('⬇️ نُزّلت الطلبات');
  }catch(e){toast('تعذّر التصدير');}}
 

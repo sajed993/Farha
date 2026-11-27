@@ -3,6 +3,13 @@ import { resolve } from 'path'
 
 export default defineConfig({
   base: './',
+  server: {
+    watch: {
+      // marketing/ holds renders and a headless-Edge profile whose locked cache
+      // files crash the watcher (EBUSY); tests/ holds Playwright reports.
+      ignored: ['**/marketing/**', '**/tests/**', '**/dist/**'],
+    },
+  },
   build: {
     rollupOptions: {
       input: {

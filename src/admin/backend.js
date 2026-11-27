@@ -50,7 +50,7 @@ function showLogin() {
   #dblogin .loc{display:block;margin:12px auto 0;color:#8A7A63;font-size:.74rem;background:none;border:none;cursor:pointer;text-decoration:underline}
   </style>
   <div class="card">
-    <h2>فرحة ✦ لوحة التحكم</h2>
+    <h2>حلم ✦ لوحة التحكم</h2>
     <p>سجّلوا الدخول بحساب المالك الذي أنشأتموه في<br>Supabase → Authentication → Users</p>
     <input id="dbem" type="email" placeholder="البريد الإلكتروني" autocomplete="username" dir="ltr">
     <input id="dbpw" type="password" placeholder="كلمة المرور" autocomplete="current-password" dir="ltr">
@@ -84,7 +84,7 @@ async function doLogin() {
 }
 
 /* ---------- cloud mode ---------- */
-let __origTitle = (typeof document !== 'undefined' && document.title) || 'فرحة'
+let __origTitle = (typeof document !== 'undefined' && document.title) || 'حلم'
 let __titleFlash = null
 function notifyNewOrder (row) {
   try {
@@ -96,7 +96,7 @@ function notifyNewOrder (row) {
     try {
       clearInterval(__titleFlash)
       let on = true
-      __titleFlash = setInterval(() => { document.title = on ? ('🔔 طلب جديد! — فرحة') : __origTitle; on = !on }, 900)
+      __titleFlash = setInterval(() => { document.title = on ? ('🔔 طلب جديد! — حلم') : __origTitle; on = !on }, 900)
       setTimeout(() => { clearInterval(__titleFlash); document.title = __origTitle }, 12000)
     } catch (e) {}
     // 3) sound
@@ -111,7 +111,7 @@ function notifyNewOrder (row) {
     // 4) desktop notification (if the owner allowed it)
     try {
       if (window.Notification && Notification.permission === 'granted') {
-        new Notification('فرحة — طلب جديد 🔔', { body: item + price, tag: 'farha-order' })
+        new Notification('حلم — طلب جديد 🔔', { body: item + price, tag: 'farha-order' })
       }
     } catch (e) {}
   } catch (e) {}
@@ -413,7 +413,7 @@ function enterDb() {
   function dbWaLink (phone, link) {
     let n = String(phone).replace(/\D/g, ''); if (n.slice(0, 2) === '00') n = n.slice(2); if (n.length === 8) n = '216' + n
     const _em = { gift: String.fromCodePoint(0x1F381), spark: String.fromCodePoint(0x2728), heart: String.fromCodePoint(0x1F49B) }
-    window.open('https://wa.me/' + n + '?text=' + encodeURIComponent(_em.gift + ' مبروك! دعوتكم من فرحة جاهزة:\n' + link + '\nافتحوها والمسوا الختم ' + _em.spark + ' ثم شاركوها مع ضيوفكم ' + _em.heart), '_blank')
+    window.open('https://wa.me/' + n + '?text=' + encodeURIComponent(_em.gift + ' مبروك! دعوتكم من حلم جاهزة:\n' + link + '\nافتحوها والمسوا الختم ' + _em.spark + ' ثم شاركوها مع ضيوفكم ' + _em.heart), '_blank')
   }
   /* An invitation link is the only thing standing between a stranger and a
      couple's names, date, venue and guest list, so it has to be unguessable.
@@ -621,7 +621,7 @@ function enterDb() {
     rs.forEach((r) => { csv += [esc(r.name), r.attending === false ? 'لا' : 'نعم', r.guests || 1, esc(r.message || ''), esc((r.created_at || '').slice(0, 10))].join(',') + '\n' })
     const a = document.createElement('a')
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
-    a.download = 'farha-rsvps-' + slug + '.csv'
+    a.download = 'holm-rsvps-' + slug + '.csv'
     a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000)
     toast('⬇️ نُزّل ملف الردود')
   }

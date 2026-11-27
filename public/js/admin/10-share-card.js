@@ -61,6 +61,22 @@ function ogcCover (ctx, im, w, h) {
   ctx.drawImage(im, sx, sy, sw, sh, 0, 0, w, h);
 }
 
+/* The brand mark, drawn from the same file the site uses (/brand/mark.svg,
+   the pen writing a card into an envelope), so the card and the site never
+   disagree about what the mark is. Loaded once per render; if it cannot be
+   read the footer keeps just the name. */
+let __ogcMarkImg = null;
+async function ogcMarkLoad (origin) {
+  if (__ogcMarkImg) return __ogcMarkImg;
+  __ogcMarkImg = await ogcLoad((origin || location.origin) + '/brand/mark.svg');
+  return __ogcMarkImg;
+}
+function ogcMark (x, cx, cy, r) {
+  if (!__ogcMarkImg) return false;
+  x.drawImage(__ogcMarkImg, cx - r, cy - r, r * 2, r * 2);
+  return true;
+}
+
 function ogcDate (cfg) {
   const c = (cfg && cfg.c) || {};
   if (c.d) return String(c.d);
@@ -86,6 +102,7 @@ async function ogcRender (cfg, origin) {
   x.fillStyle = g0; x.fillRect(0, 0, OGC_W, OGC_H);
 
   const im = await ogcLoad(ogcPoster(cfg, origin));
+  await ogcMarkLoad(origin);
   if (im) {
     x.save();
     ogcCover(x, im, OGC_W, OGC_H);
@@ -154,10 +171,12 @@ async function ogcRender (cfg, origin) {
     ogcFit(x, place, OGC_W - 300, 26, 'IBM Plex Sans Arabic', OGC_W / 2, 470);
   }
 
-  /* whose invitation this is */
+  /* whose invitation this is — the seal, then the name, read right to left */
+  const hasMark = ogcMark(x, OGC_W / 2 + 46, OGC_H - 66, 20);
   x.font = '500 22px "IBM Plex Sans Arabic", sans-serif';
   x.fillStyle = 'rgba(226,201,150,.72)';
-  x.fillText('فرحة', OGC_W / 2, OGC_H - 66);
+  if (hasMark) { x.textAlign = 'right'; x.fillText('حلم', OGC_W / 2 + 18, OGC_H - 66); x.textAlign = 'center'; }
+  else x.fillText('حلم', OGC_W / 2, OGC_H - 66);
 
   return await new Promise(function (res) {
     try { cv.toBlob(function (b) { res(b); }, 'image/jpeg', 0.86); }

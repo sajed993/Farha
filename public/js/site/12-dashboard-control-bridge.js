@@ -5,7 +5,7 @@ const LSK={cfg:'farha_cfg',wishes:'farha_wishes',orders:'farha_orders',meta:'far
    so a phone that had ever stored a config kept showing old sections and
    old prices while a fresh browser showed the new ones. Bumping this drops
    the stored sec/price once; everything the owner typed is kept. */
-const CFG_VER=5;
+const CFG_VER=6;
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 /* Everything except the newest section is off for now; each is one switch
@@ -14,10 +14,10 @@ function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
    the switch for a section that no longer exists anywhere in the codebase.
    wishes moved to CFG.edi, where the invitation's own sections live. */
 const CFG_DEF={sec:{sites:0,datef:0,gallery:0,design:0,ready:1,offers:1},
- price:{ultra:199,ai:249,site:149,design:79,ready:99,readyWas:110},
+ price:{ultra:199,ai:249,site:149,design:79,ready:79,readyWas:0},
  edi:{cd:1,prog:1,dress:1,dir:1,stay:1,rsvp:1,cal:1,share:1,wish:1},films:{},
- offers:{readyPrice:99,readyWas:110,readyRevs:3,readyDays:2,
-         signPrice:249,signWas:0,signRevs:5,signDays:7,ribbonOn:1,noteOn:1,txt:{}},
+ offers:{readyPrice:79,readyWas:0,readyRevs:3,readyDays:2,
+         signPrice:150,signWas:0,signRevs:5,signDays:7,ribbonOn:1,noteOn:1,txt:{}},
  envStyle:'full',env:{classic:1,full:1,macro:1,silk:1,press:1,curtain:1,window:1},theme:{def:'dark'},
  vid:{site:'full',customer:'full'},
  tiers:[

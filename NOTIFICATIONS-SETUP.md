@@ -1,4 +1,4 @@
-# 🔔 Farha — Notifications setup (real, mostly free)
+# 🔔 Holm — Notifications setup (real, mostly free)
 
 You now have THREE layers of new-order alerts:
 

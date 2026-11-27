@@ -1,0 +1,62 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<title>Holm brand sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Great+Vibes&family=IBM+Plex+Sans+Arabic:wght@400;500&family=Fraunces:opsz,wght@9..144,500&display=swap" rel="stylesheet">
+<style>
+:root{--brandFoil:linear-gradient(105deg,#813F49,#D6959C 24%,#AA606A 46%,#E2ABB1 70%,#8E4852);
+ --brandFoilD:linear-gradient(105deg,#F0C0C5,#E5A6AE 30%,#F7D9DC 55%,#E5A6AE 80%,#D6959C);
+ --foil:linear-gradient(105deg,#7E5F26,#E6CE96 28%,#A9803A 52%,#F4E6C6 76%,#9A742C);
+ --cream:#FBF5EA;--taupe:#7E6B57;--ink:#2B2218}
+html,body{margin:0;padding:0}
+body{font-family:'IBM Plex Sans Arabic',sans-serif;background:transparent;overflow:hidden}
+.sheet{position:relative;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.cream{background:radial-gradient(120% 90% at 50% 0%,#FFFBF3 0%,#FBF5EA 55%,#F3E8D2 100%)}
+.dark{background:radial-gradient(120% 90% at 50% 0%,#2A1F15 0%,#1A120B 55%,#0E0A06 100%)}
+.frame:before{content:'';position:absolute;inset:26px;border:2px solid rgba(201,162,75,.55);pointer-events:none}
+.frame:after{content:'';position:absolute;inset:34px;border:1px solid rgba(201,162,75,.3);pointer-events:none}
+.mark{display:block}
+.word{font-family:'Aref Ruqaa',serif;font-weight:700;line-height:1;background:var(--brandFoil);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:0;direction:rtl}
+.dark .word{background:var(--brandFoilD);-webkit-background-clip:text;background-clip:text}
+.latin{font-family:'Great Vibes',cursive;color:var(--taupe);letter-spacing:.04em;direction:ltr;line-height:1}
+.dark .latin{color:#DFBB72}
+.stack{display:flex;flex-direction:column;align-items:center;gap:0}
+.row{display:flex;flex-direction:row;align-items:center;gap:.35em}
+.row .txt{display:flex;flex-direction:column;align-items:center;gap:.1em}
+.tag{font-size:30px;color:rgba(247,239,223,.78);font-weight:400;direction:rtl}
+.handle{font-family:'Fraunces',serif;font-size:24px;color:#DFBB72;letter-spacing:.14em;direction:ltr}
+.rule{width:244px;height:1.4px;background:rgba(226,201,150,.55);position:relative}
+.rule:after{content:'';position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px;border-radius:50%;background:rgba(226,201,150,.95);box-shadow:0 0 0 7px #1A120B}
+.og{width:1200px;height:630px}
+.og .still{position:absolute;inset:0;background:url(../media/inv/inv-1.jpg) center/cover}
+.og .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,6,4,.48) 0%,rgba(8,6,4,.64) 42%,rgba(8,6,4,.88) 100%)}
+.og .body{position:relative;display:flex;flex-direction:column;align-items:center}
+</style></head><body>
+<script>
+const q = new URLSearchParams(location.search);
+const v = q.get('v') || 'stacked', bg = q.get('bg') || 'cream';
+const W = +q.get('w') || 1080, H = +q.get('h') || 1080;
+const mark = (px) => `<img class="mark" src="mark.svg" width="${px}" height="${px}" alt="">`;
+let inner = '', cls = 'sheet ' + bg;
+if (v === 'mark') { cls = 'sheet'; inner = mark(Math.round(W * .92)); }
+else if (v === 'icon') { inner = mark(Math.round(W * .78)); }
+else if (v === 'stacked') {
+  const m = Math.round(W * .26), f = Math.round(W * .2), l = Math.round(W * .085);
+  inner = `<div class="stack">${mark(m)}<div class="word" style="font-size:${f}px;margin-top:${Math.round(f*.12)}px">حلم</div><div class="latin" style="font-size:${l}px;margin-top:${Math.round(l*.15)}px">Holm</div></div>`;
+} else if (v === 'wide') {
+  const m = Math.round(H * .54), f = Math.round(H * .42), l = Math.round(H * .17);
+  inner = `<div class="row">${mark(m)}<div class="txt"><div class="word" style="font-size:${f}px">حلم</div><div class="latin" style="font-size:${l}px">Holm</div></div></div>`;
+} else if (v === 'og') {
+  cls = 'sheet og dark frame';
+  inner = `<div class="still"></div><div class="veil"></div><div class="body">
+    ${mark(118)}
+    <div class="word" style="font-size:132px;margin-top:6px">حلم</div>
+    <div class="latin" style="font-size:52px;margin-top:-4px">Holm</div>
+    <div class="rule" style="margin:22px 0 18px"></div>
+    <div class="tag">دعوات رقمية تُفتح كفيلم · افتحوا الدعوة وشاركوا الفرحة 💛</div>
+    <div class="handle" style="margin-top:14px">@holm.invitations</div>
+  </div>`;
+}
+document.body.innerHTML = `<div class="${cls}" style="width:${W}px;height:${H}px">${inner}</div>`;
+if (v === 'og') { document.querySelector('.rule').style.setProperty('--x','1'); }
+</script>
+</body></html>

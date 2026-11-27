@@ -1,6 +1,6 @@
 /* ================= state & helpers ================= */
 let S={view:'over',range:30,q:'',ostatus:'الكل',notif:false,side:false,
- cfg:{brand:'فرحة',priceStd:29,pricePrem:79,lang:'العربية',premOn:true,mailNew:true,mailRsvp:true,waShare:true}};
+ cfg:{brand:'حلم',priceStd:79,pricePrem:150,lang:'العربية',premOn:true,mailNew:true,mailRsvp:true,waShare:true}};
 const app=document.getElementById('app');
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const sum=a=>a.reduce((x,y)=>x+y,0);

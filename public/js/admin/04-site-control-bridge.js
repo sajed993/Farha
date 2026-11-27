@@ -863,7 +863,7 @@ function frmWaTo(phone){
 function exportReqs(){
  const R=frmRows(FRMK.ord);
  if(!R.length){toast('لا طلبات بعد');return;}
- dlCSV('farha-requests.csv',[['التاريخ','الاسم','الهاتف','الفيلم','الاختيار',
+ dlCSV('holm-requests.csv',[['التاريخ','الاسم','الهاتف','الفيلم','الاختيار',
    'الأسماء','تاريخ المناسبة','المكان','رسالة الدعوة','ما يتخيّلونه','السعر','اللغة','واتساب'],
   ...R.map(r=>[frmWhen(r.at),r.name||'',r.phone||'',r.filmName||'',
    {this:'هذا الفيلم',other:'فيلم آخر معروض',new:'فيلم جديد خاص'}[r.choice]||'',
@@ -873,7 +873,7 @@ function exportReqs(){
 function exportRsvp(){
  const R=frmRows(FRMK.rv);
  if(!R.length){toast('لا ردود بعد');return;}
- dlCSV('farha-guests.csv',[['التاريخ','الدعوة','اسم الضيف','الرد','العدد','الرسالة','اللغة'],
+ dlCSV('holm-guests.csv',[['التاريخ','الدعوة','اسم الضيف','الرد','العدد','الرسالة','اللغة'],
   ...R.map(r=>[frmWhen(r.at),r.host||r.invite||'',r.name||'',
    r.coming?'سيحضر':'معتذر',r.coming?(r.count||1):'',r.msg||'',r.lang||''])]);}
 
@@ -1146,7 +1146,7 @@ function newOrdersCount(){return ORDERS.filter(o=>o.d<1&&o.status==='جديد').
 function shell(inner,title){
  return `<div class="layout">
  <aside class="side ${S.side?'open':''}">
-  <div class="logo"><b>فرحة</b><small>لوحة التحكم</small></div>
+  <div class="logo"><img class="logo-mark" src="/brand/mark.svg" alt="" width="34" height="34"><b>حلم</b><small>لوحة التحكم</small></div>
   ${NAV.map(([k,ic,l])=>`<button class="nav-item ${S.view===k?'on':''}" onclick="go('${k}')">
     <span class="ic">${ic}</span>${l}${k==='orders'&&newOrdersCount()?`<span class="pill">${toAr(newOrdersCount())}</span>`:''}</button>`).join('')}
   <div class="foot"><a class="site-link" href="./" target="_blank">🌐 فتح الموقع</a></div>
